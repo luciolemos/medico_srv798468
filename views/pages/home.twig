@@ -1,0 +1,434 @@
+{% extends 'base.twig' %}
+
+{% block title %}{{ page_title ?? 'System — PHP 8.3+ moderno, didático e profissional' }}{% endblock %}
+{% set whatsapp_url = whatsapp_url ?? 'https://wa.me/5500000000000?text=Olá!%20Quero%20uma%20landing%20page%20profissional%20para%20meu%20projeto.' %}
+
+{% block content %}
+
+{# Background blobs #}
+<div class="bg-blobs" aria-hidden="true">
+  <span class="blob blob-1"></span>
+  <span class="blob blob-2"></span>
+  <span class="blob blob-3"></span>
+</div>
+
+<div id="top" class="top-anchor"></div>
+{% include 'partials/navbar.twig' %}
+
+<header class="hero py-5 py-lg-6">
+  <div class="container position-relative">
+    <div class="row align-items-center g-4 g-lg-5">
+      <div class="col-lg-6">
+        <div class="hero-badge mb-3" data-aos="fade-up" data-aos-delay="0">
+          <i class="bi bi-stars"></i>
+          <span>{{ hero_badge ?? 'Open-source, didático e pronto para produção' }}</span>
+        </div>
+
+        <h1 class="display-5 fw-bold lh-sm mb-3" data-aos="fade-up" data-aos-delay="80">
+          {{ hero_title_prefix ?? 'Uma home' }}
+          <span class="text-gradient">{{ hero_title_highlight ?? 'profissional' }}</span>
+          {{ hero_title_suffix ?? 'para seu projeto PHP — com foco em conversão.' }}
+        </h1>
+
+        <p class="lead text-secondary-emphasis mb-4" data-aos="fade-up" data-aos-delay="140">
+          {{ hero_lead ?? 'Stack moderna (PHP 8.3+, Twig, Router dinâmico, Bootstrap), documentação técnica integrada e uma experiência visual fluida com animações suaves.' }}
+        </p>
+
+        <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3" data-aos="fade-up" data-aos-delay="220">
+          <a class="btn btn-primary btn-lg px-4" href="#cta">
+            {{ cta_primary ?? 'Começar agora' }} <i class="bi bi-arrow-right-short"></i>
+          </a>
+          <a class="btn btn-outline-light btn-lg px-4" href="#docs">
+            {{ cta_secondary ?? 'Ler a documentação' }} <i class="bi bi-journal-text ms-1"></i>
+          </a>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3 mt-4 small text-secondary-emphasis" data-aos="fade-up" data-aos-delay="300">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-check"></i><span>Segurança por padrão</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-lightning-charge"></i><span>Performance & observabilidade</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-braces"></i><span>Composer + PSR-4</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="p-0" data-aos="zoom-in" data-aos-delay="200">
+          <img
+            src="{{ base_url }}/assets/img/img_default.png"
+            alt="Prévia visual da base"
+            class="img-fluid"
+            loading="lazy"
+          >
+        </div>
+
+        <div class="hero-metrics mt-3">
+          <div class="metric glass" data-aos="fade-up" data-aos-delay="350">
+            <div class="metric-kpi">290px+</div>
+            <div class="metric-label">Responsivo real</div>
+          </div>
+          <div class="metric glass" data-aos="fade-up" data-aos-delay="420">
+            <div class="metric-kpi">&lt; 2s</div>
+            <div class="metric-label">LCP otimizado*</div>
+          </div>
+          <div class="metric glass" data-aos="fade-up" data-aos-delay="490">
+            <div class="metric-kpi">AOS</div>
+            <div class="metric-label">Animações suaves</div>
+          </div>
+        </div>
+
+        <p class="small text-secondary-emphasis mt-2 mb-0">
+          *Dependente de servidor/CDN/imagens. A base já ajuda com estrutura e boas práticas.
+        </p>
+      </div>
+    </div>
+  </div>
+</header>
+
+  <hr class="section-divider">
+<section class="py-5 py-lg-6">
+  <div class="container">
+    <div class="row g-3 align-items-center justify-content-between">
+      <div class="col-12 col-lg-3 text-secondary-emphasis small" data-aos="fade-up">
+        Construído com tecnologias confiáveis:
+      </div>
+      <div class="col-12 col-lg-9" data-aos="fade-up" data-aos-delay="80">
+        <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
+          <span class="pill"><i class="bi bi-filetype-php"></i> PHP 8.3+</span>
+          <span class="pill"><i class="bi bi-box"></i> Composer</span>
+          <span class="pill"><i class="bi bi-braces-asterisk"></i> Twig</span>
+          <span class="pill"><i class="bi bi-database"></i> MySQL</span>
+          <span class="pill"><i class="bi bi-bootstrap"></i> Bootstrap 5.3</span>
+          <span class="pill"><i class="bi bi-git"></i> Git</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="features" class="py-5 py-lg-6">
+  <div class="container">
+      <div class="text-center mb-4 mb-lg-5 section-heading">
+      <h2 class="fw-bold" data-aos="fade-up">O que você ganha com essa base</h2>
+      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+        Um layout limpo, profissional e pronto para evoluir — sem peso desnecessário.
+      </p>
+    </div>
+
+    <div class="row g-3 g-lg-4">
+      {% set features = features ?? [
+        {'icon':'rocket-takeoff','title':'Alta conversão','text':'Hero direto ao ponto, CTAs claros e seções objetivas — sem poluição.'},
+        {'icon':'shield-lock','title':'Segurança como padrão','text':'Base pronta para CSRF, escape em templates e validações coerentes.'},
+        {'icon':'diagram-3','title':'Arquitetura clara','text':'Perfeita pra explicar MVC/Router/Twig na prática, com docs e exemplos.'},
+        {'icon':'phone','title':'Responsivo de verdade','text':'Ajustes para telas pequenas, inclusive abaixo de 320px.'},
+        {'icon':'speedometer2','title':'Performance','text':'CSS moderno, animações suaves e JS enxuto (sem framework no front).'},
+        {'icon':'journal-text','title':'Docs integradas','text':'Stack, request lifecycle, router, segurança e boas práticas em /docs/tech.'},
+      ] %}
+
+      {% for f in features %}
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+        <div class="feature-card glass h-100 p-4">
+          <div class="feature-icon"><i class="bi bi-{{ f.icon }}"></i></div>
+          <h3 class="h5 fw-semibold mt-3">{{ f.title }}</h3>
+          <p class="text-secondary-emphasis mb-0">{{ f.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="projects" class="py-5 py-lg-6">
+  <div class="container">
+    <div class="text-center mb-4 mb-lg-5 section-heading">
+      <h2 class="fw-bold" data-aos="fade-up">Projetos recentes</h2>
+      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+        Exemplos de landing pages publicadas com foco em performance, clareza e conversão.
+      </p>
+    </div>
+
+    {% set projects = projects ?? [
+      {
+        'image':'/assets/img/projetos/note1.png',
+        'alt':'Projeto de landing page para SaaS',
+        'icon':'lightning-charge',
+        'title':'Landing page para SaaS B2B',
+        'text':'Estrutura orientada a conversão com CTA claro, prova social e formulário enxuto.'
+      },
+      {
+        'image':'/assets/img/projetos/note2.png',
+        'alt':'Projeto de página institucional de tecnologia',
+        'icon':'house-gear',
+        'title':'Página institucional de tecnologia',
+        'text':'Narrativa técnica da stack, diferenciais do produto e benefícios para decisão rápida.'
+      },
+      {
+        'image':'/assets/img/projetos/note3.png',
+        'alt':'Projeto de landing para lançamento de MVP',
+        'icon':'tools',
+        'title':'Landing para lançamento de MVP',
+        'text':'Template base com sections modulares, FAQ, métricas e integração simples com deploy em VPS.'
+      },
+    ] %}
+
+    <div class="row g-3 g-lg-4 projects-grid">
+      {% for p in projects %}
+      <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+        <div class="glass p-4 h-100">
+          <img
+            src="{{ base_url }}{{ p.image }}"
+            alt="{{ p.alt }}"
+            class="img-fluid project-thumb mb-3"
+            loading="lazy"
+            decoding="async"
+            width="1200"
+            height="900"
+          >
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-{{ p.icon }}"></i>
+            <span class="fw-semibold">{{ p.title }}</span>
+          </div>
+          <p class="text-secondary-emphasis mb-0">{{ p.text }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="depoimentos" class="py-5 py-lg-6">
+  <div class="container">
+    <div class="text-center mb-4 section-heading">
+      <h2 class="fw-bold" data-aos="fade-up">Clientes que confiam</h2>
+    </div>
+
+    <div class="row g-3 g-lg-4 testimonials-grid">
+      {% set testimonials = testimonials ?? [
+        {'name':'Camila Rocha','region':'São Paulo/SP','service':'Landing para SaaS','text':'A página ficou pronta rápido e com copy muito clara. A taxa de clique no CTA principal subiu nas primeiras semanas.'},
+        {'name':'Bruno Martins','region':'Belo Horizonte/MG','service':'Institucional tech','text':'Conseguimos apresentar stack, arquitetura e proposta comercial sem poluir a leitura. Ótimo equilíbrio entre design e conteúdo.'},
+        {'name':'Marina Duarte','region':'Curitiba/PR','service':'Lançamento de MVP','text':'Template fácil de adaptar, estrutura organizada e deploy simples no servidor. Economizou bastante tempo de implementação.'},
+      ] %}
+      {% set testimonial_avatars = [
+        '/assets/img/avatars/face2_620_620.png',
+        '/assets/img/avatars/face9_620_620.png',
+        '/assets/img/avatars/face4_620_620.png',
+      ] %}
+
+      {% for t in testimonials %}
+      {% set avatar_src = testimonial_avatars|length > 0 ? testimonial_avatars[loop.index0 % (testimonial_avatars|length)] : '/assets/img/avatars/face2_620_620.png' %}
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 90 }}">
+        <div class="quote-card glass h-100 p-4">
+          <div class="d-flex justify-content-center mb-3">
+            <img
+              src="{{ base_url }}{{ avatar_src }}"
+              alt="Foto de {{ t.name }}"
+              class="avatar"
+              loading="lazy"
+              decoding="async"
+              width="620"
+              height="620"
+            >
+          </div>
+          <div class="quote-stars mb-2" aria-label="Avaliação 5 de 5 estrelas">★★★★★</div>
+          <div class="quote-mark">“</div>
+          <p class="text-secondary-emphasis mb-3">{{ t.text }}</p>
+          <div class="fw-semibold">{{ t.name }}</div>
+          <div class="small text-secondary-emphasis">{{ t.region }} • {{ t.service }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="how" class="py-5 py-lg-6">
+  <div class="container">
+      <div class="row align-items-center g-4 g-lg-5 section-heading">
+      <div class="col-lg-6" data-aos="fade-up">
+        <h2 class="fw-bold">Como funciona (visão rápida)</h2>
+        <p class="text-secondary-emphasis">
+          Do rewrite até o Twig renderizado — um ciclo simples e robusto.
+        </p>
+
+        <ol class="steps">
+          <li><span class="step-num">1</span> Apache recebe <code>GET /blog</code></li>
+          <li><span class="step-num">2</span> <code>public/index.php</code> (front controller)</li>
+          <li><span class="step-num">3</span> Router encontra rota em <code>routes/web.php</code></li>
+          <li><span class="step-num">4</span> Controller executa lógica e chama Model</li>
+          <li><span class="step-num">5</span> Twig renderiza e devolve o HTML final</li>
+        </ol>
+      </div>
+
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="120">
+        <div class="glass p-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="fw-semibold">Checklist “Home renovada”</div>
+            <span class="badge text-bg-success-subtle border border-success-subtle">Pronto</span>
+          </div>
+          <ul class="checklist mb-0">
+            <li><i class="bi bi-check2-circle"></i> Hero com gradientes animados</li>
+            <li><i class="bi bi-check2-circle"></i> AOS progressivo no scroll</li>
+            <li><i class="bi bi-check2-circle"></i> Cards minimalistas + CTAs</li>
+            <li><i class="bi bi-check2-circle"></i> Responsivo até 290px</li>
+            <li><i class="bi bi-check2-circle"></i> Glassmorphism com bom contraste</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="docs" class="py-5 py-lg-6">
+  <div class="container">
+      <div class="row align-items-end justify-content-between g-3 mb-4 section-heading">
+      <div class="col-lg-7" data-aos="fade-up">
+        <h2 class="fw-bold mb-2">Documentação técnica</h2>
+        <p class="text-secondary-emphasis mb-0">
+          Centralize tudo em <code>/docs/tech</code>: arquitetura, segurança, router, observabilidade e boas práticas.
+        </p>
+      </div>
+      <div class="col-lg-5 text-lg-end" data-aos="fade-up" data-aos-delay="80">
+        <a class="btn btn-outline-light" href="#cta">
+          Ver estrutura recomendada <i class="bi bi-arrow-right-short"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="row g-3 g-lg-4">
+      <div class="col-md-6 col-lg-4" data-aos="fade-up">
+        <div class="glass p-4 h-100">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-diagram-3"></i><span class="fw-semibold">Arquitetura</span>
+          </div>
+          <p class="text-secondary-emphasis mt-2 mb-0">
+            Request lifecycle, MVC e organização do código.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
+        <div class="glass p-4 h-100">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-shield-lock"></i><span class="fw-semibold">Segurança</span>
+          </div>
+          <p class="text-secondary-emphasis mt-2 mb-0">
+            CSRF, uploads hardening, sessões e PDO seguro.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
+        <div class="glass p-4 h-100">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-eye"></i><span class="fw-semibold">Observabilidade</span>
+          </div>
+          <p class="text-secondary-emphasis mt-2 mb-0">
+            Perf monitor, logs JSONL e queries sample.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="cta" class="py-5 py-lg-6">
+  <div class="container">
+    <div class="cta-box glass p-4 p-lg-5 text-center" data-aos="zoom-in">
+      <h2 class="fw-bold mb-2">Quer colocar isso no ar hoje?</h2>
+      <p class="text-secondary-emphasis mb-4">
+        Copie os arquivos, suba no Apache e você já tem uma home profissional — pronta para evoluir.
+      </p>
+
+      <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3">
+        <a class="btn btn-primary btn-lg px-4" href="{{ primary_download_url ?? '#' }}">
+          Baixar projeto <i class="bi bi-download ms-1"></i>
+        </a>
+        <a class="btn btn-outline-light btn-lg px-4" href="#features">
+          Ver recursos <i class="bi bi-arrow-up-right ms-1"></i>
+        </a>
+      </div>
+
+      <div class="small text-secondary-emphasis mt-3">
+        Dica: se estiver em <code>/site1/</code>, sirva via DocumentRoot apontando para <code>/public</code>.
+      </div>
+    </div>
+  </div>
+</section>
+
+  <hr class="section-divider">
+<section id="faq" class="py-5 py-lg-6">
+  <div class="container">
+    <div class="text-center mb-4 section-heading">
+      <h2 class="fw-bold" data-aos="fade-up">Perguntas rápidas</h2>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="accordion accordion-flush glass px-3" id="faqAcc" data-aos="fade-up" data-aos-delay="80">
+          <div class="accordion-item bg-transparent">
+            <h3 class="accordion-header">
+              <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
+                Dá pra usar isso dentro do meu MVC/Twig?
+              </button>
+            </h3>
+            <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+              <div class="accordion-body text-secondary-emphasis">
+                Sim. Essa página já está em Twig. Basta manter os assets em <code>/public/assets</code> e pronto.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item bg-transparent">
+            <h3 class="accordion-header">
+              <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
+                Isso fica leve?
+              </button>
+            </h3>
+            <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+              <div class="accordion-body text-secondary-emphasis">
+                Sim: Bootstrap + AOS + JS pequeno. Se quiser ultra-leve, dá pra remover AOS e manter só CSS.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item bg-transparent">
+            <h3 class="accordion-header">
+              <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
+                E se eu estiver servindo em /site1/?
+              </button>
+            </h3>
+            <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+              <div class="accordion-body text-secondary-emphasis">
+                Se seus assets forem servidos por <code>/site1/public</code>, use paths relativos ou um helper de assets (ex.: <code>asset()</code>).
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include 'partials/footer.twig' %}
+<a
+  class="whatsapp-float d-md-none"
+  href="{{ whatsapp_url }}"
+  target="_blank"
+  rel="noopener"
+  aria-label="Falar no WhatsApp"
+>
+  <i class="bi bi-whatsapp"></i>
+  <span>WhatsApp</span>
+</a>
+
+{% endblock %}
