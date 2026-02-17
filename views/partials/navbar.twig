@@ -44,6 +44,17 @@
         <li class="nav-item"><a class="nav-link" href="#how">Como funciona</a></li>
         <li class="nav-item"><a class="nav-link" href="#docs">Docs</a></li>
         <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+        <li class="nav-item">
+          <button
+            class="btn btn-sm btn-outline-light px-3"
+            id="copyModeToggle"
+            type="button"
+            data-copy-mode="{{ copy_mode ?? 'soft' }}"
+            aria-label="Alternar modo de copy"
+          >
+            Copy: {{ (copy_mode ?? 'soft') == 'growth' ? 'Growth' : 'Soft' }}
+          </button>
+        </li>
         <li class="nav-item d-none d-lg-block">
           <button class="btn btn-sm btn-outline-light" id="themeToggle" type="button" aria-label="Alternar tema">
             <i class="bi bi-moon-stars"></i>

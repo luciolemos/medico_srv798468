@@ -1,11 +1,35 @@
 (function () {
+  const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const saveDataEnabled = !!(navigator.connection && navigator.connection.saveData);
+  const lowMemoryDevice = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
+  const weakCpuDevice = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
+  const shouldReduceAnimations = prefersReducedMotion || saveDataEnabled;
+  const shouldLightenAnimations = shouldReduceAnimations || lowMemoryDevice || weakCpuDevice;
+
+  const applyProgressiveSectionDelays = () => {
+    if (shouldLightenAnimations) return;
+    const sections = Array.from(document.querySelectorAll("header.hero, section"));
+    sections.forEach((section, sectionIndex) => {
+      const sectionOffset = Math.min(sectionIndex * 45, 270);
+      const animatedEls = Array.from(section.querySelectorAll("[data-aos]"));
+      animatedEls.forEach((el) => {
+        const currentDelay = Number.parseInt(el.getAttribute("data-aos-delay") || "0", 10);
+        const baseDelay = Number.isFinite(currentDelay) ? currentDelay : 0;
+        el.setAttribute("data-aos-delay", String(baseDelay + sectionOffset));
+      });
+    });
+  };
+
+  applyProgressiveSectionDelays();
+
   // AOS
   if (window.AOS) {
     AOS.init({
-      duration: 650,
+      duration: shouldLightenAnimations ? 420 : 650,
       once: true,
-      offset: 90,
-      easing: "ease-out"
+      offset: shouldLightenAnimations ? 60 : 90,
+      easing: "ease-out",
+      disable: shouldReduceAnimations
     });
   }
 
@@ -107,6 +131,44 @@
     });
   });
 
+  // Copy mode toggle (soft <-> growth)
+  const copyModeToggle = document.getElementById("copyModeToggle");
+  if (copyModeToggle) {
+    const isValidCopyMode = (value) => value === "soft" || value === "growth";
+    const getCurrentCopyMode = () => {
+      const fromData = copyModeToggle.getAttribute("data-copy-mode");
+      return isValidCopyMode(fromData) ? fromData : "soft";
+    };
+
+    const updateCopyToggleUi = (mode) => {
+      const current = isValidCopyMode(mode) ? mode : "soft";
+      const next = current === "growth" ? "soft" : "growth";
+      const currentLabel = current === "growth" ? "Growth" : "Soft";
+      const nextLabel = next === "growth" ? "Growth" : "Soft";
+      copyModeToggle.textContent = `Copy: ${currentLabel}`;
+      copyModeToggle.setAttribute("title", `Alternar para ${nextLabel}`);
+      copyModeToggle.setAttribute("aria-label", `Alternar copy para modo ${nextLabel}`);
+    };
+
+    const buildNextCopyUrl = (nextMode) => {
+      const url = new URL(window.location.href);
+      if (nextMode === "soft") {
+        url.searchParams.delete("copy");
+      } else {
+        url.searchParams.set("copy", "growth");
+      }
+      return url.toString();
+    };
+
+    updateCopyToggleUi(getCurrentCopyMode());
+
+    copyModeToggle.addEventListener("click", () => {
+      const current = getCurrentCopyMode();
+      const next = current === "growth" ? "soft" : "growth";
+      window.location.assign(buildNextCopyUrl(next));
+    });
+  }
+
   // Collapse mobile menu after clicking a nav link
   const nav = document.getElementById("topNav");
   const toggler = document.querySelector('.navbar-toggler[data-bs-target="#topNav"]');
@@ -121,7 +183,7 @@
 
   if (nav) {
     document.addEventListener("click", (event) => {
-      const link = event.target.closest("a.nav-link, a.btn");
+      const link = event.target.closest("a.nav-link, a.btn, button.btn");
       if (!link) return;
       if (!nav.contains(link)) return;
       setTimeout(closeNav, 0);

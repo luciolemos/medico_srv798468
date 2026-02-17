@@ -56,3 +56,15 @@ Alias /<slug> /var/www/<slug>/public
 sudo apache2ctl -t
 sudo systemctl reload apache2
 ```
+
+## Conversao de Imagens para WebP
+Script utilitario para converter imagens com GD:
+- `scripts/convert-webp.php`
+
+Exemplos:
+```bash
+php scripts/convert-webp.php
+php scripts/convert-webp.php --path=public/assets/img --quality=82
+php scripts/convert-webp.php --path=public/assets/img --dry-run
+php scripts/convert-webp.php --path=public/assets/img --force
+```

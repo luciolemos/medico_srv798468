@@ -14,10 +14,16 @@ final class HomeController
 
     public function home(Request $request, Response $response): Response
     {
+        $copyMode = (string) ($request->getQueryParams()['copy'] ?? 'soft');
+        if (!in_array($copyMode, ['soft', 'growth'], true)) {
+            $copyMode = 'soft';
+        }
+
         return $this->twig->render($response, 'pages/home.twig', [
             'app_name' => $this->config['app_name'] ?? 'Agência',
             'app_mark' => $this->config['app_mark'] ?? 'A',
             'page_title' => $this->config['page_title'] ?? null,
+            'copy_mode' => $copyMode,
         ]);
     }
 }

@@ -1,7 +1,9 @@
 {% extends 'base.twig' %}
 
-{% block title %}{{ page_title ?? 'System — PHP 8.3+ moderno, didático e profissional' }}{% endblock %}
+{% block title %}{{ page_title ?? 'NatalCode Platform — Landing SaaS em PHP 8.3+' }}{% endblock %}
 {% set whatsapp_url = whatsapp_url ?? 'https://wa.me/5500000000000?text=Olá!%20Quero%20uma%20landing%20page%20profissional%20para%20meu%20projeto.' %}
+{% set copy_mode = copy_mode ?? 'soft' %}
+{% set is_growth = copy_mode == 'growth' %}
 
 {% block content %}
 
@@ -21,37 +23,37 @@
       <div class="col-lg-6">
         <div class="hero-badge mb-3" data-aos="fade-up" data-aos-delay="0">
           <i class="bi bi-stars"></i>
-          <span>{{ hero_badge ?? 'Open-source, didático e pronto para produção' }}</span>
+          <span>{{ hero_badge ?? (is_growth ? 'Versão Growth: copy orientada a lead e fechamento' : 'Arquitetura enxuta, visual premium e foco em conversão') }}</span>
         </div>
 
         <h1 class="display-5 fw-bold lh-sm mb-3" data-aos="fade-up" data-aos-delay="80">
-          {{ hero_title_prefix ?? 'Uma home' }}
-          <span class="text-gradient">{{ hero_title_highlight ?? 'profissional' }}</span>
-          {{ hero_title_suffix ?? 'para seu projeto PHP — com foco em conversão.' }}
+          {{ hero_title_prefix ?? (is_growth ? 'Lance sua landing tech em' : 'Seu produto') }}
+          <span class="text-gradient">{{ hero_title_highlight ?? (is_growth ? '24h' : 'tech-ready') }}</span>
+          {{ hero_title_suffix ?? (is_growth ? 'e transforme tráfego em leads qualificados.' : 'com landing de alta performance e linguagem de plataforma.') }}
         </h1>
 
         <p class="lead text-secondary-emphasis mb-4" data-aos="fade-up" data-aos-delay="140">
-          {{ hero_lead ?? 'Stack moderna (PHP 8.3+, Twig, Router dinâmico, Bootstrap), documentação técnica integrada e uma experiência visual fluida com animações suaves.' }}
+          {{ hero_lead ?? (is_growth ? 'Base pronta em PHP 8.3 + Twig, com design premium, CTA forte e estrutura para escalar sem retrabalho.' : 'Interface com identidade SaaS, stack moderna (PHP 8.3+, Twig e Bootstrap), e blocos prontos para apresentar proposta de valor, prova social e CTA.') }}
         </p>
 
         <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3" data-aos="fade-up" data-aos-delay="220">
           <a class="btn btn-primary btn-lg px-4" href="#cta">
-            {{ cta_primary ?? 'Começar agora' }} <i class="bi bi-arrow-right-short"></i>
+            {{ cta_primary ?? (is_growth ? 'Quero minha landing agora' : 'Solicitar versão') }} <i class="bi bi-arrow-right-short"></i>
           </a>
           <a class="btn btn-outline-light btn-lg px-4" href="#docs">
-            {{ cta_secondary ?? 'Ler a documentação' }} <i class="bi bi-journal-text ms-1"></i>
+            {{ cta_secondary ?? (is_growth ? 'Ver demo ao vivo' : 'Explorar arquitetura') }} <i class="bi bi-journal-text ms-1"></i>
           </a>
         </div>
 
         <div class="d-flex flex-wrap gap-3 mt-4 small text-secondary-emphasis" data-aos="fade-up" data-aos-delay="300">
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-shield-check"></i><span>Segurança por padrão</span>
+            <i class="bi bi-shield-check"></i><span>Security-first</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-lightning-charge"></i><span>Performance & observabilidade</span>
+            <i class="bi bi-lightning-charge"></i><span>Performance + observabilidade</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-braces"></i><span>Composer + PSR-4</span>
+            <i class="bi bi-braces"></i><span>Código limpo com PSR-4</span>
           </div>
         </div>
       </div>
@@ -59,7 +61,7 @@
       <div class="col-lg-6">
         <div class="p-0" data-aos="zoom-in" data-aos-delay="200">
           <img
-            src="{{ base_url }}/assets/img/img_default.png"
+            src="{{ base_url }}/assets/img/img_default.webp"
             alt="Prévia visual da base"
             class="img-fluid"
             loading="lazy"
@@ -69,7 +71,7 @@
         <div class="hero-metrics mt-3">
           <div class="metric glass" data-aos="fade-up" data-aos-delay="350">
             <div class="metric-kpi">290px+</div>
-            <div class="metric-label">Responsivo real</div>
+            <div class="metric-label">Mobile-first real</div>
           </div>
           <div class="metric glass" data-aos="fade-up" data-aos-delay="420">
             <div class="metric-kpi">&lt; 2s</div>
@@ -77,7 +79,7 @@
           </div>
           <div class="metric glass" data-aos="fade-up" data-aos-delay="490">
             <div class="metric-kpi">AOS</div>
-            <div class="metric-label">Animações suaves</div>
+            <div class="metric-label">Motion elegante</div>
           </div>
         </div>
 
@@ -94,7 +96,7 @@
   <div class="container">
     <div class="row g-3 align-items-center justify-content-between">
       <div class="col-12 col-lg-3 text-secondary-emphasis small" data-aos="fade-up">
-        Construído com tecnologias confiáveis:
+        Tecnologia sólida para escalar com segurança:
       </div>
       <div class="col-12 col-lg-9" data-aos="fade-up" data-aos-delay="80">
         <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
@@ -114,25 +116,36 @@
 <section id="features" class="py-5 py-lg-6">
   <div class="container">
       <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">O que você ganha com essa base</h2>
+      <h2 class="fw-bold" data-aos="fade-up">{{ is_growth ? 'Por que essa landing converte melhor' : 'O que você entrega com essa base' }}</h2>
       <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
-        Um layout limpo, profissional e pronto para evoluir — sem peso desnecessário.
+        {{ is_growth ? 'Menos fricção na jornada, mais clareza de oferta e mais ação no botão principal.' : 'Uma landing com cara de produto tech, pronta para vender melhor sem inflar complexidade.' }}
       </p>
     </div>
 
     <div class="row g-3 g-lg-4">
-      {% set features = features ?? [
-        {'icon':'rocket-takeoff','title':'Alta conversão','text':'Hero direto ao ponto, CTAs claros e seções objetivas — sem poluição.'},
-        {'icon':'shield-lock','title':'Segurança como padrão','text':'Base pronta para CSRF, escape em templates e validações coerentes.'},
-        {'icon':'diagram-3','title':'Arquitetura clara','text':'Perfeita pra explicar MVC/Router/Twig na prática, com docs e exemplos.'},
-        {'icon':'phone','title':'Responsivo de verdade','text':'Ajustes para telas pequenas, inclusive abaixo de 320px.'},
-        {'icon':'speedometer2','title':'Performance','text':'CSS moderno, animações suaves e JS enxuto (sem framework no front).'},
-        {'icon':'journal-text','title':'Docs integradas','text':'Stack, request lifecycle, router, segurança e boas práticas em /docs/tech.'},
-      ] %}
+      {% set default_features = is_growth
+        ? [
+          {'icon':'rocket-takeoff','title':'Mais conversão','text':'Copy orientada a decisão com proposta de valor clara acima da dobra.'},
+          {'icon':'shield-lock','title':'Mais confiança','text':'Base segura e organizada para publicar sem medo de retrabalho técnico.'},
+          {'icon':'diagram-3','title':'Mais clareza comercial','text':'Mensagem de produto, prova social e CTA alinhados para acelerar fechamento.'},
+          {'icon':'phone','title':'Mais resultado no mobile','text':'Fluxo de leitura e clique pensado para telas pequenas desde o início.'},
+          {'icon':'speedometer2','title':'Mais velocidade de entrega','text':'Front enxuto para ir de ideia a página publicada em poucas horas.'},
+          {'icon':'journal-text','title':'Mais controle','text':'Documentação técnica para evoluir o projeto sem depender de improviso.'},
+        ]
+        : [
+          {'icon':'rocket-takeoff','title':'Narrativa de conversão','text':'Hero objetivo, prova social estratégica e CTAs pensados para decisão rápida.'},
+          {'icon':'shield-lock','title':'Base segura','text':'Pronta para CSRF, escapes no template e validações consistentes desde o início.'},
+          {'icon':'diagram-3','title':'Arquitetura profissional','text':'Organização clara para evoluir produto sem virar monolito confuso.'},
+          {'icon':'phone','title':'Experiência mobile-first','text':'Layout confiável em telas pequenas sem sacrificar legibilidade ou CTA.'},
+          {'icon':'speedometer2','title':'Front leve e rápido','text':'CSS moderno, animações equilibradas e JS enxuto para manter fluidez.'},
+          {'icon':'journal-text','title':'Documentação operacional','text':'Visão de stack, lifecycle e boas práticas centralizadas em /docs/tech.'},
+        ]
+      %}
+      {% set features = features ?? default_features %}
 
       {% for f in features %}
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
-        <div class="feature-card glass h-100 p-4">
+        <div class="feature-card hover-lift glass h-100 p-4">
           <div class="feature-icon"><i class="bi bi-{{ f.icon }}"></i></div>
           <h3 class="h5 fw-semibold mt-3">{{ f.title }}</h3>
           <p class="text-secondary-emphasis mb-0">{{ f.text }}</p>
@@ -147,40 +160,40 @@
 <section id="projects" class="py-5 py-lg-6">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">Projetos recentes</h2>
+      <h2 class="fw-bold" data-aos="fade-up">Casos e entregas recentes</h2>
       <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
-        Exemplos de landing pages publicadas com foco em performance, clareza e conversão.
+        Referências de páginas lançadas com posicionamento tech, clareza comercial e bom desempenho.
       </p>
     </div>
 
     {% set projects = projects ?? [
       {
-        'image':'/assets/img/projetos/note1.png',
+        'image':'/assets/img/projetos/note1.webp',
         'alt':'Projeto de landing page para SaaS',
         'icon':'lightning-charge',
-        'title':'Landing page para SaaS B2B',
-        'text':'Estrutura orientada a conversão com CTA claro, prova social e formulário enxuto.'
+        'title':'Landing para SaaS B2B',
+        'text':'Fluxo de conversão direto com proposta clara, prova social e CTA de demonstração.'
       },
       {
-        'image':'/assets/img/projetos/note2.png',
+        'image':'/assets/img/projetos/note2.webp',
         'alt':'Projeto de página institucional de tecnologia',
         'icon':'house-gear',
-        'title':'Página institucional de tecnologia',
-        'text':'Narrativa técnica da stack, diferenciais do produto e benefícios para decisão rápida.'
+        'title':'Institucional de plataforma tech',
+        'text':'Mensagem de produto, diferenciais técnicos e argumento comercial no mesmo fluxo.'
       },
       {
-        'image':'/assets/img/projetos/note3.png',
+        'image':'/assets/img/projetos/note3.webp',
         'alt':'Projeto de landing para lançamento de MVP',
         'icon':'tools',
-        'title':'Landing para lançamento de MVP',
-        'text':'Template base com sections modulares, FAQ, métricas e integração simples com deploy em VPS.'
+        'title':'Lançamento de MVP',
+        'text':'Sections modulares com FAQ, métricas e caminho simples até deploy em VPS.'
       },
     ] %}
 
     <div class="row g-3 g-lg-4 projects-grid">
       {% for p in projects %}
       <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
-        <div class="glass p-4 h-100">
+        <div class="quote-card hover-lift glass p-4 h-100">
           <img
             src="{{ base_url }}{{ p.image }}"
             alt="{{ p.alt }}"
@@ -206,25 +219,33 @@
 <section id="depoimentos" class="py-5 py-lg-6">
   <div class="container">
     <div class="text-center mb-4 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">Clientes que confiam</h2>
+      <h2 class="fw-bold" data-aos="fade-up">{{ is_growth ? 'Resultados de quem já aplicou' : 'Times que confiam na entrega' }}</h2>
     </div>
 
     <div class="row g-3 g-lg-4 testimonials-grid">
-      {% set testimonials = testimonials ?? [
-        {'name':'Camila Rocha','region':'São Paulo/SP','service':'Landing para SaaS','text':'A página ficou pronta rápido e com copy muito clara. A taxa de clique no CTA principal subiu nas primeiras semanas.'},
-        {'name':'Bruno Martins','region':'Belo Horizonte/MG','service':'Institucional tech','text':'Conseguimos apresentar stack, arquitetura e proposta comercial sem poluir a leitura. Ótimo equilíbrio entre design e conteúdo.'},
-        {'name':'Marina Duarte','region':'Curitiba/PR','service':'Lançamento de MVP','text':'Template fácil de adaptar, estrutura organizada e deploy simples no servidor. Economizou bastante tempo de implementação.'},
-      ] %}
+      {% set default_testimonials = is_growth
+        ? [
+          {'name':'Camila Rocha','region':'São Paulo/SP','service':'SaaS B2B','text':'Depois da nova landing, o CTA principal começou a gerar leads com mais consistência já no primeiro mês.'},
+          {'name':'Bruno Martins','region':'Belo Horizonte/MG','service':'Plataforma tech','text':'A proposta ficou muito mais fácil de entender. As reuniões passaram a começar com mais interesse comercial.'},
+          {'name':'Marina Duarte','region':'Curitiba/PR','service':'MVP','text':'Publicamos rápido, testamos oferta em dias e ajustamos a copy com base em dados reais de clique.'},
+        ]
+        : [
+          {'name':'Camila Rocha','region':'São Paulo/SP','service':'SaaS B2B','text':'Conseguimos lançar rápido com visual premium e narrativa objetiva. O CTA principal ganhou mais cliques nas primeiras semanas.'},
+          {'name':'Bruno Martins','region':'Belo Horizonte/MG','service':'Plataforma tech','text':'A página comunica stack, produto e proposta comercial sem ruído. Ficou técnica na medida certa para vender com clareza.'},
+          {'name':'Marina Duarte','region':'Curitiba/PR','service':'MVP','text':'Estrutura modular, fácil de adaptar e simples de publicar. Reduziu tempo de implementação e acelerou nosso lançamento.'},
+        ]
+      %}
+      {% set testimonials = testimonials ?? default_testimonials %}
       {% set testimonial_avatars = [
-        '/assets/img/avatars/face2_620_620.png',
-        '/assets/img/avatars/face9_620_620.png',
-        '/assets/img/avatars/face4_620_620.png',
+        '/assets/img/avatars/face2_620_620.webp',
+        '/assets/img/avatars/face9_620_620.webp',
+        '/assets/img/avatars/face4_620_620.webp',
       ] %}
 
       {% for t in testimonials %}
-      {% set avatar_src = testimonial_avatars|length > 0 ? testimonial_avatars[loop.index0 % (testimonial_avatars|length)] : '/assets/img/avatars/face2_620_620.png' %}
+      {% set avatar_src = testimonial_avatars|length > 0 ? testimonial_avatars[loop.index0 % (testimonial_avatars|length)] : '/assets/img/avatars/face2_620_620.webp' %}
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 90 }}">
-        <div class="quote-card glass h-100 p-4">
+        <div class="quote-card hover-lift glass h-100 p-4">
           <div class="d-flex justify-content-center mb-3">
             <img
               src="{{ base_url }}{{ avatar_src }}"
@@ -253,9 +274,9 @@
   <div class="container">
       <div class="row align-items-center g-4 g-lg-5 section-heading">
       <div class="col-lg-6" data-aos="fade-up">
-        <h2 class="fw-bold">Como funciona (visão rápida)</h2>
+        <h2 class="fw-bold">Como funciona (pipeline resumido)</h2>
         <p class="text-secondary-emphasis">
-          Do rewrite até o Twig renderizado — um ciclo simples e robusto.
+          Do rewrite ao HTML final, com fluxo previsível para manter velocidade de desenvolvimento.
         </p>
 
         <ol class="steps">
@@ -268,17 +289,17 @@
       </div>
 
       <div class="col-lg-6" data-aos="fade-up" data-aos-delay="120">
-        <div class="glass p-4">
+        <div class="quote-card hover-lift glass p-4">
           <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="fw-semibold">Checklist “Home renovada”</div>
+            <div class="fw-semibold">Checklist da landing tech</div>
             <span class="badge text-bg-success-subtle border border-success-subtle">Pronto</span>
           </div>
           <ul class="checklist mb-0">
-            <li><i class="bi bi-check2-circle"></i> Hero com gradientes animados</li>
-            <li><i class="bi bi-check2-circle"></i> AOS progressivo no scroll</li>
-            <li><i class="bi bi-check2-circle"></i> Cards minimalistas + CTAs</li>
-            <li><i class="bi bi-check2-circle"></i> Responsivo até 290px</li>
-            <li><i class="bi bi-check2-circle"></i> Glassmorphism com bom contraste</li>
+            <li><i class="bi bi-check2-circle"></i> Hero com estética SaaS e CTA forte</li>
+            <li><i class="bi bi-check2-circle"></i> Motion progressivo no scroll</li>
+            <li><i class="bi bi-check2-circle"></i> Cards de benefício e prova social</li>
+            <li><i class="bi bi-check2-circle"></i> Responsividade real até 290px</li>
+            <li><i class="bi bi-check2-circle"></i> Contraste otimizado em dark/light</li>
           </ul>
         </div>
       </div>
@@ -292,21 +313,21 @@
   <div class="container">
       <div class="row align-items-end justify-content-between g-3 mb-4 section-heading">
       <div class="col-lg-7" data-aos="fade-up">
-        <h2 class="fw-bold mb-2">Documentação técnica</h2>
+        <h2 class="fw-bold mb-2">Documentação de engenharia</h2>
         <p class="text-secondary-emphasis mb-0">
-          Centralize tudo em <code>/docs/tech</code>: arquitetura, segurança, router, observabilidade e boas práticas.
+          Tudo em <code>/docs/tech</code>: arquitetura, segurança, router, observabilidade e padrões para manter qualidade em escala.
         </p>
       </div>
       <div class="col-lg-5 text-lg-end" data-aos="fade-up" data-aos-delay="80">
         <a class="btn btn-outline-light" href="#cta">
-          Ver estrutura recomendada <i class="bi bi-arrow-right-short"></i>
+          Ver blueprint técnico <i class="bi bi-arrow-right-short"></i>
         </a>
       </div>
     </div>
 
     <div class="row g-3 g-lg-4">
       <div class="col-md-6 col-lg-4" data-aos="fade-up">
-        <div class="glass p-4 h-100">
+        <div class="quote-card hover-lift glass p-4 h-100">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-diagram-3"></i><span class="fw-semibold">Arquitetura</span>
           </div>
@@ -316,7 +337,7 @@
         </div>
       </div>
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
-        <div class="glass p-4 h-100">
+        <div class="quote-card hover-lift glass p-4 h-100">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-shield-lock"></i><span class="fw-semibold">Segurança</span>
           </div>
@@ -326,7 +347,7 @@
         </div>
       </div>
       <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
-        <div class="glass p-4 h-100">
+        <div class="quote-card hover-lift glass p-4 h-100">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-eye"></i><span class="fw-semibold">Observabilidade</span>
           </div>
@@ -343,22 +364,22 @@
 <section id="cta" class="py-5 py-lg-6">
   <div class="container">
     <div class="cta-box glass p-4 p-lg-5 text-center" data-aos="zoom-in">
-      <h2 class="fw-bold mb-2">Quer colocar isso no ar hoje?</h2>
+      <h2 class="fw-bold mb-2">{{ is_growth ? 'Pronto para colocar sua operação no ar hoje?' : 'Quer subir sua landing tech hoje?' }}</h2>
       <p class="text-secondary-emphasis mb-4">
-        Copie os arquivos, suba no Apache e você já tem uma home profissional — pronta para evoluir.
+        {{ is_growth ? 'Receba a base, personalize em minutos e comece a captar leads ainda esta semana.' : 'Estrutura pronta para publicar rápido, validar com usuários e evoluir com base em dados.' }}
       </p>
 
       <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3">
         <a class="btn btn-primary btn-lg px-4" href="{{ primary_download_url ?? '#' }}">
-          Baixar projeto <i class="bi bi-download ms-1"></i>
+          {{ is_growth ? 'Começar implementação' : 'Quero essa base' }} <i class="bi bi-download ms-1"></i>
         </a>
         <a class="btn btn-outline-light btn-lg px-4" href="#features">
-          Ver recursos <i class="bi bi-arrow-up-right ms-1"></i>
+          Ver funcionalidades <i class="bi bi-arrow-up-right ms-1"></i>
         </a>
       </div>
 
       <div class="small text-secondary-emphasis mt-3">
-        Dica: se estiver em <code>/site1/</code>, sirva via DocumentRoot apontando para <code>/public</code>.
+        Dica: em Apache/Nginx, exponha direto a pasta <code>/public</code> para manter a estrutura correta.
       </div>
     </div>
   </div>
@@ -368,7 +389,7 @@
 <section id="faq" class="py-5 py-lg-6">
   <div class="container">
     <div class="text-center mb-4 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">Perguntas rápidas</h2>
+      <h2 class="fw-bold" data-aos="fade-up">FAQ técnico-comercial</h2>
     </div>
 
     <div class="row justify-content-center">
@@ -377,12 +398,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
-                Dá pra usar isso dentro do meu MVC/Twig?
+                Funciona no meu stack MVC/Twig atual?
               </button>
             </h3>
             <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Sim. Essa página já está em Twig. Basta manter os assets em <code>/public/assets</code> e pronto.
+                Sim. A página já está em Twig; mantenha os assets em <code>/public/assets</code> e conecte suas rotas.
               </div>
             </div>
           </div>
@@ -390,12 +411,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
-                Isso fica leve?
+                Essa landing fica leve em produção?
               </button>
             </h3>
             <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Sim: Bootstrap + AOS + JS pequeno. Se quiser ultra-leve, dá pra remover AOS e manter só CSS.
+                Sim. A base usa Bootstrap + AOS + JS enxuto. Para ultra performance, é só desativar AOS e manter o CSS.
               </div>
             </div>
           </div>
@@ -403,12 +424,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent text-white" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
-                E se eu estiver servindo em /site1/?
+                E se meu app estiver em subdiretório?
               </button>
             </h3>
             <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Se seus assets forem servidos por <code>/site1/public</code>, use paths relativos ou um helper de assets (ex.: <code>asset()</code>).
+                Se você servir por <code>/site1/public</code>, use paths relativos ou helper de assets (ex.: <code>asset()</code>).
               </div>
             </div>
           </div>
