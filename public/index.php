@@ -25,13 +25,16 @@ if (!is_file($autoload)) {
 require $autoload;
 
 $base = $_ENV['APP_BASE'] ?? '';
+$appEnv = strtolower((string) ($_ENV['APP_ENV'] ?? 'production'));
+$isDev = in_array($appEnv, ['dev', 'development', 'local'], true);
+$twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
 
 $twig = Twig::create(__DIR__ . '/../views', [
-    'cache' => false,
-    'auto_reload' => true,
+    'cache' => $twigCache,
+    'auto_reload' => $isDev,
 ]);
 $twig->getEnvironment()->addGlobal('base_url', $base);
-$twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'prod');
+$twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
 $twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Agência');
 $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'A');
 $twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'PHP 8.3+');
@@ -63,7 +66,6 @@ $app = AppFactory::create();
 $app->setBasePath($base);
 $app->add(TwigMiddleware::create($app, $twig));
 
-$isDev = ($_ENV['APP_ENV'] ?? 'prod') === 'dev';
 $app->addErrorMiddleware($isDev, $isDev, $isDev);
 
 $routes = require __DIR__ . '/../routes/web.php';

@@ -1,11 +1,12 @@
 # Slim Site Template
 
-Template base para aplicações web em PHP com arquitetura orientada a rotas e controllers, utilizando Slim 4 como microframework HTTP/PSR-7 e Twig como engine de templates para composição da camada de apresentação.
+Template base para aplicacoes web em PHP com arquitetura orientada a rotas e controllers, utilizando Slim 4 como microframework HTTP/PSR-7 e Twig como engine de templates para composicao da camada de apresentacao.
 
 ## Stack
 - PHP 8.3+
 - Slim 4 (`slim/slim`, `slim/psr7`)
 - Twig (`slim/twig-view`, `twig/twig`)
+- PHPMailer (`phpmailer/phpmailer`)
 - Apache 2.4 com `mod_rewrite`
 
 ## Estrutura
@@ -14,194 +15,210 @@ Template base para aplicações web em PHP com arquitetura orientada a rotas e c
 - `src/Controllers/HomeController.php`: controller HTTP (PSR-7).
 - `src/Core/Env.php`: loader simples de `.env`.
 - `views/`: templates Twig.
-- `storage/`: cache/logs.
+- `storage/`: cache e logs de runtime.
+- `.env.example`: modelo de configuracao para novos servidores.
 
-## Mapa da Home (conversao)
-Arquivo principal: `views/pages/home.twig`
+## Requisitos de servidor
+- PHP 8.3 ou superior
+- Apache 2.4 com `mod_rewrite`
+- Composer 2
+- Permissao de escrita em `storage/`
 
-- `Hero`: proposta de valor, CTAs primarios e prova social inicial.
-- `Stack strip`: reforco rapido de credibilidade tecnica.
-- `Features`: beneficios em cards (copy muda por modo `soft/growth`).
-- `Projects`: casos visuais para tangibilizar qualidade/entrega.
-- `Depoimentos`: prova social principal (tambem alimenta o quick-proof da hero).
-- `How`: pipeline tecnico resumido para reduzir friccao com lead tecnico.
-- `Docs`: reforco de governanca e maturidade de engenharia.
-- `Labs links`: atalhos operacionais do ecossistema Labs.
-- `CTA final`: reforco de decisao antes do formulario.
-- `Formulario #form-orcamento`: captura de lead com wizard de 2 etapas.
-- `FAQ`: quebra de objecoes tecnico-comerciais.
-- `Footer + palette FAB + WhatsApp float`: navegacao de suporte e contato rapido.
+## Variaveis de ambiente
+Use `.env.example` como base para criar o arquivo `.env` do servidor.
 
-## Interacoes ativas no front
-Arquivo principal: `public/assets/js/landing.js`
-
-- `AOS progressivo` com ajustes por secao e por perfil de dispositivo.
-- `Theme toggle` (dark/light) com persistencia em `localStorage`.
-- `Palette switcher` por query string + persistencia local.
-- `Quick-proof randomizer` no card de depoimento da hero (a cada load).
-- `Lead form wizard` (2 etapas) com validacao progressiva.
-- `Tracking de CTA/form` via `dataLayer`/`gtag`/`fbq` quando disponiveis.
-- `Tablet carousel` para `projects` e `depoimentos`.
-- `Navegacao one-page` (active link + smooth scroll + fechamento do menu mobile).
+Principais variaveis:
+- `APP_NAME`
+- `APP_MARK`
+- `APP_BADGE`
+- `APP_PAGE_TITLE`
+- `APP_BASE`
+- `APP_ENV`
+- `APP_PALETTE`
+- `GITHUB_URL`
+- `X_URL`
+- `INSTAGRAM_URL`
+- `WHATSAPP_URL`
+- `CONTACT_TO`
+- `CONTACT_FROM`
+- `MAIL_DRIVER`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `SMTP_ENCRYPTION`
+- `SMTP_AUTH`
+- `SMTP_TIMEOUT`
 
 ## Execucao local
 ```bash
 composer install
+cp .env.example .env
 ```
 
-Abra:
-- `http://88.198.104.148/<slug>/`
+Para ambiente local, use:
+- `APP_ENV="dev"`
+- `APP_BASE=""` se o projeto abrir na raiz local
 
-## Como funciona
-1. Apache aponta para `/var/www/<slug>/public`.
-2. `public/index.php` sobe Slim, Twig e middlewares.
-3. `routes/web.php` registra endpoints.
-4. Controller renderiza Twig.
+## Comportamento por ambiente
+- `APP_ENV=dev`: Twig sem cache, `auto_reload` ativo e erros detalhados.
+- `APP_ENV=production`: Twig com cache em `storage/cache/twig`, `auto_reload` desativado e middleware de erro em modo restrito.
 
-## Alias Apache (Labs)
-Formato correto:
+## Formulario de contato
+- Rota: `POST /contato`
+- Controller: `src/Controllers/HomeController.php`
+- Driver suportado: `smtp` ou `mail`
+- Logs:
+  - `storage/logs/lead-events.log`
+  - `storage/logs/contatos-fallback.log`
+
+Se `MAIL_DRIVER=smtp`, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_ENCRYPTION`, `SMTP_AUTH` e `SMTP_TIMEOUT`.
+
+## Deploy principal: vhost compartilhado com alias `/natalcloud`
+Este e o fluxo recomendado para o servidor de destino atual, onde o host principal ja existe e o projeto sera publicado em `https://srv798468.hstgr.cloud/natalcloud/`.
+
+### 1. Publicar o codigo
+```bash
+git clone https://github.com/luciolemos/natalcode_cloud18344.git /var/www/natalcloud
+cd /var/www/natalcloud
+composer install --no-dev --optimize-autoloader
+cp .env.example .env
+```
+
+### 2. Configurar o `.env`
+Para deploy em subcaminho, use:
+- `APP_ENV="production"`
+- `APP_BASE="/natalcloud"`
+
+Preencha tambem:
+- identidade visual (`APP_NAME`, `APP_MARK`, `APP_BADGE`, `APP_PAGE_TITLE`)
+- links institucionais
+- configuracao de envio de email
+
+### 3. Ajustar permissoes
+Exemplo com Apache rodando como `www-data`:
+
+```bash
+sudo chown -R www-data:www-data storage
+sudo chmod -R 775 storage
+```
+
+### 4. Ajustar o vhost existente
+No servidor de destino, adicione ao `VirtualHost` os aliases abaixo em `:80` e `:443`:
 
 ```apache
-Alias /<slug> /var/www/<slug>/public
-<Directory /var/www/<slug>/public>
-  Options FollowSymLinks
-  AllowOverride All
-  Require all granted
+Alias /natalcloud/ /var/www/natalcloud/public/
+Alias /natalcloud /var/www/natalcloud/public/
+
+<Directory /var/www/natalcloud/public>
+    Options -Indexes +FollowSymLinks
+    AllowOverride All
+    Require all granted
 </Directory>
 ```
 
-## Variaveis de ambiente
-- `APP_NAME`
-- `APP_BASE` (ex.: `/site2`)
-- `APP_ENV` (`production` ou `dev`)
-- `APP_PALETTE` (`blue`, `red`, `emerald`, `amber`, `violet`)
-- Links sociais e contato (`GITHUB_URL`, `X_URL`, `INSTAGRAM_URL`, `WHATSAPP_URL`)
+No bloco HTTP (`*:80`), inclua `natalcloud` no redirect para a barra final:
 
-### Formulario de contato (backend + tracking)
-- Rota: `POST /contato`
-- Secao front: `#form-orcamento` em `views/pages/home.twig`
-- Controller: `src/Controllers/HomeController.php` (`contact()`)
-- SMTP via PHPMailer (com fallback para `mail()`).
-
-Variaveis:
-- `CONTACT_TO`
-- `CONTACT_FROM`
-- `MAIL_DRIVER` (`smtp` ou `mail`)
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`
-- `SMTP_ENCRYPTION` (`tls` ou `ssl`)
-- `SMTP_AUTH` (`true`/`false`)
-- `SMTP_TIMEOUT`
-
-Logs gerados:
-- `storage/logs/lead-events.log` (sucesso/falha do envio)
-- `storage/logs/contatos-fallback.log` (quando houver falha de envio/configuracao)
-
-Fluxo resumido:
-1. Front envia `POST /contato`.
-2. Controller valida campos e tenta envio por SMTP (ou `mail()` fallback).
-3. Resultado retorna como flash (`form_status`) para a home.
-4. Front le `form_status` e dispara evento de analytics de sucesso/falha.
-
-## Templates unificados (Labs)
-O layout/comportamento agora usa uma base unica (`natalcode`) e a diferenca entre templates fica na paleta.
-
-- CSS base: `public/assets/css/landing.css`
-- Paletas: `public/assets/css/palettes/*.css`
-- Seletor front-only (navbar): troca paleta em runtime via JS, sem rebuild
-- Guia operacional completo: `docs/centralizacao.md`
-
-Para trocar o visual sem alterar estrutura:
-1. Defina `APP_PALETTE` no `.env`.
-2. Use um valor permitido: `blue`, `red`, `emerald`, `amber`, `violet`.
-
-Preview rapido por URL (sem mudar `.env`):
-- `/?palette=red`
-
-## Como a paleta e resolvida
-Ordem de prioridade atual:
-1. Query string `?palette=<cor>` (se valida)
-2. `localStorage.palette` (se valida)
-3. Valor default do backend (`APP_PALETTE` / `palette` no controller)
-
-Paletas invalidas fazem fallback para `blue`.
-
-## Arquitetura centralizada (na pratica)
-No `natalcode`, a estrutura e comportamento vivem em arquivos base:
-- `views/pages/home.twig` (layout e secoes)
-- `views/partials/navbar.twig` e `views/partials/footer.twig`
-- `public/assets/css/landing.css` (UI/motion core)
-- `public/assets/js/landing.js` (interacoes core)
-
-As variacoes de cor ficam isoladas em:
-- `public/assets/css/palettes/blue.css`
-- `public/assets/css/palettes/red.css`
-- `public/assets/css/palettes/emerald.css`
-- `public/assets/css/palettes/amber.css`
-- `public/assets/css/palettes/violet.css`
-
-O carregamento da paleta acontece em:
-- `views/base.twig` (`<link ... /palettes/{{ palette }}.css>`)
-
-## Importante: heranca entre sites
-Sites provisionados (`/var/www/site1`, `/var/www/yellowsite`, etc.) nao herdam automaticamente mudancas do `natalcode` se tiverem arquivos proprios.
-
-Para um site refletir o `natalcode`, e preciso:
-1. sincronizar arquivos base (views/css/js/controller/index), e
-2. manter apenas a paleta diferente via `APP_PALETTE`.
-
-## Script de paleta em lote
-Arquivo:
-- `scripts/set-palettes.sh`
-
-Exemplos:
-```bash
-# Simular
-scripts/set-palettes.sh --dry-run --base-dir /var/www --from-file palettes.map
-
-# Aplicar
-scripts/set-palettes.sh --base-dir /var/www --from-file palettes.map
+```apache
+RewriteCond %{REQUEST_URI} ^/(dashboard|itapiru|mvc|natalcloud)$
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}/ [L,R=301]
 ```
 
-Formato de `palettes.map`:
-```txt
-slug=palette
-site1=red
-site2=blue
-yellowsite=amber
+No bloco HTTPS (`*:443`), inclua o redirect da URL sem barra:
+
+```apache
+RewriteRule ^/natalcloud$ /natalcloud/ [R=301,L]
 ```
 
-Paletas permitidas:
-- `blue`, `red`, `emerald`, `amber`, `violet`
+Se o vhost usar segregacao de logs por app, inclua:
 
-## APP_BASE e rotas
-`APP_BASE` deve bater com o alias Apache do site:
-- Se o site abre em `http://host/natalcode`, use `APP_BASE="/natalcode"`.
-- Se abre no root `http://host/`, use `APP_BASE=""`.
+```apache
+SetEnvIf Request_URI "^/natalcloud(/|$)" app_natalcloud
+SetEnvIf Request_URI "^/(?!dashboard(/|$)|itapiru(/|$)|mvc(/|$)|natalcloud(/|$)).*" app_natalcode
 
-Se estiver errado, podem ocorrer 404 em rotas ou assets.
+CustomLog ${APACHE_LOG_DIR}/srv-hstgr-http-natalcloud-access.log combined env=app_natalcloud
+CustomLog ${APACHE_LOG_DIR}/srv-hstgr-https-natalcloud-access.log combined env=app_natalcloud
+```
 
-## Deploy
-1. Garantir permissao de escrita em `storage/`.
-2. Rodar `composer install --no-dev --optimize-autoloader`.
-3. Validar Apache:
+### 5. Validar a configuracao Apache
 ```bash
 sudo apache2ctl -t
 sudo systemctl reload apache2
 ```
 
-## Conversao de Imagens para WebP
-Script utilitario para converter imagens com GD:
-- `scripts/convert-webp.php`
+### 6. Validar apos o deploy
+Checklist minimo:
+- `https://srv798468.hstgr.cloud/natalcloud/` abre corretamente
+- assets carregam sem `404`
+- `POST /contato` responde corretamente
+- redirects preservam o prefixo `/natalcloud`
+- `storage/cache/twig` e `storage/logs/` recebem escrita
 
-Exemplos:
-```bash
-php scripts/convert-webp.php
-php scripts/convert-webp.php --path=public/assets/img --quality=82
-php scripts/convert-webp.php --path=public/assets/img --dry-run
-php scripts/convert-webp.php --path=public/assets/img --force
+## Deploy alternativo: vhost dedicado
+Se no futuro o projeto for publicado em um host raiz dedicado, entao:
+- o codigo pode continuar em `/var/www/natalcloud`
+- `APP_BASE=""`
+- o `DocumentRoot` deve apontar para `/var/www/natalcloud/public`
+
+Exemplo:
+
+```apache
+<VirtualHost *:80>
+    ServerName exemplo.com
+    ServerAlias www.exemplo.com
+
+    DocumentRoot /var/www/natalcloud/public
+
+    <Directory /var/www/natalcloud/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/natalcloud_error.log
+    CustomLog ${APACHE_LOG_DIR}/natalcloud_access.log combined
+</VirtualHost>
 ```
 
-Exemplo de conversao de arquivo unico:
+## APP_BASE e rotas
+- Em `vhost` dedicado: `APP_BASE=""`
+- Em subcaminho `/natalcloud`: `APP_BASE="/natalcloud"`
+
+Se `APP_BASE` estiver incorreto, podem ocorrer `404` em rotas, redirects ou assets.
+
+## Paletas
+Paletas suportadas:
+- `blue`
+- `red`
+- `emerald`
+- `amber`
+- `violet`
+
+Prioridade de resolucao:
+1. query string `?palette=<cor>`
+2. `localStorage.palette`
+3. `APP_PALETTE`
+
+Paletas invalidas fazem fallback para `blue`.
+
+## Seguranca de deploy
+- Publique apenas o diretorio `public/` no Apache
+- Nao versione o arquivo `.env`
+- Use `APP_ENV="production"` em servidor publico
+- Restrinja escrita apenas a `storage/`
+- Configure SMTP com credenciais do servidor de destino
+- Prefira HTTPS no host final
+- Rode `apache2ctl -t` antes de qualquer reload
+
+## Operacao
+Comandos uteis:
+
 ```bash
-php -r '$src="public/assets/img/avatars/face1_620_620.png"; $dst="public/assets/img/avatars/face1_620_620.webp"; $im=imagecreatefrompng($src); imagepalettetotruecolor($im); imagealphablending($im,true); imagesavealpha($im,true); imagewebp($im,$dst,82); imagedestroy($im);'
+composer install --no-dev --optimize-autoloader
+sudo apache2ctl -t
+sudo systemctl reload apache2
 ```
+
+## Referencias internas
+- Guia operacional de centralizacao: `docs/centralizacao.md`
+- Script de paleta em lote: `scripts/set-palettes.sh`
+- Conversao de imagens para WebP: `scripts/convert-webp.php`
