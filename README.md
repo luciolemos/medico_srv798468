@@ -74,13 +74,13 @@ Para ambiente local, use:
 
 Se `MAIL_DRIVER=smtp`, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_ENCRYPTION`, `SMTP_AUTH` e `SMTP_TIMEOUT`.
 
-## Deploy principal: vhost compartilhado com alias `/natalcloud`
-Este e o fluxo recomendado para o servidor de destino atual, onde o host principal ja existe e o projeto sera publicado em `https://srv798468.hstgr.cloud/natalcloud/`.
+## Deploy principal: vhost compartilhado com alias `/natalcode`
+Este e o fluxo recomendado para o servidor de destino atual, onde o host principal ja existe e o projeto sera publicado em `https://srv798468.hstgr.cloud/natalcode/`.
 
 ### 1. Publicar o codigo
 ```bash
-git clone https://github.com/luciolemos/natalcode_cloud18344.git /var/www/natalcloud
-cd /var/www/natalcloud
+git clone https://github.com/luciolemos/natalcode_cloud18344.git /var/www/natalcode
+cd /var/www/natalcode
 composer install --no-dev --optimize-autoloader
 cp .env.example .env
 ```
@@ -88,7 +88,7 @@ cp .env.example .env
 ### 2. Configurar o `.env`
 Para deploy em subcaminho, use:
 - `APP_ENV="production"`
-- `APP_BASE="/natalcloud"`
+- `APP_BASE="/natalcode"`
 
 Preencha tambem:
 - identidade visual (`APP_NAME`, `APP_MARK`, `APP_BADGE`, `APP_PAGE_TITLE`)
@@ -107,37 +107,37 @@ sudo chmod -R 775 storage
 No servidor de destino, adicione ao `VirtualHost` os aliases abaixo em `:80` e `:443`:
 
 ```apache
-Alias /natalcloud/ /var/www/natalcloud/public/
-Alias /natalcloud /var/www/natalcloud/public/
+Alias /natalcode/ /var/www/natalcode/public/
+Alias /natalcode /var/www/natalcode/public/
 
-<Directory /var/www/natalcloud/public>
+<Directory /var/www/natalcode/public>
     Options -Indexes +FollowSymLinks
     AllowOverride All
     Require all granted
 </Directory>
 ```
 
-No bloco HTTP (`*:80`), inclua `natalcloud` no redirect para a barra final:
+No bloco HTTP (`*:80`), inclua `natalcode` no redirect para a barra final:
 
 ```apache
-RewriteCond %{REQUEST_URI} ^/(dashboard|itapiru|mvc|natalcloud)$
+RewriteCond %{REQUEST_URI} ^/(dashboard|itapiru|mvc|natalcode)$
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI}/ [L,R=301]
 ```
 
 No bloco HTTPS (`*:443`), inclua o redirect da URL sem barra:
 
 ```apache
-RewriteRule ^/natalcloud$ /natalcloud/ [R=301,L]
+RewriteRule ^/natalcode$ /natalcode/ [R=301,L]
 ```
 
 Se o vhost usar segregacao de logs por app, inclua:
 
 ```apache
-SetEnvIf Request_URI "^/natalcloud(/|$)" app_natalcloud
-SetEnvIf Request_URI "^/(?!dashboard(/|$)|itapiru(/|$)|mvc(/|$)|natalcloud(/|$)).*" app_natalcode
+SetEnvIf Request_URI "^/natalcode(/|$)" app_natalcode
+SetEnvIf Request_URI "^/(?!dashboard(/|$)|itapiru(/|$)|mvc(/|$)|natalcode(/|$)).*" app_root
 
-CustomLog ${APACHE_LOG_DIR}/srv-hstgr-http-natalcloud-access.log combined env=app_natalcloud
-CustomLog ${APACHE_LOG_DIR}/srv-hstgr-https-natalcloud-access.log combined env=app_natalcloud
+CustomLog ${APACHE_LOG_DIR}/srv-hstgr-http-natalcode-access.log combined env=app_natalcode
+CustomLog ${APACHE_LOG_DIR}/srv-hstgr-https-natalcode-access.log combined env=app_natalcode
 ```
 
 ### 5. Validar a configuracao Apache
@@ -148,17 +148,17 @@ sudo systemctl reload apache2
 
 ### 6. Validar apos o deploy
 Checklist minimo:
-- `https://srv798468.hstgr.cloud/natalcloud/` abre corretamente
+- `https://srv798468.hstgr.cloud/natalcode/` abre corretamente
 - assets carregam sem `404`
 - `POST /contato` responde corretamente
-- redirects preservam o prefixo `/natalcloud`
+- redirects preservam o prefixo `/natalcode`
 - `storage/cache/twig` e `storage/logs/` recebem escrita
 
 ## Deploy alternativo: vhost dedicado
 Se no futuro o projeto for publicado em um host raiz dedicado, entao:
-- o codigo pode continuar em `/var/www/natalcloud`
+- o codigo pode continuar em `/var/www/natalcode`
 - `APP_BASE=""`
-- o `DocumentRoot` deve apontar para `/var/www/natalcloud/public`
+- o `DocumentRoot` deve apontar para `/var/www/natalcode/public`
 
 Exemplo:
 
@@ -167,21 +167,21 @@ Exemplo:
     ServerName exemplo.com
     ServerAlias www.exemplo.com
 
-    DocumentRoot /var/www/natalcloud/public
+    DocumentRoot /var/www/natalcode/public
 
-    <Directory /var/www/natalcloud/public>
+    <Directory /var/www/natalcode/public>
         AllowOverride All
         Require all granted
     </Directory>
 
-    ErrorLog ${APACHE_LOG_DIR}/natalcloud_error.log
-    CustomLog ${APACHE_LOG_DIR}/natalcloud_access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/natalcode_error.log
+    CustomLog ${APACHE_LOG_DIR}/natalcode_access.log combined
 </VirtualHost>
 ```
 
 ## APP_BASE e rotas
 - Em `vhost` dedicado: `APP_BASE=""`
-- Em subcaminho `/natalcloud`: `APP_BASE="/natalcloud"`
+- Em subcaminho `/natalcode`: `APP_BASE="/natalcode"`
 
 Se `APP_BASE` estiver incorreto, podem ocorrer `404` em rotas, redirects ou assets.
 
@@ -220,5 +220,7 @@ sudo systemctl reload apache2
 
 ## Referencias internas
 - Guia operacional de centralizacao: `docs/centralizacao.md`
+- Exemplo de vhost compartilhado: `docs/apache-vhost-srv798468-natalcode.conf`
+- Exemplo de `.env` para subcaminho: `docs/.env.natalcode.example`
 - Script de paleta em lote: `scripts/set-palettes.sh`
 - Conversao de imagens para WebP: `scripts/convert-webp.php`
