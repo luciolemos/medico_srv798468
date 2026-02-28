@@ -22,6 +22,23 @@
 
   applyProgressiveSectionDelays();
 
+  const applySectionMotionProfiles = () => {
+    const profiles = [
+      { selector: "#features [data-aos]", duration: 560, easing: "ease-out-sine" },
+      { selector: "#projects [data-aos], #depoimentos [data-aos]", duration: 620, easing: "ease-out-back" },
+      { selector: "#how [data-aos], #docs [data-aos], #labs-links [data-aos]", duration: 520, easing: "ease-out-sine" }
+    ];
+    profiles.forEach(({ selector, duration, easing }) => {
+      const nodes = document.querySelectorAll(selector);
+      nodes.forEach((node) => {
+        node.setAttribute("data-aos-duration", String(duration));
+        node.setAttribute("data-aos-easing", easing);
+      });
+    });
+  };
+
+  applySectionMotionProfiles();
+
   // AOS
   if (window.AOS) {
     AOS.init({
@@ -49,6 +66,7 @@
   // Floating buttons (back-to-top + WhatsApp)
   const btn = document.getElementById("backToTop");
   const whatsappFloat = document.querySelector(".whatsapp-float");
+  const scrollProgress = document.getElementById("scrollProgress");
   const toggleFloatingButtons = () => {
     const show = window.scrollY > 120;
     if (btn) {
@@ -63,9 +81,110 @@
   window.addEventListener("scroll", toggleFloatingButtons, { passive: true });
   toggleFloatingButtons();
 
+  const updateScrollProgress = () => {
+    if (!scrollProgress) return;
+    const doc = document.documentElement;
+    const body = document.body;
+    const scrollTop = window.pageYOffset || doc.scrollTop || body.scrollTop || 0;
+    const scrollHeight = Math.max(
+      body.scrollHeight, doc.scrollHeight,
+      body.offsetHeight, doc.offsetHeight,
+      body.clientHeight, doc.clientHeight
+    );
+    const clientHeight = window.innerHeight || doc.clientHeight || body.clientHeight || 1;
+    const total = scrollHeight - clientHeight;
+    const pct = total > 0 ? (scrollTop / total) * 100 : 0;
+    scrollProgress.style.width = `${Math.min(100, Math.max(0, pct))}%`;
+  };
+  window.addEventListener("scroll", updateScrollProgress, { passive: true });
+  window.addEventListener("resize", updateScrollProgress);
+  window.addEventListener("load", updateScrollProgress);
+  updateScrollProgress();
+
   if (btn) {
     btn.addEventListener("click", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  // Palette switcher (front-only)
+  const paletteLink = document.querySelector("link[data-palette-link]");
+  const paletteButtons = Array.from(document.querySelectorAll("[data-palette-btn]"));
+  const allowedPalettes = ["blue", "red", "emerald", "amber", "violet"];
+  const isValidPalette = (value) => allowedPalettes.includes(value);
+  const getPaletteFromUrl = () => {
+    const url = new URL(window.location.href);
+    const p = url.searchParams.get("palette");
+    return isValidPalette(p || "") ? p : "";
+  };
+  const updatePaletteQuery = (palette) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set("palette", palette);
+    window.history.replaceState({}, "", url.toString());
+  };
+  const applyPalette = (palette) => {
+    if (!paletteLink || !isValidPalette(palette)) return;
+    const base = paletteLink.getAttribute("data-palette-base");
+    if (!base) return;
+    paletteLink.setAttribute("href", `${base}/${palette}.css`);
+    paletteButtons.forEach((btn) => {
+      btn.classList.toggle("active", btn.getAttribute("data-palette-btn") === palette);
+    });
+  };
+
+  if (paletteLink) {
+    const defaultPalette = paletteLink.getAttribute("data-palette-default") || "blue";
+    let activePalette = isValidPalette(defaultPalette) ? defaultPalette : "blue";
+    const fromUrl = getPaletteFromUrl();
+    if (fromUrl) {
+      activePalette = fromUrl;
+    } else {
+      try {
+        const saved = localStorage.getItem("palette");
+        if (isValidPalette(saved || "")) activePalette = saved;
+      } catch (e) {}
+    }
+    applyPalette(activePalette);
+    updatePaletteQuery(activePalette);
+  }
+
+  if (paletteButtons.length) {
+    paletteButtons.forEach((buttonEl) => {
+      buttonEl.addEventListener("click", () => {
+        const next = buttonEl.getAttribute("data-palette-btn") || "";
+        if (!isValidPalette(next)) return;
+        applyPalette(next);
+        updatePaletteQuery(next);
+        try { localStorage.setItem("palette", next); } catch (e) {}
+      });
+    });
+  }
+
+  const paletteFab = document.querySelector("[data-palette-fab]");
+  const paletteFabToggle = document.getElementById("paletteFabToggle");
+  const setPaletteFabOpen = (isOpen) => {
+    if (!paletteFab || !paletteFabToggle) return;
+    paletteFab.classList.toggle("is-open", isOpen);
+    paletteFabToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+  };
+  if (paletteFab && paletteFabToggle) {
+    paletteFabToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      setPaletteFabOpen(!paletteFab.classList.contains("is-open"));
+    });
+    document.addEventListener("click", (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (!paletteFab.contains(target)) setPaletteFabOpen(false);
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") setPaletteFabOpen(false);
+    });
+    paletteButtons.forEach((buttonEl) => {
+      buttonEl.addEventListener("click", () => setPaletteFabOpen(false));
+    });
+    window.addEventListener("resize", () => {
+      if (window.innerWidth < 992) setPaletteFabOpen(false);
     });
   }
 
@@ -167,6 +286,285 @@
       const next = current === "growth" ? "soft" : "growth";
       window.location.assign(buildNextCopyUrl(next));
     });
+  }
+
+  // In-page smooth scroll with focus management
+  document.addEventListener("click", (event) => {
+    const anchor = event.target.closest('a[href^="#"]');
+    if (!anchor) return;
+    if (anchor.hasAttribute("data-bs-toggle")) return;
+    const hash = anchor.getAttribute("href");
+    if (!hash || hash === "#") return;
+    const target = document.querySelector(hash);
+    if (!target) return;
+    event.preventDefault();
+    target.scrollIntoView({
+      behavior: shouldReduceAnimations ? "auto" : "smooth",
+      block: "start"
+    });
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, "", hash);
+    }
+    window.setTimeout(() => {
+      if (!target.hasAttribute("tabindex")) {
+        target.setAttribute("tabindex", "-1");
+      }
+      target.focus({ preventScroll: true });
+    }, shouldReduceAnimations ? 0 : 280);
+  });
+
+  // CTA + form tracking (GA4 dataLayer/gtag + Meta Pixel fbq)
+  const query = new URLSearchParams(window.location.search);
+  const copyMode = query.get("copy") === "growth" ? "growth" : "soft";
+  const activePalette = query.get("palette") || document.querySelector("link[data-palette-link]")?.getAttribute("data-palette-default") || "blue";
+
+  const emitAnalyticsEvent = (eventName, payload = {}) => {
+    const basePayload = {
+      copy_mode: copyMode,
+      palette: activePalette,
+      page_path: window.location.pathname,
+      page_url: window.location.href,
+      ...payload
+    };
+    if (Array.isArray(window.dataLayer)) {
+      window.dataLayer.push({
+        event: eventName,
+        ...basePayload
+      });
+    }
+    if (typeof window.gtag === "function") {
+      window.gtag("event", eventName, basePayload);
+    }
+    if (eventName === "cta_click" && typeof window.fbq === "function") {
+      window.fbq("trackCustom", "CTA_Click", basePayload);
+    }
+  };
+
+  const formResultAlert = document.querySelector("[data-form-result-event][data-form-result-id]");
+  if (formResultAlert) {
+    const resultEvent = (formResultAlert.getAttribute("data-form-result-event") || "").trim();
+    const resultId = (formResultAlert.getAttribute("data-form-result-id") || "").trim();
+    const requestId = (formResultAlert.getAttribute("data-form-request-id") || "").trim();
+    const resultType = (formResultAlert.getAttribute("data-form-result-type") || "").trim();
+    if (resultEvent !== "" && resultId !== "") {
+      emitAnalyticsEvent(resultEvent, {
+        event_id: resultId,
+        request_id: requestId,
+        result_type: resultType
+      });
+    }
+  }
+
+  document.addEventListener("click", (event) => {
+    const link = event.target.closest("a.cta-track");
+    if (!link) return;
+    const href = link.getAttribute("href") || "";
+    emitAnalyticsEvent("cta_click", {
+      cta_id: (link.getAttribute("data-cta-id") || "unknown").trim() || "unknown",
+      cta_text: (link.textContent || "").replace(/\s+/g, " ").trim().slice(0, 120),
+      cta_href: href,
+      cta_type: href.startsWith("#") ? "anchor" : "link"
+    });
+  });
+
+  // Quick-proof randomizer: picks one testimonial on each page load
+  const quickProofRoot = document.querySelector(".js-quick-proof");
+  if (quickProofRoot) {
+    const quickProofAvatar = document.getElementById("quickProofAvatar");
+    const quickProofText = document.getElementById("quickProofText");
+    const quickProofMeta = document.getElementById("quickProofMeta");
+    const testimonialCards = Array.from(document.querySelectorAll("#depoimentos .quote-card"));
+
+    const testimonialPool = testimonialCards
+      .map((card) => {
+        const img = card.querySelector("img.avatar");
+        const text = card.querySelector("p.text-secondary-emphasis");
+        const name = card.querySelector(".fw-semibold");
+        const meta = card.querySelector(".small.text-secondary-emphasis");
+        return {
+          avatarSrc: img ? img.getAttribute("src") || "" : "",
+          avatarAlt: img ? img.getAttribute("alt") || "Cliente da NatalCode" : "Cliente da NatalCode",
+          quote: text ? (text.textContent || "").trim() : "",
+          who: name ? (name.textContent || "").trim() : "",
+          detail: meta ? (meta.textContent || "").trim() : ""
+        };
+      })
+      .filter((item) => item.quote !== "" && item.who !== "");
+
+    let lastIndex = -1;
+    const storageKey = "quick_proof_last_index";
+    const readStoredIndex = () => {
+      try {
+        const raw = window.sessionStorage.getItem(storageKey);
+        const parsed = Number.parseInt(raw || "-1", 10);
+        return Number.isInteger(parsed) ? parsed : -1;
+      } catch (e) {
+        return -1;
+      }
+    };
+    const storeIndex = (index) => {
+      try {
+        window.sessionStorage.setItem(storageKey, String(index));
+      } catch (e) {}
+    };
+
+    const pickNextIndex = () => {
+      if (testimonialPool.length <= 1) return 0;
+      const previous = readStoredIndex();
+      let next = Math.floor(Math.random() * testimonialPool.length);
+      let guard = 0;
+      while ((next === previous || next === lastIndex) && guard < 12) {
+        next = Math.floor(Math.random() * testimonialPool.length);
+        guard += 1;
+      }
+      return next;
+    };
+
+    const paintQuickProof = (entry) => {
+      if (!entry || !quickProofText || !quickProofMeta) return;
+      if (quickProofAvatar && entry.avatarSrc) {
+        quickProofAvatar.setAttribute("src", entry.avatarSrc);
+        quickProofAvatar.setAttribute("alt", entry.avatarAlt || "Cliente da NatalCode");
+      }
+      quickProofText.textContent = `"${entry.quote.replace(/^\"|\"$/g, "")}"`;
+      quickProofMeta.textContent = entry.detail ? `${entry.who} • ${entry.detail}` : entry.who;
+    };
+
+    const applyRandomQuickProof = () => {
+      const nextIndex = pickNextIndex();
+      const nextEntry = testimonialPool[nextIndex];
+      if (!nextEntry) return;
+      lastIndex = nextIndex;
+      storeIndex(nextIndex);
+      paintQuickProof(nextEntry);
+    };
+
+    if (testimonialPool.length) {
+      applyRandomQuickProof();
+    }
+  }
+
+  // Lead form wizard (2 steps)
+  const leadForm = document.querySelector(".js-lead-form");
+  if (leadForm) {
+    const formSteps = Array.from(leadForm.querySelectorAll("[data-form-step]"));
+    const totalSteps = formSteps.length;
+    const progressBar = document.getElementById("leadFormProgressBar");
+    const stepLabels = Array.from(leadForm.querySelectorAll("[data-form-step-label]"));
+    const prevButton = document.getElementById("leadFormPrev");
+    const nextButton = document.getElementById("leadFormNext");
+    const submitButton = document.getElementById("leadFormSubmit");
+    const formStatusLiveRegion = document.getElementById("leadFormStatus");
+    const phoneInput = leadForm.querySelector("#cta-telefone");
+    let currentStep = 1;
+
+    const setFormStatus = (text) => {
+      if (!formStatusLiveRegion) return;
+      formStatusLiveRegion.textContent = text;
+    };
+
+    const normalizeDigits = (value) => value.replace(/\D/g, "").slice(0, 11);
+    const formatBrazilianPhone = (value) => {
+      const digits = normalizeDigits(value);
+      if (!digits) return "";
+      if (digits.length <= 2) return `(${digits}`;
+      if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+      if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+      return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
+    };
+
+    if (phoneInput) {
+      phoneInput.addEventListener("input", () => {
+        phoneInput.value = formatBrazilianPhone(phoneInput.value);
+      });
+    }
+
+    const getFieldsForStep = (step) => {
+      const wrappers = Array.from(leadForm.querySelectorAll(`[data-step-field="${step}"]`));
+      return wrappers.flatMap((wrapper) =>
+        Array.from(wrapper.querySelectorAll("input, textarea, select")).filter((field) => !field.disabled)
+      );
+    };
+
+    const validateStep = (step) => {
+      const fields = getFieldsForStep(step);
+      let firstInvalid = null;
+      const isValid = fields.every((field) => {
+        const valid = field.checkValidity();
+        if (!valid && !firstInvalid) firstInvalid = field;
+        return valid;
+      });
+      if (!isValid && firstInvalid) {
+        emitAnalyticsEvent("lead_form_validation_error", {
+          step: step,
+          field_id: firstInvalid.id || firstInvalid.name || "unknown"
+        });
+        setFormStatus("Há campos obrigatórios pendentes nesta etapa.");
+        firstInvalid.reportValidity();
+        firstInvalid.focus();
+      }
+      return isValid;
+    };
+
+    const setStep = (step, shouldFocus = false) => {
+      currentStep = Math.max(1, Math.min(step, totalSteps));
+      formSteps.forEach((panel) => {
+        const panelStep = Number(panel.getAttribute("data-form-step"));
+        panel.classList.toggle("d-none", panelStep !== currentStep);
+      });
+      stepLabels.forEach((label) => {
+        const labelStep = Number(label.getAttribute("data-form-step-label"));
+        label.classList.toggle("active", labelStep === currentStep);
+      });
+      if (progressBar) {
+        const width = `${(currentStep / totalSteps) * 100}%`;
+        progressBar.style.width = width;
+      }
+      if (prevButton) prevButton.classList.toggle("d-none", currentStep === 1);
+      if (nextButton) nextButton.classList.toggle("d-none", currentStep === totalSteps);
+      if (submitButton) submitButton.classList.toggle("d-none", currentStep !== totalSteps);
+      setFormStatus(`Etapa ${currentStep} de ${totalSteps}.`);
+
+      if (shouldFocus) {
+        const firstField = getFieldsForStep(currentStep)[0];
+        if (firstField) firstField.focus();
+      }
+    };
+
+    if (nextButton) {
+      nextButton.addEventListener("click", () => {
+        if (!validateStep(currentStep)) return;
+        emitAnalyticsEvent("lead_form_step_advance", {
+          from_step: currentStep,
+          to_step: currentStep + 1
+        });
+        setStep(currentStep + 1, true);
+      });
+    }
+
+    if (prevButton) {
+      prevButton.addEventListener("click", () => {
+        setStep(currentStep - 1, true);
+      });
+    }
+
+    leadForm.addEventListener("submit", (event) => {
+      if (currentStep !== totalSteps) {
+        event.preventDefault();
+        if (validateStep(currentStep)) setStep(totalSteps, true);
+        return;
+      }
+      if (!validateStep(currentStep)) {
+        event.preventDefault();
+        return;
+      }
+      emitAnalyticsEvent("lead_form_submit_attempt", {
+        current_step: currentStep
+      });
+    });
+
+    const hasStep2Errors = leadForm.querySelector('[data-step-field="2"] .is-invalid');
+    setStep(hasStep2Errors ? 2 : 1, false);
   }
 
   // Collapse mobile menu after clicking a nav link

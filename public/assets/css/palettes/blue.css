@@ -1,0 +1,25 @@
+:root {
+  --bg0: #040914;
+  --bg1: #091326;
+  --bg2: #0f1f3d;
+  --gradA: 88, 201, 255;
+  --gradB: 55, 167, 255;
+  --gradC: 43, 117, 255;
+  --stroke: rgba(41, 97, 156, 0.24);
+  --stroke-soft: rgba(41, 97, 156, 0.17);
+}
+
+html[data-theme="light"] body {
+  --light-accent-rgb: 26, 83, 142;
+  --light-accent-strong-rgb: 8, 31, 59;
+  --light-bg0: #f3f7fc;
+  --light-bg1: #eef3fa;
+  --light-bg2: #e6edf7;
+  --light-surface-rgb: 236, 246, 255;
+  --light-surface-strong-rgb: 224, 238, 253;
+  --light-muted-rgb: 18, 59, 95;
+  --light-muted-mobile-rgb: 19, 58, 93;
+  --light-muted-tablet-rgb: 17, 56, 91;
+  --light-check-rgb: 27, 138, 91;
+  --light-success-strong-rgb: 9, 72, 44;
+}

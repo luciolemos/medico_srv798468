@@ -25,7 +25,7 @@
   {# ==============================
      FAVICON / PWA (opcional)
      ============================== #}
-  <link rel="icon" href="{{ base_url }}/assets/img/favicon.png">
+  <link rel="icon" href="{{ base_url }}/assets/img/natalcode/nc400.png">
 
   {# ==============================
      CSS — LIBS
@@ -51,12 +51,22 @@
 
   <link href="{{ base_url }}/assets/css/app.css" rel="stylesheet">
   <link href="{{ base_url }}/assets/css/landing.css" rel="stylesheet">
+  <link
+    href="{{ base_url }}/assets/css/palettes/{{ palette ?? app_palette ?? 'blue' }}.css"
+    rel="stylesheet"
+    id="paletteStylesheet"
+    data-palette-link
+    data-palette-base="{{ base_url }}/assets/css/palettes"
+    data-palette-default="{{ palette ?? app_palette ?? 'blue' }}"
+  >
 
   {% block head_extra %}{% endblock %}
 </head>
 
 
 <body class="bg-body text-body antialiased">
+
+<div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
 {# ==============================
    LOADER (opcional)
