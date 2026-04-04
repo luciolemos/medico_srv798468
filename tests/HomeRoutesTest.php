@@ -38,13 +38,13 @@ final class HomeRoutesTest extends TestCase
             'base_url' => '/natalcode',
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/natalcode/');
-        $response = $app->handle($request);
+        $response = $this->request($app, 'GET', '/natalcode/');
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('<title>NatalCode | Teste de Home</title>', $html);
         self::assertStringContainsString('/natalcode/assets/css/landing.css', $html);
+        self::assertMatchesRegularExpression('/name="csrf_token" value="[a-f0-9]{64}"/', $html);
     }
 
     public function testHomeRendersCorrectAssetPathsWhenBasePathIsEmpty(): void
@@ -54,8 +54,7 @@ final class HomeRoutesTest extends TestCase
             'base_url' => '',
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/');
-        $response = $app->handle($request);
+        $response = $this->request($app, 'GET', '/');
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
@@ -72,8 +71,7 @@ final class HomeRoutesTest extends TestCase
             'base_url' => '/natalcode',
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/natalcode/?palette=invalida');
-        $response = $app->handle($request);
+        $response = $this->request($app, 'GET', '/natalcode/?palette=invalida');
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
@@ -87,8 +85,7 @@ final class HomeRoutesTest extends TestCase
             'base_url' => '/natalcode',
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/natalcode/?copy=growth&palette=red');
-        $response = $app->handle($request);
+        $response = $this->request($app, 'GET', '/natalcode/?copy=growth&palette=red');
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
@@ -122,8 +119,7 @@ final class HomeRoutesTest extends TestCase
             'storage_path' => $this->storagePath,
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/natalcode/');
-        $response = $app->handle($request);
+        $response = $this->request($app, 'GET', '/natalcode/');
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
@@ -138,8 +134,7 @@ final class HomeRoutesTest extends TestCase
             'base_url' => '/natalcode',
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('GET', '/natalcode/');
-        $response = $app->handle($request);
+        $response = $this->request($app, 'GET', '/natalcode/');
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
@@ -158,16 +153,13 @@ final class HomeRoutesTest extends TestCase
             'base_url' => '/natalcode',
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/natalcode/contato')
-            ->withParsedBody([
-                'nome' => '',
-                'telefone' => '',
-                'email' => 'email-invalido',
-                'empresa' => '',
-                'mensagem' => '',
-            ]);
-
-        $response = $app->handle($request);
+        $response = $this->submitContactForm($app, '/natalcode', [
+            'nome' => '',
+            'telefone' => '',
+            'email' => 'email-invalido',
+            'empresa' => '',
+            'mensagem' => '',
+        ]);
 
         self::assertSame(302, $response->getStatusCode());
         self::assertSame('/natalcode/#form-orcamento', $response->getHeaderLine('Location'));
@@ -191,16 +183,13 @@ final class HomeRoutesTest extends TestCase
             },
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/natalcode/contato')
-            ->withParsedBody([
-                'nome' => 'Lucio Lemos',
-                'telefone' => '(84) 99999-9999',
-                'email' => 'lucio@example.com',
-                'empresa' => 'NatalCode',
-                'mensagem' => 'Quero publicar uma nova landing institucional.',
-            ]);
-
-        $response = $app->handle($request);
+        $response = $this->submitContactForm($app, '/natalcode', [
+            'nome' => 'Lucio Lemos',
+            'telefone' => '(84) 99999-9999',
+            'email' => 'lucio@example.com',
+            'empresa' => 'NatalCode',
+            'mensagem' => 'Quero publicar uma nova landing institucional.',
+        ]);
 
         self::assertSame(302, $response->getStatusCode());
         self::assertSame('/natalcode/#form-orcamento', $response->getHeaderLine('Location'));
@@ -222,16 +211,13 @@ final class HomeRoutesTest extends TestCase
             'contact_to' => null,
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/natalcode/contato')
-            ->withParsedBody([
-                'nome' => 'Lucio Lemos',
-                'telefone' => '(84) 99999-9999',
-                'email' => 'lucio@example.com',
-                'empresa' => 'NatalCode',
-                'mensagem' => 'Quero publicar uma nova landing institucional.',
-            ]);
-
-        $response = $app->handle($request);
+        $response = $this->submitContactForm($app, '/natalcode', [
+            'nome' => 'Lucio Lemos',
+            'telefone' => '(84) 99999-9999',
+            'email' => 'lucio@example.com',
+            'empresa' => 'NatalCode',
+            'mensagem' => 'Quero publicar uma nova landing institucional.',
+        ]);
 
         self::assertSame(302, $response->getStatusCode());
         self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
@@ -251,8 +237,34 @@ final class HomeRoutesTest extends TestCase
             },
         ]);
 
+        $response = $this->submitContactForm($app, '/natalcode', [
+            'nome' => 'Lucio Lemos',
+            'telefone' => '(84) 99999-9999',
+            'email' => 'lucio@example.com',
+            'empresa' => 'NatalCode',
+            'mensagem' => 'Quero publicar uma nova landing institucional.',
+        ]);
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
+        self::assertStringContainsString('lead_form_submit_failure', $_SESSION['form_flash']['status']['tracking_event'] ?? '');
+        self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '');
+        self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '');
+    }
+
+    public function testContatoRejectsInvalidCsrfToken(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/natalcode',
+            'storage_path' => $this->storagePath,
+        ]);
+
+        $this->request($app, 'GET', '/natalcode/');
+
         $request = (new ServerRequestFactory())->createServerRequest('POST', '/natalcode/contato')
             ->withParsedBody([
+                'csrf_token' => 'token-invalido',
+                'website' => '',
                 'nome' => 'Lucio Lemos',
                 'telefone' => '(84) 99999-9999',
                 'email' => 'lucio@example.com',
@@ -263,10 +275,32 @@ final class HomeRoutesTest extends TestCase
         $response = $app->handle($request);
 
         self::assertSame(302, $response->getStatusCode());
+        self::assertSame('/natalcode/#form-orcamento', $response->getHeaderLine('Location'));
+        self::assertSame('error', $_SESSION['form_flash']['status']['type'] ?? null);
+        self::assertStringContainsString('Sua sessao expirou', $_SESSION['form_flash']['status']['message'] ?? '');
+    }
+
+    public function testContatoRejectsHoneypotSubmission(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/natalcode',
+            'storage_path' => $this->storagePath,
+        ]);
+
+        $response = $this->submitContactForm($app, '/natalcode', [
+            'nome' => 'Lucio Lemos',
+            'telefone' => '(84) 99999-9999',
+            'email' => 'lucio@example.com',
+            'empresa' => 'NatalCode',
+            'mensagem' => 'Quero publicar uma nova landing institucional.',
+            'website' => 'https://bot.example.com',
+        ]);
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('/natalcode/#form-orcamento', $response->getHeaderLine('Location'));
         self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
-        self::assertStringContainsString('lead_form_submit_failure', $_SESSION['form_flash']['status']['tracking_event'] ?? '');
-        self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '');
-        self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '');
+        self::assertStringContainsString('Nao foi possivel processar o envio', $_SESSION['form_flash']['status']['message'] ?? '');
+        self::assertFileDoesNotExist($this->storagePath . '/logs/lead-events.log');
     }
 
     public function testContatoRedirectsToRootAnchorWhenBasePathIsEmpty(): void
@@ -276,19 +310,39 @@ final class HomeRoutesTest extends TestCase
             'storage_path' => $this->storagePath,
         ]);
 
-        $request = (new ServerRequestFactory())->createServerRequest('POST', '/contato')
-            ->withParsedBody([
-                'nome' => '',
-                'telefone' => '',
-                'email' => 'email-invalido',
-                'empresa' => '',
-                'mensagem' => '',
-            ]);
-
-        $response = $app->handle($request);
+        $response = $this->submitContactForm($app, '', [
+            'nome' => '',
+            'telefone' => '',
+            'email' => 'email-invalido',
+            'empresa' => '',
+            'mensagem' => '',
+        ]);
 
         self::assertSame(302, $response->getStatusCode());
         self::assertSame('/#form-orcamento', $response->getHeaderLine('Location'));
+    }
+
+    private function submitContactForm(object $app, string $basePath, array $data)
+    {
+        $path = $basePath === '' ? '/' : $basePath . '/';
+        $this->request($app, 'GET', $path);
+
+        $payload = array_merge([
+            'csrf_token' => $_SESSION['contact_csrf_token'] ?? '',
+            'website' => '',
+        ], $data);
+
+        $submitPath = $basePath === '' ? '/contato' : $basePath . '/contato';
+        $request = (new ServerRequestFactory())->createServerRequest('POST', $submitPath)
+            ->withParsedBody($payload);
+
+        return $app->handle($request);
+    }
+
+    private function request(object $app, string $method, string $uri)
+    {
+        $request = (new ServerRequestFactory())->createServerRequest($method, $uri);
+        return $app->handle($request);
     }
 
     private function removeDirectory(string $path): void

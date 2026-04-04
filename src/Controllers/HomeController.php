@@ -11,6 +11,7 @@ use Slim\Views\Twig;
 final class HomeController
 {
     private const ALLOWED_PALETTES = ['blue', 'red', 'emerald', 'amber', 'violet'];
+    private const CSRF_SESSION_KEY = 'contact_csrf_token';
 
     public function __construct(private Twig $twig, private array $config)
     {
@@ -36,6 +37,7 @@ final class HomeController
             'page_title' => $this->config['page_title'] ?? null,
             'copy_mode' => $copyMode,
             'palette' => $palette,
+            'csrf_token' => $this->issueContactCsrfToken(),
             'form_status' => $flash['status'] ?? null,
             'form_data' => $flash['data'] ?? [
                 'nome' => '',
@@ -52,6 +54,22 @@ final class HomeController
     {
         $parsed = $request->getParsedBody();
         $post = is_array($parsed) ? $parsed : [];
+
+        if (!$this->hasValidCsrfToken((string) ($post['csrf_token'] ?? ''))) {
+            $this->setFormFlash([
+                'type' => 'error',
+                'message' => 'Sua sessao expirou ou o formulario ficou invalido. Atualize a pagina e tente novamente.',
+            ]);
+            return $this->redirectToForm($response);
+        }
+
+        if ($this->isBotSubmission($post)) {
+            $this->setFormFlash([
+                'type' => 'warning',
+                'message' => 'Nao foi possivel processar o envio. Revise os campos e tente novamente.',
+            ]);
+            return $this->redirectToForm($response);
+        }
 
         $data = [
             'nome' => trim((string) ($post['nome'] ?? '')),
@@ -203,6 +221,43 @@ final class HomeController
         ]);
 
         return $this->redirectToForm($response);
+    }
+
+    private function issueContactCsrfToken(): string
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return '';
+        }
+
+        $token = $_SESSION[self::CSRF_SESSION_KEY] ?? null;
+        if (is_string($token) && $token !== '') {
+            return $token;
+        }
+
+        try {
+            $token = bin2hex(random_bytes(32));
+        } catch (\Throwable $e) {
+            $token = hash('sha256', (string) microtime(true));
+        }
+
+        $_SESSION[self::CSRF_SESSION_KEY] = $token;
+        return $token;
+    }
+
+    private function hasValidCsrfToken(string $token): bool
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return false;
+        }
+
+        $expected = $_SESSION[self::CSRF_SESSION_KEY] ?? null;
+        return is_string($expected) && $expected !== '' && $token !== '' && hash_equals($expected, $token);
+    }
+
+    private function isBotSubmission(array $post): bool
+    {
+        $honeypot = trim((string) ($post['website'] ?? ''));
+        return $honeypot !== '';
     }
 
     private function validateContact(array $data): array

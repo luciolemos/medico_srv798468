@@ -536,6 +536,11 @@
          - Classe `.js-lead-form` conecta com o wizard JS.
          - `action` respeita `base_url` para funcionar em subdiretório (APP_BASE). #}
       <form class="row g-3 js-lead-form" action="{{ base_url }}/contato" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token|default('') }}">
+        <div class="visually-hidden" aria-hidden="true">
+          <label for="contact-website">Website</label>
+          <input type="text" id="contact-website" name="website" value="" tabindex="-1" autocomplete="off">
+        </div>
         <div class="col-12">
           <div class="form-step-progress" aria-hidden="true">
             <div class="form-step-progress-bar" id="leadFormProgressBar"></div>
