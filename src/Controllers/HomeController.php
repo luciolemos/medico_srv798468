@@ -97,7 +97,34 @@ final class HomeController
         $from = $this->resolveFromAddress();
         $replyTo = ($data['email'] !== '' && filter_var($data['email'], FILTER_VALIDATE_EMAIL)) ? $data['email'] : null;
 
-        if ($this->useSmtpDriver()) {
+        $customSender = $this->config['mail_sender'] ?? null;
+        if (is_callable($customSender)) {
+            $result = $customSender([
+                'to' => $to,
+                'subject' => $subject,
+                'text_body' => $textBody,
+                'html_body' => $htmlBody,
+                'from' => $from,
+                'reply_to' => $replyTo,
+                'data' => $data,
+                'event_id' => $eventId,
+                'request_id' => $requestId,
+            ]);
+
+            if (!is_array($result) || !($result['ok'] ?? false)) {
+                $reason = 'mail_sender falhou: ' . (($result['error'] ?? 'erro desconhecido'));
+                $this->persistFallbackLead($data, $reason);
+                $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
+                $this->setFormFlash([
+                    'type' => 'warning',
+                    'message' => 'Recebemos sua solicitação, mas o envio de e-mail falhou no servidor. Entre em contato também pelo WhatsApp.',
+                    'event_id' => $eventId,
+                    'request_id' => $requestId,
+                    'tracking_event' => 'lead_form_submit_failure',
+                ]);
+                return $this->redirectToForm($response);
+            }
+        } elseif ($this->useSmtpDriver()) {
             if (!$this->isSmtpConfigured()) {
                 $reason = 'SMTP selecionado, mas incompleto no .env';
                 $this->persistFallbackLead($data, $reason);

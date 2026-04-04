@@ -48,6 +48,7 @@ final class TestAppFactory
             'smtp_encryption' => $config['smtp_encryption'] ?? 'tls',
             'smtp_auth' => $config['smtp_auth'] ?? true,
             'smtp_timeout' => $config['smtp_timeout'] ?? 15,
+            'mail_sender' => $config['mail_sender'] ?? null,
         ]);
 
         $app = AppFactory::create();
