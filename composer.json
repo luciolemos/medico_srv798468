@@ -1,5 +1,7 @@
 {
   "name": "agency/natalcode",
+  "description": "Base de landing page em Slim 4 e Twig para projetos web em PHP.",
+  "license": "proprietary",
   "type": "project",
   "require": {
     "php": "^8.3",

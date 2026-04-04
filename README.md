@@ -161,6 +161,27 @@ Checklist minimo:
 - redirects preservam o prefixo `/natalcode`
 - `storage/cache/twig` e `storage/logs/` recebem escrita
 
+## Checklist de producao
+Antes de considerar o deploy concluido, valide:
+- `composer test` verde no ambiente de build ou homologacao
+- `composer install --no-dev --optimize-autoloader` executado no servidor
+- `APP_ENV="production"` e `APP_BASE` coerente com a publicacao
+- envio real do formulario com recebimento do email
+- criacao de entradas em `storage/logs/lead-events.log` quando houver submit
+- ausencia de erro em `storage/logs/contatos-fallback.log` apos submit valido
+- permissoes de escrita em `storage/cache`, `storage/logs` e `storage/rate-limit`
+- `apache2ctl -t` sem erro antes do reload
+
+Comandos uteis de verificacao:
+
+```bash
+composer test
+php -r 'require "src/Core/Env.php"; \App\Core\Env::load(".env"); var_export($_ENV["APP_ENV"] ?? null); echo PHP_EOL;'
+sudo apache2ctl -t
+tail -n 50 storage/logs/lead-events.log
+tail -n 50 storage/logs/contatos-fallback.log
+```
+
 ## Deploy alternativo: vhost dedicado
 Se no futuro o projeto for publicado em um host raiz dedicado, entao:
 - o codigo pode continuar em `/var/www/natalcode`
@@ -222,6 +243,7 @@ Comandos uteis:
 
 ```bash
 composer install --no-dev --optimize-autoloader
+composer test
 sudo apache2ctl -t
 sudo systemctl reload apache2
 ```
