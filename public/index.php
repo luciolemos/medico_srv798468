@@ -60,6 +60,8 @@ $controller = new HomeController($twig, [
     'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? 'tls',
     'smtp_auth' => ($_ENV['SMTP_AUTH'] ?? 'true') !== 'false',
     'smtp_timeout' => (int) ($_ENV['SMTP_TIMEOUT'] ?? 15),
+    'rate_limit_max_attempts' => (int) ($_ENV['RATE_LIMIT_MAX_ATTEMPTS'] ?? 5),
+    'rate_limit_window_seconds' => (int) ($_ENV['RATE_LIMIT_WINDOW_SECONDS'] ?? 600),
 ]);
 
 $app = AppFactory::create();

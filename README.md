@@ -49,6 +49,8 @@ Principais variaveis:
 - `SMTP_ENCRYPTION`
 - `SMTP_AUTH`
 - `SMTP_TIMEOUT`
+- `RATE_LIMIT_MAX_ATTEMPTS`
+- `RATE_LIMIT_WINDOW_SECONDS`
 
 ## Execucao local
 ```bash
@@ -68,11 +70,16 @@ Para ambiente local, use:
 - Rota: `POST /contato`
 - Controller: `src/Controllers/HomeController.php`
 - Driver suportado: `smtp` ou `mail`
+- Protecoes ativas: `CSRF`, honeypot simples e rate limit por IP
 - Logs:
   - `storage/logs/lead-events.log`
   - `storage/logs/contatos-fallback.log`
 
 Se `MAIL_DRIVER=smtp`, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_ENCRYPTION`, `SMTP_AUTH` e `SMTP_TIMEOUT`.
+
+Rate limit padrao:
+- `RATE_LIMIT_MAX_ATTEMPTS=5`
+- `RATE_LIMIT_WINDOW_SECONDS=600`
 
 ## Deploy principal: vhost compartilhado com alias `/natalcode`
 Este e o fluxo recomendado para o servidor de destino atual, onde o host principal ja existe e o projeto sera publicado em `https://srv798468.hstgr.cloud/natalcode/`.
@@ -206,6 +213,7 @@ Paletas invalidas fazem fallback para `blue`.
 - Use `APP_ENV="production"` em servidor publico
 - Restrinja escrita apenas a `storage/`
 - Configure SMTP com credenciais do servidor de destino
+- Revise o rate limit do formulario conforme o perfil de trafego do site
 - Prefira HTTPS no host final
 - Rode `apache2ctl -t` antes de qualquer reload
 

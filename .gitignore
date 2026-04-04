@@ -1,6 +1,7 @@
 /vendor/
 /storage/cache/
 /storage/logs/
+/storage/rate-limit/
 .phpunit.cache/
 .env
 .DS_Store

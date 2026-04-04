@@ -79,6 +79,14 @@ final class HomeController
             'mensagem' => trim((string) ($post['mensagem'] ?? '')),
         ];
 
+        if ($this->hasHitContactRateLimit()) {
+            $this->setFormFlash([
+                'type' => 'warning',
+                'message' => 'Recebemos muitas tentativas seguidas deste origem. Aguarde alguns minutos e tente novamente.',
+            ], $data);
+            return $this->redirectToForm($response);
+        }
+
         $errors = $this->validateContact($data);
         if ($errors !== []) {
             $this->setFormFlash(
@@ -260,6 +268,45 @@ final class HomeController
         return $honeypot !== '';
     }
 
+    private function hasHitContactRateLimit(): bool
+    {
+        $maxAttempts = (int) ($this->config['rate_limit_max_attempts'] ?? 5);
+        $windowSeconds = (int) ($this->config['rate_limit_window_seconds'] ?? 600);
+
+        if ($maxAttempts <= 0 || $windowSeconds <= 0) {
+            return false;
+        }
+
+        $ip = $this->resolveClientIp();
+        $dir = $this->storagePath() . '/rate-limit';
+        $file = $dir . '/contact-' . sha1($ip) . '.json';
+
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
+        }
+
+        $now = time();
+        $attempts = [];
+
+        if (is_file($file)) {
+            $decoded = json_decode((string) file_get_contents($file), true);
+            if (is_array($decoded)) {
+                $attempts = array_values(array_filter($decoded, static function ($timestamp) use ($now, $windowSeconds): bool {
+                    return is_int($timestamp) && $timestamp >= ($now - $windowSeconds);
+                }));
+            }
+        }
+
+        if (count($attempts) >= $maxAttempts) {
+            @file_put_contents($file, json_encode($attempts), LOCK_EX);
+            return true;
+        }
+
+        $attempts[] = $now;
+        @file_put_contents($file, json_encode($attempts), LOCK_EX);
+        return false;
+    }
+
     private function validateContact(array $data): array
     {
         $errors = [];
@@ -287,6 +334,12 @@ final class HomeController
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $host = preg_replace('/:\\d+$/', '', $host);
         return 'no-reply@' . $host;
+    }
+
+    private function resolveClientIp(): string
+    {
+        $ip = trim((string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+        return $ip !== '' ? $ip : 'unknown';
     }
 
     private function setFormFlash(array $status, ?array $data = null, ?array $errors = null): void

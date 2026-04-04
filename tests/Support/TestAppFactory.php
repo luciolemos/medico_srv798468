@@ -50,6 +50,8 @@ final class TestAppFactory
             'smtp_timeout' => $config['smtp_timeout'] ?? 15,
             'mail_sender' => $config['mail_sender'] ?? null,
             'storage_path' => $config['storage_path'] ?? null,
+            'rate_limit_max_attempts' => $config['rate_limit_max_attempts'] ?? 5,
+            'rate_limit_window_seconds' => $config['rate_limit_window_seconds'] ?? 600,
         ]);
 
         $app = AppFactory::create();

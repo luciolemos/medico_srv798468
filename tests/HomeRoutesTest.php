@@ -151,6 +151,7 @@ final class HomeRoutesTest extends TestCase
     {
         $app = TestAppFactory::create([
             'base_url' => '/natalcode',
+            'storage_path' => $this->storagePath,
         ]);
 
         $response = $this->submitContactForm($app, '/natalcode', [
@@ -301,6 +302,46 @@ final class HomeRoutesTest extends TestCase
         self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
         self::assertStringContainsString('Nao foi possivel processar o envio', $_SESSION['form_flash']['status']['message'] ?? '');
         self::assertFileDoesNotExist($this->storagePath . '/logs/lead-events.log');
+    }
+
+    public function testContatoAppliesRateLimitAfterConfiguredNumberOfAttempts(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/natalcode',
+            'storage_path' => $this->storagePath,
+            'rate_limit_max_attempts' => 2,
+            'rate_limit_window_seconds' => 3600,
+        ]);
+
+        $first = $this->submitContactForm($app, '/natalcode', [
+            'nome' => '',
+            'telefone' => '',
+            'email' => 'email-invalido',
+            'empresa' => '',
+            'mensagem' => '',
+        ]);
+
+        $second = $this->submitContactForm($app, '/natalcode', [
+            'nome' => '',
+            'telefone' => '',
+            'email' => 'email-invalido',
+            'empresa' => '',
+            'mensagem' => '',
+        ]);
+
+        $third = $this->submitContactForm($app, '/natalcode', [
+            'nome' => '',
+            'telefone' => '',
+            'email' => 'email-invalido',
+            'empresa' => '',
+            'mensagem' => '',
+        ]);
+
+        self::assertSame(302, $first->getStatusCode());
+        self::assertSame(302, $second->getStatusCode());
+        self::assertSame(302, $third->getStatusCode());
+        self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
+        self::assertStringContainsString('Recebemos muitas tentativas seguidas', $_SESSION['form_flash']['status']['message'] ?? '');
     }
 
     public function testContatoRedirectsToRootAnchorWhenBasePathIsEmpty(): void
