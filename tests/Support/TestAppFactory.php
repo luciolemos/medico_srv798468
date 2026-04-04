@@ -38,8 +38,8 @@ final class TestAppFactory
             'page_title' => $config['page_title'] ?? 'NatalCode | Teste',
             'palette' => $config['palette'] ?? 'blue',
             'base_url' => $base,
-            'contact_to' => $config['contact_to'] ?? 'contato@example.com',
-            'contact_from' => $config['contact_from'] ?? 'no-reply@example.com',
+            'contact_to' => array_key_exists('contact_to', $config) ? $config['contact_to'] : 'contato@example.com',
+            'contact_from' => array_key_exists('contact_from', $config) ? $config['contact_from'] : 'no-reply@example.com',
             'mail_driver' => $config['mail_driver'] ?? 'smtp',
             'smtp_host' => $config['smtp_host'] ?? '',
             'smtp_port' => $config['smtp_port'] ?? 587,
@@ -49,6 +49,7 @@ final class TestAppFactory
             'smtp_auth' => $config['smtp_auth'] ?? true,
             'smtp_timeout' => $config['smtp_timeout'] ?? 15,
             'mail_sender' => $config['mail_sender'] ?? null,
+            'storage_path' => $config['storage_path'] ?? null,
         ]);
 
         $app = AppFactory::create();

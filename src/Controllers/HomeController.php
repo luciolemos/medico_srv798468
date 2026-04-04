@@ -495,8 +495,7 @@ HTML;
 
     private function persistFallbackLead(array $data, string $reason): void
     {
-        $basePath = dirname(__DIR__, 2);
-        $logDir = $basePath . '/storage/logs';
+        $logDir = $this->storagePath() . '/logs';
         $logFile = $logDir . '/contatos-fallback.log';
 
         if (!is_dir($logDir)) {
@@ -537,8 +536,7 @@ HTML;
 
     private function persistLeadEvent(string $eventId, string $requestId, string $result, string $reason, array $data): void
     {
-        $basePath = dirname(__DIR__, 2);
-        $logDir = $basePath . '/storage/logs';
+        $logDir = $this->storagePath() . '/logs';
         $logFile = $logDir . '/lead-events.log';
 
         if (!is_dir($logDir)) {
@@ -561,5 +559,15 @@ HTML;
         ];
 
         @file_put_contents($logFile, json_encode($entry, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+    }
+
+    private function storagePath(): string
+    {
+        $configured = trim((string) ($this->config['storage_path'] ?? ''));
+        if ($configured !== '') {
+            return rtrim($configured, '/');
+        }
+
+        return dirname(__DIR__, 2) . '/storage';
     }
 }
