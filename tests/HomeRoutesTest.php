@@ -47,6 +47,24 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('/natalcode/assets/css/landing.css', $html);
     }
 
+    public function testHomeRendersCorrectAssetPathsWhenBasePathIsEmpty(): void
+    {
+        $app = TestAppFactory::create([
+            'page_title' => 'NatalCode | Root',
+            'base_url' => '',
+        ]);
+
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/');
+        $response = $app->handle($request);
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<title>NatalCode | Root</title>', $html);
+        self::assertStringContainsString('href="/assets/css/landing.css"', $html);
+        self::assertStringContainsString('src="/assets/img/img_default.webp"', $html);
+        self::assertStringNotContainsString('//assets/', $html);
+    }
+
     public function testHomeFallsBackToBluePaletteWhenQueryPaletteIsInvalid(): void
     {
         $app = TestAppFactory::create([
@@ -112,6 +130,26 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Solicitacao recebida com sucesso.', $html);
         self::assertStringContainsString('data-form-result-event="lead_form_submit_success"', $html);
         self::assertArrayNotHasKey('form_flash', $_SESSION);
+    }
+
+    public function testHomeRendersCoreSectionsAsSmokeCoverage(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/natalcode',
+        ]);
+
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/natalcode/');
+        $response = $app->handle($request);
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('id="features"', $html);
+        self::assertStringContainsString('id="projects"', $html);
+        self::assertStringContainsString('id="depoimentos"', $html);
+        self::assertStringContainsString('id="how"', $html);
+        self::assertStringContainsString('id="docs"', $html);
+        self::assertStringContainsString('id="form-orcamento"', $html);
+        self::assertStringContainsString('id="faq"', $html);
     }
 
     public function testContatoWithInvalidPayloadRedirectsBackToFormAndStoresErrors(): void
@@ -229,6 +267,28 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('lead_form_submit_failure', $_SESSION['form_flash']['status']['tracking_event'] ?? '');
         self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '');
         self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '');
+    }
+
+    public function testContatoRedirectsToRootAnchorWhenBasePathIsEmpty(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '',
+            'storage_path' => $this->storagePath,
+        ]);
+
+        $request = (new ServerRequestFactory())->createServerRequest('POST', '/contato')
+            ->withParsedBody([
+                'nome' => '',
+                'telefone' => '',
+                'email' => 'email-invalido',
+                'empresa' => '',
+                'mensagem' => '',
+            ]);
+
+        $response = $app->handle($request);
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('/#form-orcamento', $response->getHeaderLine('Location'));
     }
 
     private function removeDirectory(string $path): void
