@@ -1,0 +1,7 @@
+{
+  "name": "natalcloud-e2e",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "1.53.0"
+  }
+}
