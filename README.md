@@ -62,6 +62,14 @@ Para ambiente local, use:
 - `APP_ENV="dev"`
 - `APP_BASE=""` se o projeto abrir na raiz local
 
+Atalho recomendado para dev local sem editar manualmente o .env:
+
+```bash
+bash scripts/dev-local.sh
+```
+
+Esse comando aplica APP_BASE vazio e APP_ENV dev apenas durante a sessao local e restaura o .env ao encerrar.
+
 ## Comportamento por ambiente
 - `APP_ENV=dev`: Twig sem cache, `auto_reload` ativo e erros detalhados.
 - `APP_ENV=production`: Twig com cache em `storage/cache/twig`, `auto_reload` desativado e middleware de erro em modo restrito.
@@ -221,12 +229,146 @@ Paletas suportadas:
 - `amber`
 - `violet`
 
-Prioridade de resolucao:
+Resolucao no backend (SSR inicial):
 1. query string `?palette=<cor>`
-2. `localStorage.palette`
+2. cookie `palette`
 3. `APP_PALETTE`
 
+Resolucao no frontend (apos JS carregar):
+1. query string `?palette=<cor>`
+2. `localStorage.palette`
+3. paleta inicial renderizada pelo backend
+
 Paletas invalidas fazem fallback para `blue`.
+
+### Checklist de regressao (paleta)
+1. Acesse sem query string e confirme que a pagina abre na paleta salva anteriormente.
+2. Clique para trocar entre `blue`, `red` e `emerald` e valide mudanca imediata sem recarregar.
+3. Recarregue a pagina e confirme persistencia da ultima paleta (sem flicker perceptivel).
+4. Abra com `?palette=red` e confirme prioridade da query string sobre cookie/localStorage.
+5. Abra com `?palette=invalida` e confirme fallback para `blue`.
+6. Confirme que a URL so recebe `?palette=` apos clique do usuario (nao automaticamente no primeiro carregamento).
+
+### Smoke test automatizado (SSR)
+Para validar rapidamente o comportamento de paleta no HTML inicial (sem navegador), execute:
+
+```bash
+bash scripts/smoke-palette.sh --url "https://srv798468.hstgr.cloud/natalcloud/" --default blue
+```
+
+O script cobre:
+1. query valida
+2. prioridade query sobre cookie
+3. prioridade cookie sem query
+4. query invalida
+5. fallback default SSR
+
+### Smoke test automatizado (contato)
+Para validar o fluxo HTTP basico do formulario de contato (payload invalido com redirect de retorno):
+
+```bash
+bash scripts/smoke-contact.sh --url "https://srv798468.hstgr.cloud/natalcloud/"
+```
+
+O script cobre:
+1. status HTTP 302 no POST invalido
+2. redirect para ancora de formulario
+3. emissao de cookie de sessao
+
+### Smoke test automatizado (frontend)
+Para validar regressao basica de copy mode SSR e hooks de analytics no JS:
+
+```bash
+bash scripts/smoke-frontend.sh --url "https://srv798468.hstgr.cloud/natalcloud/"
+```
+
+O script cobre:
+1. `?copy=growth` refletido no HTML SSR
+2. fallback de copy invalido para `soft`
+3. presenca dos hooks `dataLayer`, `gtag`, `cta_click` e `lead_form_submit_attempt`
+
+### Smoke test automatizado (contato com sucesso SMTP)
+Para validar caminho de sucesso do formulario (exige SMTP funcional/sandbox):
+
+```bash
+bash scripts/smoke-contact-success.sh --url "http://127.0.0.1:8000/"
+```
+
+O script cobre:
+1. POST valido com status 302
+2. redirect para `#form-orcamento`
+3. flash de sucesso renderizado no HTML
+4. evento `lead_form_submit_success` presente
+
+### Runner unico de testes
+Para rodar unitarios + smoke tests em um comando:
+
+```bash
+bash scripts/run-tests.sh --url "https://srv798468.hstgr.cloud/natalcloud/" --default-palette blue
+```
+
+Com teste de sucesso SMTP (quando sandbox estiver disponivel):
+
+```bash
+bash scripts/run-tests.sh --url "http://127.0.0.1:8000/" --default-palette blue --with-contact-success
+```
+
+### Quality Gate (seguranca + build)
+Executa validacao de composer, auditoria de dependencias e lint basico:
+
+```bash
+bash scripts/quality-gate.sh
+```
+
+### Budget de performance (Lighthouse CI)
+Executa auditoria Lighthouse com thresholds minimos de qualidade:
+
+```bash
+bash scripts/lighthouse-ci.sh balanced
+```
+
+Perfil mais rigoroso (recomendado para staging/release):
+
+```bash
+bash scripts/lighthouse-ci.sh strict
+```
+
+Arquivo de configuracao de budget:
+- `.lighthouserc.json`
+- `.lighthouserc.strict.json`
+
+Runner local de um comando (sobe servidor + ajusta ambiente temporario + executa Lighthouse + restaura `.env`):
+
+```bash
+bash scripts/lighthouse-local.sh strict
+```
+
+### Smoke E2E (browser real com Playwright)
+Executa validacao em navegador real (chromium):
+
+```bash
+bash scripts/smoke-e2e.sh "http://127.0.0.1:8000/"
+```
+
+Cobertura atual do E2E:
+1. troca de paleta com persistencia apos reload
+2. toggle de copy mode com navegacao growth/soft
+
+### Testes unitarios PHP (sem framework externo)
+Para validar regras centrais de controller (prioridade de paleta e validacao de contato):
+
+```bash
+php scripts/test-unit.php
+```
+
+CI automatizada:
+1. workflow em `.github/workflows/ci.yml`
+2. sobe SMTP sandbox (Mailpit) local
+3. executa quality gate (composer validate/audit + lint)
+4. executa runner unico com unitarios + smoke tests (paleta, contato, frontend e contato com sucesso)
+5. aplica budget Lighthouse
+    perfil usado no CI: `strict`
+6. roda smoke E2E em navegador real (Playwright)
 
 ## Seguranca de deploy
 - Publique apenas o diretorio `public/` no Apache

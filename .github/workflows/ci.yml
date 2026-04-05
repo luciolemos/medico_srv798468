@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring
+          tools: composer:v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare env for local CI server
+        run: |
+          cp .env.example .env
+          sed -i 's|^APP_BASE=.*$|APP_BASE=""|' .env
+          sed -i 's|^APP_ENV=.*$|APP_ENV="dev"|' .env
+          sed -i 's|^CONTACT_TO=.*$|CONTACT_TO="qa@example.test"|' .env
+          sed -i 's|^CONTACT_FROM=.*$|CONTACT_FROM="no-reply@example.test"|' .env
+          sed -i 's|^MAIL_DRIVER=.*$|MAIL_DRIVER="smtp"|' .env
+          sed -i 's|^SMTP_HOST=.*$|SMTP_HOST="127.0.0.1"|' .env
+          sed -i 's|^SMTP_PORT=.*$|SMTP_PORT="1025"|' .env
+          sed -i 's|^SMTP_USER=.*$|SMTP_USER="sandbox"|' .env
+          sed -i 's|^SMTP_PASS=.*$|SMTP_PASS="sandbox"|' .env
+          sed -i 's|^SMTP_ENCRYPTION=.*$|SMTP_ENCRYPTION="none"|' .env
+          sed -i 's|^SMTP_AUTH=.*$|SMTP_AUTH="false"|' .env
+
+      - name: Start SMTP sandbox (Mailpit)
+        run: docker run -d --name natalcloud-mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit:latest
+
+      - name: Start local server
+        run: |
+          php -S 127.0.0.1:8000 -t public >/tmp/natalcloud-php-server.log 2>&1 &
+          echo $! > /tmp/natalcloud-php-server.pid
+
+      - name: Make scripts executable
+        run: chmod +x scripts/run-tests.sh scripts/quality-gate.sh scripts/lighthouse-ci.sh scripts/smoke-e2e.sh
+
+      - name: Run quality gate
+        run: bash scripts/quality-gate.sh
+
+      - name: Run test suite
+        run: bash scripts/run-tests.sh --url "http://127.0.0.1:8000/" --default-palette blue --with-contact-success
+
+      - name: Run Lighthouse budget
+        run: bash scripts/lighthouse-ci.sh strict
+
+      - name: Run browser smoke e2e
+        run: bash scripts/smoke-e2e.sh "http://127.0.0.1:8000/"
+
+      - name: Stop local server
+        if: always()
+        run: |
+          if [ -f /tmp/natalcloud-php-server.pid ]; then
+            kill "$(cat /tmp/natalcloud-php-server.pid)" || true
+          fi
+
+      - name: Stop SMTP sandbox
+        if: always()
+        run: docker rm -f natalcloud-mailpit || true

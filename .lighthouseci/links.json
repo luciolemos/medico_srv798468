@@ -1,0 +1,5 @@
+{
+  "http://127.0.0.1:8000/": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1775348393612-95685.report.html",
+  "http://127.0.0.1:8000/?palette=red": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1775348394729-57706.report.html",
+  "http://127.0.0.1:8000/?copy=growth": "https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/reports/1775348395813-12226.report.html"
+}

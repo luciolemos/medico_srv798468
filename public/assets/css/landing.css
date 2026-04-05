@@ -54,6 +54,8 @@ body::before {
   background-size: 34px 34px;
   mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
   z-index: -2;
+  opacity: 0;
+  transition: opacity 0.28s ease;
 }
 
 body::after {
@@ -63,8 +65,17 @@ body::after {
   pointer-events: none;
   background-image: radial-gradient(rgba(255, 255, 255, 0.045) 0.6px, transparent 0.6px);
   background-size: 3px 3px;
-  opacity: 0.16;
+  opacity: 0;
   z-index: -1;
+  transition: opacity 0.28s ease;
+}
+
+html.fx-ready body::before {
+  opacity: 1;
+}
+
+html.fx-ready body::after {
+  opacity: 0.16;
 }
 
 h1,
@@ -81,6 +92,12 @@ h6,
 
 section[id] {
   scroll-margin-top: 110px;
+}
+
+header.hero + section,
+header.hero + section ~ section {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 860px;
 }
 
 .scroll-progress {
@@ -916,6 +933,12 @@ html[data-theme="light"] .logo-light {
   inset: 0;
   pointer-events: none;
   z-index: -1;
+  opacity: 0;
+  transition: opacity 0.34s ease;
+}
+
+html.fx-ready .bg-blobs {
+  opacity: 1;
 }
 
 .blob {

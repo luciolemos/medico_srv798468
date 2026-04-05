@@ -12,6 +12,8 @@ final class HomeController
 {
     private const ALLOWED_PALETTES = ['blue', 'red', 'emerald', 'amber', 'violet'];
     private const CSRF_SESSION_KEY = 'contact_csrf_token';
+    private const PALETTE_COOKIE_NAME = 'palette';
+    private const PALETTE_COOKIE_TTL = 31536000;
 
     public function __construct(private Twig $twig, private array $config)
     {
@@ -19,15 +21,28 @@ final class HomeController
 
     public function home(Request $request, Response $response): Response
     {
+        $queryParams = $request->getQueryParams();
+
         $copyMode = (string) ($request->getQueryParams()['copy'] ?? 'soft');
         if (!in_array($copyMode, ['soft', 'growth'], true)) {
             $copyMode = 'soft';
         }
 
-        $palette = strtolower((string) ($request->getQueryParams()['palette'] ?? ($this->config['palette'] ?? 'blue')));
-        if (!in_array($palette, self::ALLOWED_PALETTES, true)) {
+        $paletteFromQuery = strtolower((string) ($queryParams['palette'] ?? ''));
+        $paletteFromCookie = strtolower((string) ($_COOKIE[self::PALETTE_COOKIE_NAME] ?? ''));
+        $paletteFromConfig = strtolower((string) ($this->config['palette'] ?? 'blue'));
+
+        if (in_array($paletteFromQuery, self::ALLOWED_PALETTES, true)) {
+            $palette = $paletteFromQuery;
+        } elseif (in_array($paletteFromCookie, self::ALLOWED_PALETTES, true)) {
+            $palette = $paletteFromCookie;
+        } elseif (in_array($paletteFromConfig, self::ALLOWED_PALETTES, true)) {
+            $palette = $paletteFromConfig;
+        } else {
             $palette = 'blue';
         }
+
+        $this->persistPaletteCookie($palette);
 
         $flash = $this->pullFormFlash();
 
@@ -38,6 +53,7 @@ final class HomeController
             'copy_mode' => $copyMode,
             'palette' => $palette,
             'csrf_token' => $this->issueContactCsrfToken(),
+            'allowed_palettes' => self::ALLOWED_PALETTES,
             'form_status' => $flash['status'] ?? null,
             'form_data' => $flash['data'] ?? [
                 'nome' => '',
@@ -380,6 +396,36 @@ final class HomeController
         return $response
             ->withHeader('Location', rtrim($base, '/') . '/#form-orcamento')
             ->withStatus(302);
+    }
+
+    private function persistPaletteCookie(string $palette): void
+    {
+        if (!in_array($palette, self::ALLOWED_PALETTES, true)) {
+            return;
+        }
+
+        if ((string) ($_COOKIE[self::PALETTE_COOKIE_NAME] ?? '') === $palette) {
+            return;
+        }
+
+        setcookie(self::PALETTE_COOKIE_NAME, $palette, [
+            'expires' => time() + self::PALETTE_COOKIE_TTL,
+            'path' => $this->resolveCookiePath(),
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly' => false,
+            'samesite' => 'Lax',
+        ]);
+    }
+
+    private function resolveCookiePath(): string
+    {
+        $base = trim((string) ($this->config['base_url'] ?? ''));
+        if ($base === '' || $base === '/') {
+            return '/';
+        }
+
+        $normalized = '/' . trim($base, '/');
+        return $normalized . '/';
     }
 
     private function useSmtpDriver(): bool

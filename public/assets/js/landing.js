@@ -5,6 +5,23 @@
   const weakCpuDevice = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
   const shouldReduceAnimations = prefersReducedMotion || saveDataEnabled;
   const shouldLightenAnimations = shouldReduceAnimations || lowMemoryDevice || weakCpuDevice;
+  const markVisualFxReady = () => {
+    document.documentElement.classList.add("fx-ready");
+  };
+
+  const scheduleAfterFirstPaint = (callback) => {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(callback, { timeout: 1400 });
+      return;
+    }
+    window.setTimeout(callback, 360);
+  };
+
+  if (document.readyState === "complete") {
+    scheduleAfterFirstPaint(markVisualFxReady);
+  } else {
+    window.addEventListener("load", () => scheduleAfterFirstPaint(markVisualFxReady), { once: true });
+  }
 
   const applyProgressiveSectionDelays = () => {
     if (shouldLightenAnimations) return;
@@ -20,7 +37,7 @@
     });
   };
 
-  applyProgressiveSectionDelays();
+  scheduleAfterFirstPaint(applyProgressiveSectionDelays);
 
   const applySectionMotionProfiles = () => {
     const profiles = [
@@ -37,17 +54,21 @@
     });
   };
 
-  applySectionMotionProfiles();
+  scheduleAfterFirstPaint(applySectionMotionProfiles);
 
   // AOS
   if (window.AOS) {
-    AOS.init({
-      duration: shouldLightenAnimations ? 420 : 650,
-      once: true,
-      offset: shouldLightenAnimations ? 60 : 90,
-      easing: "ease-out",
-      disable: shouldReduceAnimations
-    });
+    const initAOS = () => {
+      AOS.init({
+        duration: shouldLightenAnimations ? 420 : 650,
+        once: true,
+        offset: shouldLightenAnimations ? 60 : 90,
+        easing: "ease-out",
+        disable: shouldReduceAnimations
+      });
+    };
+
+    scheduleAfterFirstPaint(initAOS);
   }
 
   // Footer year
@@ -110,12 +131,45 @@
   // Palette switcher (front-only)
   const paletteLink = document.querySelector("link[data-palette-link]");
   const paletteButtons = Array.from(document.querySelectorAll("[data-palette-btn]"));
-  const allowedPalettes = ["blue", "red", "emerald", "amber", "violet"];
+  const fallbackAllowedPalettes = ["blue", "red", "emerald", "amber", "violet"];
+  const parseAllowedPalettes = () => {
+    if (paletteLink) {
+      const fromData = paletteLink.getAttribute("data-palette-allowed");
+      if (fromData) {
+        try {
+          const parsed = JSON.parse(fromData);
+          if (Array.isArray(parsed)) {
+            const cleaned = parsed
+              .map((value) => String(value || "").toLowerCase().trim())
+              .filter(Boolean);
+            if (cleaned.length) return Array.from(new Set(cleaned));
+          }
+        } catch (e) {}
+      }
+    }
+    const fromApp = window.APP && Array.isArray(window.APP.allowedPalettes) ? window.APP.allowedPalettes : [];
+    if (fromApp.length) {
+      return Array.from(new Set(fromApp.map((value) => String(value || "").toLowerCase().trim()).filter(Boolean)));
+    }
+    return fallbackAllowedPalettes;
+  };
+  const allowedPalettes = parseAllowedPalettes();
   const isValidPalette = (value) => allowedPalettes.includes(value);
   const getPaletteFromUrl = () => {
     const url = new URL(window.location.href);
     const p = url.searchParams.get("palette");
     return isValidPalette(p || "") ? p : "";
+  };
+  const resolveCookiePath = () => {
+    const baseUrl = window.APP && typeof window.APP.baseUrl === "string" ? window.APP.baseUrl.trim() : "";
+    if (!baseUrl || baseUrl === "/") return "/";
+    return `/${baseUrl.replace(/^\/+|\/+$/g, "")}/`;
+  };
+  const persistPaletteCookie = (palette) => {
+    if (!isValidPalette(palette)) return;
+    const expires = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString();
+    const secure = window.location.protocol === "https:" ? "; Secure" : "";
+    document.cookie = `palette=${encodeURIComponent(palette)}; expires=${expires}; path=${resolveCookiePath()}; SameSite=Lax${secure}`;
   };
   const updatePaletteQuery = (palette) => {
     const url = new URL(window.location.href);
@@ -127,8 +181,11 @@
     const base = paletteLink.getAttribute("data-palette-base");
     if (!base) return;
     paletteLink.setAttribute("href", `${base}/${palette}.css`);
+    document.documentElement.setAttribute("data-palette", palette);
     paletteButtons.forEach((btn) => {
-      btn.classList.toggle("active", btn.getAttribute("data-palette-btn") === palette);
+      const isActive = btn.getAttribute("data-palette-btn") === palette;
+      btn.classList.toggle("active", isActive);
+      btn.setAttribute("aria-pressed", isActive ? "true" : "false");
     });
   };
 
@@ -145,7 +202,7 @@
       } catch (e) {}
     }
     applyPalette(activePalette);
-    updatePaletteQuery(activePalette);
+    persistPaletteCookie(activePalette);
   }
 
   if (paletteButtons.length) {
@@ -155,6 +212,7 @@
         if (!isValidPalette(next)) return;
         applyPalette(next);
         updatePaletteQuery(next);
+        persistPaletteCookie(next);
         try { localStorage.setItem("palette", next); } catch (e) {}
       });
     });
@@ -316,7 +374,11 @@
   // CTA + form tracking (GA4 dataLayer/gtag + Meta Pixel fbq)
   const query = new URLSearchParams(window.location.search);
   const copyMode = query.get("copy") === "growth" ? "growth" : "soft";
-  const activePalette = query.get("palette") || document.querySelector("link[data-palette-link]")?.getAttribute("data-palette-default") || "blue";
+  const activePalette =
+    document.documentElement.getAttribute("data-palette") ||
+    query.get("palette") ||
+    document.querySelector("link[data-palette-link]")?.getAttribute("data-palette-default") ||
+    "blue";
 
   const emitAnalyticsEvent = (eventName, payload = {}) => {
     const basePayload = {

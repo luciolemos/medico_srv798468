@@ -1,6 +1,16 @@
 {% extends 'base.twig' %}
 
 {% block title %}{{ page_title ?? 'NatalCode — Landing SaaS em PHP 8.3+' }}{% endblock %}
+{% block head_extra %}
+<link
+  rel="preload"
+  as="image"
+  href="{{ base_url }}/assets/img/img_default_640.webp"
+  imagesrcset="{{ base_url }}/assets/img/img_default_640.webp 640w, {{ base_url }}/assets/img/img_default_960.webp 960w, {{ base_url }}/assets/img/img_default.webp 1896w"
+  imagesizes="(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px"
+  fetchpriority="high"
+>
+{% endblock %}
 {# Define o modo de copy da página.
    - `soft`: tom mais institucional e técnico.
    - `growth`: tom mais comercial e orientado a conversão imediata.
@@ -73,7 +83,7 @@
            reutilizando os depoimentos cadastrados na seção #depoimentos. #}
         <div class="hero-proof glass mt-3 js-quick-proof" data-aos="fade-up" data-aos-delay="360">
           <div class="proof-avatars" aria-hidden="true">
-            <img id="quickProofAvatar" src="{{ base_url }}/assets/img/avatars/face2_620_620.webp" alt="Cliente atendido" width="620" height="620">
+            <img id="quickProofAvatar" src="{{ base_url }}/assets/img/avatars/face2_620_620.webp" alt="Cliente atendido" width="620" height="620" loading="lazy" decoding="async" fetchpriority="low">
           </div>
           <div class="proof-copy">
             <strong>Depoimento de cliente</strong>
@@ -85,12 +95,23 @@
 
       <div class="col-lg-6">
         <div class="p-0 hero-media" data-aos="zoom-in" data-aos-delay="200">
-          <img
-            src="{{ base_url }}/assets/img/img_default.webp"
-            alt="Prévia visual da base"
-            class="img-fluid"
-            loading="lazy"
-          >
+          <picture>
+            <source
+              type="image/webp"
+              srcset="{{ base_url }}/assets/img/img_default_640.webp 640w, {{ base_url }}/assets/img/img_default_960.webp 960w, {{ base_url }}/assets/img/img_default.webp 1896w"
+              sizes="(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px"
+            >
+            <img
+              src="{{ base_url }}/assets/img/img_default_640.webp"
+              alt="Prévia visual da base"
+              class="img-fluid"
+              width="640"
+              height="405"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+            >
+          </picture>
         </div>
 
         {# Bloco de métricas de percepção.

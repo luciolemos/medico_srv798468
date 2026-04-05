@@ -43,7 +43,8 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
   <!-- AOS Animate On Scroll -->
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+   <link rel="preload" href="https://unpkg.com/aos@2.3.1/dist/aos.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+   <noscript><link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></noscript>
 
   {# ==============================
      CSS — APP
@@ -58,7 +59,14 @@
     data-palette-link
     data-palette-base="{{ base_url }}/assets/css/palettes"
     data-palette-default="{{ palette ?? app_palette ?? 'blue' }}"
+      data-palette-allowed="{{ (allowed_palettes ?? ['blue', 'red', 'emerald', 'amber', 'violet'])|json_encode|e('html_attr') }}"
   >
+   {% set warm_palettes = ['blue', 'red', 'emerald'] %}
+   {% for warm_palette in warm_palettes %}
+   {% if warm_palette != (palette ?? app_palette ?? 'blue') %}
+   <link rel="prefetch" href="{{ base_url }}/assets/css/palettes/{{ warm_palette }}.css" as="style">
+   {% endif %}
+   {% endfor %}
 
   {% block head_extra %}{% endblock %}
 </head>
@@ -103,7 +111,8 @@
 <script>
 window.APP = {
   baseUrl: "{{ base_url }}",
-  env: "{{ app_env ?? 'prod' }}"
+   env: "{{ app_env ?? 'prod' }}",
+   allowedPalettes: {{ (allowed_palettes ?? ['blue', 'red', 'emerald', 'amber', 'violet'])|json_encode|raw }}
 };
 </script>
 
