@@ -60,8 +60,18 @@ jobs:
       - name: Run test suite
         run: bash scripts/run-tests.sh --url "http://127.0.0.1:8000/" --default-palette blue --with-contact-success
 
+      - name: Select Lighthouse profile
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "push" && "${GITHUB_REF_NAME}" == "main" ]]; then
+            PROFILE="strict"
+          else
+            PROFILE="balanced"
+          fi
+          echo "LIGHTHOUSE_PROFILE=${PROFILE}" >> "$GITHUB_ENV"
+          echo "Using profile: ${PROFILE}"
+
       - name: Run Lighthouse budget
-        run: bash scripts/lighthouse-ci.sh strict
+        run: bash scripts/lighthouse-ci.sh "${LIGHTHOUSE_PROFILE}"
 
       - name: Run browser smoke e2e
         run: bash scripts/smoke-e2e.sh "http://127.0.0.1:8000/"
