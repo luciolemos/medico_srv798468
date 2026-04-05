@@ -21,6 +21,7 @@ Options:
 
 Notas:
   - Exige backend com SMTP funcional (sandbox/local recomendado).
+  - O CSRF e obtido via GET da home antes do POST.
   - Este teste faz POST valido em /contato.
 USAGE
 }
@@ -74,15 +75,36 @@ TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 headers_file="$TMP_DIR/headers.txt"
 cookie_file="$TMP_DIR/cookies.txt"
+home_html_file="$TMP_DIR/home.html"
+
+extract_csrf_token() {
+  local html_file="$1"
+  tr '\n' ' ' < "$html_file" | sed -n 's/.*name="csrf_token"[^>]*value="\([^"]*\)".*/\1/p' | head -n 1
+}
 
 echo "[info] Base URL: $BASE_URL"
 echo "[info] POST URL: $POST_URL"
+echo "[step] Captura CSRF da home"
+
+curl -sS --max-time "$TIMEOUT" \
+  -c "$cookie_file" \
+  -b "$cookie_file" \
+  -o "$home_html_file" \
+  "$BASE_URL"
+
+csrf_token="$(extract_csrf_token "$home_html_file")"
+if [[ -z "$csrf_token" ]]; then
+  echo "[fail] nao foi possivel extrair csrf_token da home" >&2
+  exit 2
+fi
 
 curl -sS --max-time "$TIMEOUT" \
   -D "$headers_file" \
   -c "$cookie_file" \
+  -b "$cookie_file" \
   -o /dev/null \
   -X POST "$POST_URL" \
+  --data-urlencode "csrf_token=$csrf_token" \
   --data-urlencode "nome=Contato Smoke" \
   --data-urlencode "telefone=(84) 99999-0000" \
   --data-urlencode "email=smoke@example.test" \

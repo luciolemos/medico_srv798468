@@ -22,7 +22,8 @@ Options:
 
 Notas:
   - Este script valida o fluxo HTTP do POST /contato com payload invalido.
-  - Resultado esperado: redirect 302 para #form-orcamento com cookie de sessao.
+  - O CSRF e obtido via GET da home antes do POST.
+  - Resultado esperado: redirect 302 para #form-orcamento com erro de validacao.
 USAGE
 }
 
@@ -73,14 +74,37 @@ POST_URL="${BASE_URL}contato"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 headers_file="$TMP_DIR/headers.txt"
+cookie_file="$TMP_DIR/cookies.txt"
+home_html_file="$TMP_DIR/home.html"
+
+extract_csrf_token() {
+  local html_file="$1"
+  tr '\n' ' ' < "$html_file" | sed -n 's/.*name="csrf_token"[^>]*value="\([^"]*\)".*/\1/p' | head -n 1
+}
 
 echo "[info] Base URL: $BASE_URL"
 echo "[info] POST URL: $POST_URL"
+echo "[step] Captura CSRF da home"
+
+curl -sS --max-time "$TIMEOUT" \
+  -c "$cookie_file" \
+  -b "$cookie_file" \
+  -o "$home_html_file" \
+  "$BASE_URL"
+
+csrf_token="$(extract_csrf_token "$home_html_file")"
+if [[ -z "$csrf_token" ]]; then
+  echo "[fail] nao foi possivel extrair csrf_token da home" >&2
+  exit 2
+fi
 
 curl -sS --max-time "$TIMEOUT" \
   -D "$headers_file" \
+  -c "$cookie_file" \
+  -b "$cookie_file" \
   -o /dev/null \
   -X POST "$POST_URL" \
+  --data-urlencode "csrf_token=$csrf_token" \
   --data-urlencode "nome=" \
   --data-urlencode "telefone=" \
   --data-urlencode "email=email-invalido" \
@@ -90,9 +114,11 @@ curl -sS --max-time "$TIMEOUT" \
 status="$(awk 'toupper($1) ~ /^HTTP\// {code=$2} END{print code}' "$headers_file")"
 location="$(awk 'BEGIN{IGNORECASE=1} /^Location:/ {sub(/^Location:[[:space:]]*/, "", $0); gsub(/\r/, "", $0); loc=$0} END{print loc}' "$headers_file")"
 has_session_cookie=0
-if grep -qi '^Set-Cookie: PHPSESSID=' "$headers_file"; then
+if grep -q 'PHPSESSID' "$cookie_file"; then
   has_session_cookie=1
 fi
+
+html_after_post="$(curl -sS -L --max-time "$TIMEOUT" -b "$cookie_file" "$BASE_URL")"
 
 failures=0
 
@@ -114,6 +140,20 @@ if [[ "$has_session_cookie" -eq 1 ]]; then
   echo "[ok  ] cookie de sessao emitido"
 else
   echo "[fail] cookie de sessao PHPSESSID nao encontrado" >&2
+  failures=$((failures + 1))
+fi
+
+if grep -Fq 'data-form-result-type="error"' <<< "$html_after_post"; then
+  echo "[ok  ] tipo de resultado error presente"
+else
+  echo "[fail] nao encontrou data-form-result-type=error no HTML" >&2
+  failures=$((failures + 1))
+fi
+
+if grep -Fq 'Revise os campos e tente novamente.' <<< "$html_after_post"; then
+  echo "[ok  ] mensagem de erro de validacao renderizada"
+else
+  echo "[fail] nao encontrou mensagem de erro de validacao esperada no HTML" >&2
   failures=$((failures + 1))
 fi
 
