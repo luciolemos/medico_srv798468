@@ -75,15 +75,6 @@
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
-  // Page loader (fail-safe)
-  const hideLoader = () => {
-    const loader = document.getElementById("pageLoader");
-    if (loader) loader.classList.add("loaded");
-  };
-  window.addEventListener("load", hideLoader);
-  document.addEventListener("DOMContentLoaded", hideLoader);
-  setTimeout(hideLoader, 2000);
-
   // Floating buttons (back-to-top + WhatsApp)
   const btn = document.getElementById("backToTop");
   const whatsappFloat = document.querySelector(".whatsapp-float");
