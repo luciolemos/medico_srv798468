@@ -162,9 +162,10 @@
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
     document.cookie = `palette=${encodeURIComponent(palette)}; expires=${expires}; path=${resolveCookiePath()}; SameSite=Lax${secure}`;
   };
-  const updatePaletteQuery = (palette) => {
+  const stripPaletteQueryParam = () => {
     const url = new URL(window.location.href);
-    url.searchParams.set("palette", palette);
+    if (!url.searchParams.has("palette")) return;
+    url.searchParams.delete("palette");
     window.history.replaceState({}, "", url.toString());
   };
   const applyPalette = (palette) => {
@@ -194,6 +195,7 @@
     }
     applyPalette(activePalette);
     persistPaletteCookie(activePalette);
+    stripPaletteQueryParam();
   }
 
   if (paletteButtons.length) {
@@ -202,7 +204,6 @@
         const next = buttonEl.getAttribute("data-palette-btn") || "";
         if (!isValidPalette(next)) return;
         applyPalette(next);
-        updatePaletteQuery(next);
         persistPaletteCookie(next);
         try { localStorage.setItem("palette", next); } catch (e) {}
       });

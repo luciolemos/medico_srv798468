@@ -22,6 +22,7 @@ final class HomeController
     public function home(Request $request, Response $response): Response
     {
         $queryParams = $request->getQueryParams();
+        $hasSeoVariantQuery = $this->hasSeoVariantQuery($queryParams);
 
         $copyMode = (string) ($request->getQueryParams()['copy'] ?? 'soft');
         if (!in_array($copyMode, ['soft', 'growth'], true)) {
@@ -45,6 +46,9 @@ final class HomeController
         $this->persistPaletteCookie($palette);
 
         $flash = $this->pullFormFlash();
+        if ($hasSeoVariantQuery) {
+            $response = $response->withHeader('X-Robots-Tag', 'noindex, nofollow');
+        }
 
         return $this->twig->render($response, 'pages/home.twig', [
             'app_name' => $this->config['app_name'] ?? 'Agência',
@@ -52,6 +56,8 @@ final class HomeController
             'page_title' => $this->config['page_title'] ?? null,
             'copy_mode' => $copyMode,
             'palette' => $palette,
+            'canonical_url' => $this->canonicalHomeUrl(),
+            'should_noindex' => $hasSeoVariantQuery,
             'csrf_token' => $this->issueContactCsrfToken(),
             'allowed_palettes' => self::ALLOWED_PALETTES,
             'form_status' => $flash['status'] ?? null,
@@ -426,6 +432,16 @@ final class HomeController
 
         $normalized = '/' . trim($base, '/');
         return $normalized . '/';
+    }
+
+    private function hasSeoVariantQuery(array $queryParams): bool
+    {
+        return array_key_exists('palette', $queryParams) || array_key_exists('copy', $queryParams);
+    }
+
+    private function canonicalHomeUrl(): string
+    {
+        return rtrim($this->resolveOrigin(), '/') . '/';
     }
 
     private function useSmtpDriver(): bool

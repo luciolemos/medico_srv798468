@@ -6,6 +6,15 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="{% block meta_description %}Landing profissional em PHP + Twig{% endblock %}">
+  {% if canonical_url is defined and canonical_url %}
+  <link rel="canonical" href="{{ canonical_url|e('html_attr') }}">
+  <meta property="og:url" content="{{ canonical_url|e('html_attr') }}">
+  {% endif %}
+  {% if should_noindex ?? false %}
+  <meta name="robots" content="noindex, nofollow">
+  {% else %}
+  <meta name="robots" content="index, follow">
+  {% endif %}
   <meta name="theme-color" content="#0b0f19">
   <script>
   (function () {
