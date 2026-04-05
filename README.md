@@ -3,7 +3,7 @@
 Template base para aplicacoes web em PHP com arquitetura orientada a rotas e controllers, utilizando Slim 4 como microframework HTTP/PSR-7 e Twig como engine de templates para composicao da camada de apresentacao.
 
 ## Stack
-- PHP 8.3+
+- PHP 8.4+
 - Slim 4 (`slim/slim`, `slim/psr7`)
 - Twig (`slim/twig-view`, `twig/twig`)
 - PHPMailer (`phpmailer/phpmailer`)
@@ -19,7 +19,7 @@ Template base para aplicacoes web em PHP com arquitetura orientada a rotas e con
 - `.env.example`: modelo de configuracao para novos servidores.
 
 ## Requisitos de servidor
-- PHP 8.3 ou superior
+- PHP 8.4 ou superior
 - Apache 2.4 com `mod_rewrite`
 - Composer 2
 - Permissao de escrita em `storage/`
