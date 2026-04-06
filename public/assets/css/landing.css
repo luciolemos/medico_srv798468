@@ -90,16 +90,10 @@ section[id] {
   scroll-margin-top: 110px;
 }
 
-header.hero + section,
-header.hero + section ~ section {
+#projects,
+#depoimentos {
   content-visibility: auto;
-  contain-intrinsic-size: 1px 860px;
-}
-
-#docs,
-#labs-links {
-  content-visibility: visible;
-  contain-intrinsic-size: none;
+  contain-intrinsic-size: 1px 980px;
 }
 
 .scroll-progress {
