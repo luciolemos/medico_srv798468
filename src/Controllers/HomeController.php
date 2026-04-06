@@ -51,7 +51,7 @@ final class HomeController
         }
 
         return $this->twig->render($response, 'pages/home.twig', [
-            'app_name' => $this->config['app_name'] ?? 'Agência',
+            'app_name' => $this->config['app_name'] ?? 'NatalCloud',
             'app_mark' => $this->config['app_mark'] ?? 'A',
             'page_title' => $this->config['page_title'] ?? null,
             'copy_mode' => $copyMode,
