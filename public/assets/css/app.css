@@ -15,7 +15,7 @@ body {
 }
 
 .bg-body {
-  background-color: var(--bg) !important;
+  background-color: var(--bg0, var(--bg)) !important;
 }
 
 .text-body {

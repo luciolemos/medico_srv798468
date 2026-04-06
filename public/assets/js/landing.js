@@ -1,10 +1,7 @@
 (function () {
   const prefersReducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const saveDataEnabled = !!(navigator.connection && navigator.connection.saveData);
-  const lowMemoryDevice = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
-  const weakCpuDevice = typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency <= 4;
   const shouldReduceAnimations = prefersReducedMotion || saveDataEnabled;
-  const shouldLightenAnimations = shouldReduceAnimations || lowMemoryDevice || weakCpuDevice;
   const markVisualFxReady = () => {
     document.documentElement.classList.add("fx-ready");
   };
@@ -21,54 +18,6 @@
     scheduleAfterFirstPaint(markVisualFxReady);
   } else {
     window.addEventListener("load", () => scheduleAfterFirstPaint(markVisualFxReady), { once: true });
-  }
-
-  const applyProgressiveSectionDelays = () => {
-    if (shouldLightenAnimations) return;
-    const sections = Array.from(document.querySelectorAll("header.hero, section"));
-    sections.forEach((section, sectionIndex) => {
-      const sectionOffset = Math.min(sectionIndex * 45, 270);
-      const animatedEls = Array.from(section.querySelectorAll("[data-aos]"));
-      animatedEls.forEach((el) => {
-        const currentDelay = Number.parseInt(el.getAttribute("data-aos-delay") || "0", 10);
-        const baseDelay = Number.isFinite(currentDelay) ? currentDelay : 0;
-        el.setAttribute("data-aos-delay", String(baseDelay + sectionOffset));
-      });
-    });
-  };
-
-  scheduleAfterFirstPaint(applyProgressiveSectionDelays);
-
-  const applySectionMotionProfiles = () => {
-    const profiles = [
-      { selector: "#features [data-aos]", duration: 560, easing: "ease-out-sine" },
-      { selector: "#projects [data-aos], #depoimentos [data-aos]", duration: 620, easing: "ease-out-back" },
-      { selector: "#how [data-aos], #docs [data-aos], #labs-links [data-aos]", duration: 520, easing: "ease-out-sine" }
-    ];
-    profiles.forEach(({ selector, duration, easing }) => {
-      const nodes = document.querySelectorAll(selector);
-      nodes.forEach((node) => {
-        node.setAttribute("data-aos-duration", String(duration));
-        node.setAttribute("data-aos-easing", easing);
-      });
-    });
-  };
-
-  scheduleAfterFirstPaint(applySectionMotionProfiles);
-
-  // AOS
-  if (window.AOS) {
-    const initAOS = () => {
-      AOS.init({
-        duration: shouldLightenAnimations ? 420 : 650,
-        once: true,
-        offset: shouldLightenAnimations ? 60 : 90,
-        easing: "ease-out",
-        disable: shouldReduceAnimations
-      });
-    };
-
-    scheduleAfterFirstPaint(initAOS);
   }
 
   // Footer year
@@ -171,8 +120,10 @@
   const applyPalette = (palette) => {
     if (!paletteLink || !isValidPalette(palette)) return;
     const base = paletteLink.getAttribute("data-palette-base");
+    const assetVersion = paletteLink.getAttribute("data-palette-version") || "";
+    const versionQuery = assetVersion ? `?v=${encodeURIComponent(assetVersion)}` : "";
     if (!base) return;
-    paletteLink.setAttribute("href", `${base}/${palette}.css`);
+    paletteLink.setAttribute("href", `${base}/${palette}.css${versionQuery}`);
     document.documentElement.setAttribute("data-palette", palette);
     paletteButtons.forEach((btn) => {
       const isActive = btn.getAttribute("data-palette-btn") === palette;
@@ -673,7 +624,9 @@
       const el = document.getElementById(id);
       return el ? { link, el } : null;
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    // Use document order (vertical position), not navbar order.
+    .sort((a, b) => a.el.offsetTop - b.el.offsetTop);
 
   const setActiveLink = () => {
     if (!sections.length) return;
@@ -689,6 +642,7 @@
 
   window.addEventListener("scroll", setActiveLink, { passive: true });
   window.addEventListener("load", setActiveLink);
+  window.addEventListener("hashchange", setActiveLink);
 
   // Tablet carousels (projects + testimonials): arrows + pagination dots
   const tabletRange = window.matchMedia("(min-width: 768px) and (max-width: 1366px)");

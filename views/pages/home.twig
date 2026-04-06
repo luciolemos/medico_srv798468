@@ -36,7 +36,7 @@
 
 {# HERO (acima da dobra):
    - Apresenta proposta de valor, CTA principal e prova rápida.
-   - Usa AOS para entrada progressiva dos elementos.
+   - Usa animações CSS leves para dar ritmo visual.
    - Mistura copy dinâmica (soft/growth) e elementos fixos de branding. #}
 <header class="hero py-5 py-lg-6">
   <div class="container position-relative">
@@ -47,10 +47,10 @@
           <span>{{ hero_badge ?? (is_growth ? 'Versão Growth: copy orientada a lead e fechamento' : 'Arquitetura enxuta, visual premium e foco em conversão') }}</span>
         </div>
 
-        <h1 class="display-5 fw-bold lh-sm mb-3">
-          {{ hero_title_prefix ?? (is_growth ? 'Lance sua landing em' : 'Sua plataforma') }}
-          <span class="text-gradient">{{ hero_title_highlight ?? (is_growth ? '24h' : 'pronta para escalar') }}</span>
-          {{ hero_title_suffix ?? (is_growth ? 'e transforme tráfego em leads qualificados.' : 'com alta performance e linguagem de produto.') }}
+        <h1 class="display-5 fw-bold lh-sm mb-3 hero-title-motion">
+          <span class="hero-title-part hero-title-part-1">{{ hero_title_prefix ?? (is_growth ? 'Lance sua landing em' : 'Sua plataforma') }}</span>
+          <span class="text-gradient hero-title-part hero-title-part-2 hero-title-highlight">{{ hero_title_highlight ?? (is_growth ? '24h' : 'pronta para escalar') }}</span>
+          <span class="hero-title-part hero-title-part-3">{{ hero_title_suffix ?? (is_growth ? 'e transforme tráfego em leads qualificados.' : 'com alta performance e linguagem de produto.') }}</span>
         </h1>
 
         <p class="lead text-secondary-emphasis mb-4">
@@ -137,7 +137,7 @@
             <div class="metric-label">LCP otimizado*</div>
           </div>
           <div class="metric glass">
-            <div class="metric-kpi">AOS</div>
+            <div class="metric-kpi">CSS</div>
             <div class="metric-label">Motion elegante</div>
           </div>
         </div>
@@ -156,13 +156,13 @@
 <section class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">{{ is_growth ? 'Base técnica pronta para escalar' : 'Stack moderna, estável e auditável' }}</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">{{ is_growth ? 'Base técnica pronta para escalar' : 'Stack moderna, estável e auditável' }}</h2>
+      <p class="text-secondary-emphasis mb-0">
         {{ is_growth ? 'Arquitetura enxuta para lançar rápido, medir resultados e evoluir sem retrabalho.' : 'Tecnologias consolidadas para performance, manutenção previsível e evolução contínua do produto.' }}
       </p>
     </div>
     <div class="row g-3 align-items-center justify-content-center">
-      <div class="col-12" data-aos="fade-up" data-aos-delay="80">
+      <div class="col-12">
         <div class="d-flex flex-wrap gap-2 justify-content-center">
           <span class="pill"><i class="bi bi-filetype-php"></i> PHP 8.4+</span>
           <span class="pill"><i class="bi bi-server"></i> Apache 2.4</span>
@@ -187,8 +187,8 @@
 <section id="features" class="py-5 py-lg-6 section-tech">
   <div class="container">
       <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">{{ is_growth ? 'Por que essa landing converte melhor' : 'O que você entrega com essa base' }}</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">{{ is_growth ? 'Por que essa landing converte melhor' : 'O que você entrega com essa base' }}</h2>
+      <p class="text-secondary-emphasis mb-0">
         {{ is_growth ? 'Menos fricção na jornada, mais clareza de oferta e mais ação no botão principal.' : 'Uma landing com cara de produto tech, pronta para vender melhor sem inflar complexidade.' }}
       </p>
     </div>
@@ -216,10 +216,9 @@
       %}
       {% set features = features ?? default_features %}
 
-      {# Renderização dos cards de benefício.
-         O delay usa `loop.index0` para efeito de entrada em cascata com AOS. #}
+      {# Renderização dos cards de benefício. #}
       {% for f in features %}
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+      <div class="col-md-6 col-lg-4">
         <div class="feature-card hover-lift glass card-variant-feature h-100 p-4">
           <div class="feature-icon"><i class="bi bi-{{ f.icon }}"></i></div>
           <h3 class="h5 fw-semibold mt-3">{{ f.title }}</h3>
@@ -237,8 +236,8 @@
 <section id="projects" class="py-5 py-lg-6 section-showcase section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">Casos e entregas recentes</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">Casos e entregas recentes</h2>
+      <p class="text-secondary-emphasis mb-0">
         Referências de páginas lançadas com posicionamento técnico, clareza comercial e bom desempenho.
       </p>
     </div>
@@ -272,7 +271,7 @@
     <div class="row g-3 g-lg-4 projects-grid">
       {# Grid de cards de cases. #}
       {% for p in projects %}
-      <div class="col-12 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+      <div class="col-12 col-lg-4">
         <div class="quote-card hover-lift glass card-variant-showcase p-4 h-100">
           <img
             src="{{ base_url }}{{ p.image }}"
@@ -303,8 +302,8 @@
 <section id="depoimentos" class="py-5 py-lg-6 section-proof section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">{{ is_growth ? 'Resultados de quem já aplicou' : 'Times que confiam na entrega' }}</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">{{ is_growth ? 'Resultados de quem já aplicou' : 'Times que confiam na entrega' }}</h2>
+      <p class="text-secondary-emphasis mb-0">
         {{ is_growth ? 'Provas reais de melhoria de clareza comercial e geração de leads.' : 'Depoimentos de quem usou a base em contextos reais de lançamento.' }}
       </p>
     </div>
@@ -336,7 +335,7 @@
          O avatar é resolvido com módulo (%) para evitar índice fora do array. #}
       {% for t in testimonials %}
       {% set avatar_key = testimonial_avatar_keys|length > 0 ? testimonial_avatar_keys[loop.index0 % (testimonial_avatar_keys|length)] : 'face2' %}
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 90 }}">
+      <div class="col-md-6 col-lg-4">
         <div class="quote-card hover-lift glass card-variant-proof h-100 p-4">
           <div class="d-flex justify-content-center mb-3">
             <img
@@ -369,14 +368,14 @@
 <section id="how" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">Como funciona (pipeline resumido)</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">Como funciona (pipeline resumido)</h2>
+      <p class="text-secondary-emphasis mb-0">
         Do rewrite ao HTML final, com fluxo previsível para manter velocidade de desenvolvimento.
       </p>
     </div>
 
     <div class="row align-items-center g-4 g-lg-5">
-      <div class="col-lg-6" data-aos="fade-up">
+      <div class="col-lg-6">
         <ol class="steps">
           <li><span class="step-num">1</span> Apache recebe <code>GET /</code></li>
           <li><span class="step-num">2</span> <code>public/index.php</code> (front controller)</li>
@@ -386,7 +385,7 @@
         </ol>
       </div>
 
-      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="120">
+      <div class="col-lg-6">
         <div class="quote-card hover-lift glass card-variant-docs p-4">
           <div class="d-flex align-items-center justify-content-between mb-2">
             <div class="fw-semibold">Checklist da landing</div>
@@ -412,11 +411,11 @@
 <section id="docs" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold mb-2" data-aos="fade-up">Documentação de engenharia</h2>
-      <p class="text-secondary-emphasis mb-3" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold mb-2">Documentação de engenharia</h2>
+      <p class="text-secondary-emphasis mb-3">
         Tudo em <code>/docs/tech</code>: arquitetura, segurança, router, observabilidade e padrões para manter qualidade em escala.
       </p>
-      <div data-aos="fade-up" data-aos-delay="120">
+      <div>
         <a class="btn btn-outline-light cta-track" href="#cta" data-cta-id="docs_primary">
           Ver blueprint técnico <i class="bi bi-arrow-right-short"></i>
         </a>
@@ -445,7 +444,7 @@
     <div class="row g-3 g-lg-4">
       {# Renderização dos cards de docs. #}
       {% for item in docs_cards %}
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+      <div class="col-md-6 col-lg-4">
         <div class="quote-card hover-lift glass card-variant-docs p-4 h-100">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-{{ item.icon }}"></i><span class="fw-semibold">{{ item.title }}</span>
@@ -464,8 +463,8 @@
 <section id="labs-links" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">Acessos do Labs</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">Acessos do Labs</h2>
+      <p class="text-secondary-emphasis mb-0">
         Atalhos para operação, administração e documentação do painel.
       </p>
     </div>
@@ -495,7 +494,7 @@
     <div class="row g-3 g-lg-4">
       {# Renderização dos atalhos operacionais. #}
       {% for item in labs_cards %}
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+      <div class="col-md-6 col-lg-4">
         <a class="quote-card hover-lift glass card-variant-docs p-4 h-100 d-block text-decoration-none" href="{{ item.href }}" target="_blank" rel="noopener">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-{{ item.icon }}"></i><span class="fw-semibold">{{ item.title }}</span>
@@ -511,14 +510,16 @@
 {# CTA FINAL:
    Reforço de decisão antes do formulário.
    CTA primário leva para #form-orcamento e também dispara tracking (classe `cta-track`). #}
-<section id="cta" class="py-5 py-lg-6">
+<section id="cta" class="py-5 py-lg-6 section-tech">
   <div class="container">
-    <div class="cta-box glass p-4 p-lg-5 text-center" data-aos="zoom-in">
-      <h2 class="fw-bold mb-2">{{ is_growth ? 'Pronto para colocar sua operação no ar hoje?' : 'Quer subir sua landing tech hoje?' }}</h2>
-      <p class="text-secondary-emphasis mb-4">
+    <div class="text-center mb-4 mb-lg-5 section-heading">
+      <h2 class="fw-bold">{{ is_growth ? 'Pronto para colocar sua operação no ar hoje?' : 'Quer subir sua landing tech hoje?' }}</h2>
+      <p class="text-secondary-emphasis mb-0">
         {{ is_growth ? 'Receba a base, personalize em minutos e comece a captar leads ainda esta semana.' : 'Estrutura pronta para publicar rápido, validar com usuários e evoluir com base em dados.' }}
       </p>
+    </div>
 
+    <div class="cta-box glass cta-box-no-bg p-4 p-lg-5 text-center">
       <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3">
         <a class="btn btn-primary btn-lg px-4 cta-track" href="#form-orcamento" data-cta-id="final_primary">
           {{ is_growth ? 'Começar implementação' : 'Quero essa base' }} <i class="bi bi-download ms-1"></i>
@@ -541,16 +542,16 @@
    - Exibe estado de retorno (`form_status`) vindo do backend (sucesso/aviso/erro).
    - Em caso de envio, publica metadados de rastreio (event_id/request_id) no HTML
      para analytics no client-side. #}
-<section id="form-orcamento" class="py-5 py-lg-6">
+<section id="form-orcamento" class="py-5 py-lg-6 section-tech">
   <div class="container">
-    <div class="cta-box glass p-4 p-lg-5" data-aos="zoom-in">
-      <div class="text-center mb-4 mb-lg-5 section-heading">
-        <h2 class="fw-bold mb-2">Solicite uma proposta</h2>
-        <p class="text-secondary-emphasis mb-0">
-          Envie seu contexto e retornamos com direcionamento técnico e comercial.
-        </p>
-      </div>
+    <div class="text-center mb-4 mb-lg-5 section-heading">
+      <h2 class="fw-bold">Solicite uma proposta</h2>
+      <p class="text-secondary-emphasis mb-0">
+        Envie seu contexto e retornamos com direcionamento técnico e comercial.
+      </p>
+    </div>
 
+    <div class="cta-box glass p-4 p-lg-5">
       {# Feedback pós-submit (flash de sessão do backend).
          Também serve como fonte para eventos de analytics no front. #}
       {% if form_status %}
@@ -657,15 +658,15 @@
 <section id="faq" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold" data-aos="fade-up">FAQ técnico-comercial</h2>
-      <p class="text-secondary-emphasis mb-0" data-aos="fade-up" data-aos-delay="80">
+      <h2 class="fw-bold">FAQ técnico-comercial</h2>
+      <p class="text-secondary-emphasis mb-0">
         Respostas objetivas para dúvidas frequentes antes da implementação.
       </p>
     </div>
 
     <div class="row justify-content-center">
-      <div class="col-lg-9">
-        <div class="accordion accordion-flush glass px-3" id="faqAcc" data-aos="fade-up" data-aos-delay="80">
+      <div class="col-12">
+        <div class="accordion accordion-flush glass px-3" id="faqAcc">
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
@@ -687,7 +688,7 @@
             </h3>
             <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Sim. A base usa Bootstrap + AOS + JS enxuto. Para ultra performance, é só desativar AOS e manter o CSS.
+                Sim. A base usa Bootstrap + JS enxuto + animações CSS leves. Para ultra performance, é só reduzir motion e manter a estrutura.
               </div>
             </div>
           </div>

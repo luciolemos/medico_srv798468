@@ -28,6 +28,14 @@ $base = $_ENV['APP_BASE'] ?? '';
 $appEnv = strtolower((string) ($_ENV['APP_ENV'] ?? 'production'));
 $isDev = in_array($appEnv, ['dev', 'development', 'local'], true);
 $twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
+$assetVersion = trim((string) ($_ENV['ASSET_VERSION'] ?? ''));
+if ($assetVersion === '') {
+    $assetVersion = (string) max(
+        (int) (@filemtime(__DIR__ . '/assets/css/app.css') ?: 0),
+        (int) (@filemtime(__DIR__ . '/assets/css/landing.css') ?: 0),
+        (int) (@filemtime(__DIR__ . '/assets/js/landing.js') ?: 0)
+    );
+}
 
 $twig = Twig::create(__DIR__ . '/../views', [
     'cache' => $twigCache,
@@ -39,6 +47,7 @@ $twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Agência');
 $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'A');
 $twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'PHP 8.3+');
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
+$twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? 'https://x.com');
 $twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? 'https://instagram.com');
