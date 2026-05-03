@@ -63,6 +63,10 @@
    {% endif %}
    {% endfor %}
 
+  {% if recaptcha_enabled ?? false %}
+  <script src="https://www.google.com/recaptcha/api.js?render={{ recaptcha_site_key|url_encode }}" async defer></script>
+  {% endif %}
+
   {% block head_extra %}{% endblock %}
 </head>
 
@@ -93,7 +97,12 @@
 window.APP = {
   baseUrl: "{{ base_url }}",
    env: "{{ app_env ?? 'prod' }}",
-   allowedPalettes: {{ (allowed_palettes ?? ['blue', 'red', 'emerald', 'amber', 'violet'])|json_encode|raw }}
+   allowedPalettes: {{ (allowed_palettes ?? ['blue', 'red', 'emerald', 'amber', 'violet'])|json_encode|raw }},
+   recaptcha: {
+     enabled: {{ (recaptcha_enabled ?? false) ? 'true' : 'false' }},
+     siteKey: "{{ recaptcha_site_key|default('')|e('js') }}",
+     action: "{{ recaptcha_action|default('contact_submit')|e('js') }}"
+   }
 };
 </script>
 

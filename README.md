@@ -22,7 +22,7 @@ Copie `.env.example` para `.env` e ajuste:
 - `CONTACT_TO` e `CONTACT_FROM`: emails usados pelo formulário.
 - Configurações `SMTP_*`, se `MAIL_DRIVER="smtp"`.
 - `RECAPTCHA_ENABLED`: mantenha `false` em `srv798468.hstgr.cloud`; use `true` apenas no `.env` real de produção em `natalcode.com.br/medico`.
-- `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `RECAPTCHA_ALLOWED_HOSTNAME`: configure somente no `.env` não versionado da produção.
+- `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `RECAPTCHA_MIN_SCORE`, `RECAPTCHA_ALLOWED_HOSTNAME` e `RECAPTCHA_ACTION`: configuram o reCAPTCHA v3 do formulário; mantenha os segredos somente no `.env` não versionado da produção.
 
 O arquivo `.env` não é versionado. Não coloque chaves secretas de reCAPTCHA em `.env.example`, README ou arquivos de backup versionados.
 

@@ -114,6 +114,25 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('palette-dot-emerald active', $html);
     }
 
+    public function testHomeRendersRecaptchaAssetsWhenEnabled(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/medico',
+            'recaptcha_enabled' => true,
+            'recaptcha_site_key' => 'site-key-123',
+            'recaptcha_action' => 'contact_submit',
+        ]);
+
+        $response = $this->request($app, 'GET', '/medico/');
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('https://www.google.com/recaptcha/api.js?render=site-key-123', $html);
+        self::assertStringContainsString('name="recaptcha_token"', $html);
+        self::assertStringContainsString('data-recaptcha-site-key="site-key-123"', $html);
+        self::assertStringContainsString('data-recaptcha-action="contact_submit"', $html);
+    }
+
     public function testHomeConsumesFlashStatusAndClearsItFromSession(): void
     {
         $_SESSION['form_flash'] = [
@@ -223,6 +242,79 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Nova solicitação de agendamento', $capturedMessage['html_body'] ?? '');
         self::assertFileDoesNotExist($this->storagePath . '/logs/contatos-fallback.log');
         self::assertFileExists($this->storagePath . '/logs/lead-events.log');
+    }
+
+    public function testContatoWithRecaptchaEnabledAcceptsValidToken(): void
+    {
+        $capturedMessage = [];
+
+        $app = TestAppFactory::create([
+            'base_url' => '/medico',
+            'storage_path' => $this->storagePath,
+            'recaptcha_enabled' => true,
+            'recaptcha_site_key' => 'site-key-123',
+            'recaptcha_secret_key' => 'secret-key-123',
+            'recaptcha_min_score' => 0.5,
+            'recaptcha_allowed_hostname' => 'localhost',
+            'recaptcha_action' => 'contact_submit',
+            'recaptcha_verifier' => static function (array $payload): array {
+                return [
+                    'success' => $payload['token'] === 'valid-token',
+                    'score' => 0.9,
+                    'hostname' => 'localhost',
+                    'action' => 'contact_submit',
+                ];
+            },
+            'mail_sender' => static function (array $payload) use (&$capturedMessage): array {
+                $capturedMessage = $payload;
+                return ['ok' => true];
+            },
+        ]);
+
+        $response = $this->submitContactForm($app, '/medico', [
+            'nome' => 'Lucio Lemos',
+            'telefone' => '(84) 99999-9999',
+            'email' => 'lucio@example.com',
+            'empresa' => 'Particular',
+            'mensagem' => 'Gostaria de agendar uma consulta clínica.',
+            'recaptcha_token' => 'valid-token',
+        ]);
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertSame('success', $_SESSION['form_flash']['status']['type'] ?? null);
+        self::assertSame('lucio@example.com', $capturedMessage['reply_to'] ?? null);
+    }
+
+    public function testContatoWithRecaptchaEnabledRejectsMissingToken(): void
+    {
+        $sent = false;
+
+        $app = TestAppFactory::create([
+            'base_url' => '/medico',
+            'storage_path' => $this->storagePath,
+            'recaptcha_enabled' => true,
+            'recaptcha_site_key' => 'site-key-123',
+            'recaptcha_secret_key' => 'secret-key-123',
+            'recaptcha_allowed_hostname' => 'localhost',
+            'mail_sender' => static function () use (&$sent): array {
+                $sent = true;
+                return ['ok' => true];
+            },
+        ]);
+
+        $response = $this->submitContactForm($app, '/medico', [
+            'nome' => 'Lucio Lemos',
+            'telefone' => '(84) 99999-9999',
+            'email' => 'lucio@example.com',
+            'empresa' => 'Particular',
+            'mensagem' => 'Gostaria de agendar uma consulta clínica.',
+        ]);
+
+        self::assertSame(302, $response->getStatusCode());
+        self::assertFalse($sent);
+        self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
+        self::assertStringContainsString('Não foi possível validar o reCAPTCHA', $_SESSION['form_flash']['status']['message'] ?? '');
+        self::assertStringContainsString('reCAPTCHA falhou: token ausente', file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '');
     }
 
     public function testContatoWithoutConfiguredRecipientCreatesWarningAndFallbackLogs(): void

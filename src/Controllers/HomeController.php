@@ -51,6 +51,9 @@ final class HomeController
             'page_title' => $this->config['page_title'] ?? null,
             'palette' => $palette,
             'show_palette_selector' => (bool) ($this->config['show_palette_selector'] ?? false),
+            'recaptcha_enabled' => $this->isRecaptchaFrontendEnabled(),
+            'recaptcha_site_key' => (string) ($this->config['recaptcha_site_key'] ?? ''),
+            'recaptcha_action' => $this->recaptchaAction(),
             'canonical_url' => $this->canonicalHomeUrl(),
             'should_noindex' => $hasSeoVariantQuery,
             'csrf_token' => $this->issueContactCsrfToken(),
@@ -116,6 +119,20 @@ final class HomeController
 
         $eventId = $this->newTrackingEventId();
         $requestId = $this->newRequestId();
+
+        $recaptchaResult = $this->verifyRecaptchaToken((string) ($post['recaptcha_token'] ?? ''));
+        if (!($recaptchaResult['ok'] ?? false)) {
+            $reason = 'reCAPTCHA falhou: ' . (string) ($recaptchaResult['error'] ?? 'erro desconhecido');
+            $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
+            $this->setFormFlash([
+                'type' => 'warning',
+                'message' => 'Não foi possível validar o reCAPTCHA. Atualize a página e tente novamente.',
+                'event_id' => $eventId,
+                'request_id' => $requestId,
+                'tracking_event' => 'lead_form_submit_failure',
+            ], $data);
+            return $this->redirectToForm($response);
+        }
 
         $to = $this->config['contact_to'] ?? null;
         if (!$to) {
@@ -283,6 +300,157 @@ final class HomeController
     {
         $honeypot = trim((string) ($post['website'] ?? ''));
         return $honeypot !== '';
+    }
+
+    private function isRecaptchaEnabled(): bool
+    {
+        return (bool) ($this->config['recaptcha_enabled'] ?? false);
+    }
+
+    private function isRecaptchaFrontendEnabled(): bool
+    {
+        return $this->isRecaptchaEnabled() && trim((string) ($this->config['recaptcha_site_key'] ?? '')) !== '';
+    }
+
+    private function recaptchaAction(): string
+    {
+        $action = trim((string) ($this->config['recaptcha_action'] ?? 'contact_submit'));
+        return $action !== '' ? $action : 'contact_submit';
+    }
+
+    private function verifyRecaptchaToken(string $token): array
+    {
+        if (!$this->isRecaptchaEnabled()) {
+            return ['ok' => true, 'disabled' => true];
+        }
+
+        $token = trim($token);
+        if ($token === '') {
+            return ['ok' => false, 'error' => 'token ausente'];
+        }
+
+        $secret = trim((string) ($this->config['recaptcha_secret_key'] ?? ''));
+        if ($secret === '') {
+            return ['ok' => false, 'error' => 'secret ausente'];
+        }
+
+        $verifier = $this->config['recaptcha_verifier'] ?? null;
+        if (is_callable($verifier)) {
+            $result = $verifier([
+                'secret' => $secret,
+                'token' => $token,
+                'remote_ip' => $this->resolveClientIp(),
+                'action' => $this->recaptchaAction(),
+            ]);
+            if (!is_array($result)) {
+                return ['ok' => false, 'error' => 'verificador retornou resposta invalida'];
+            }
+        } else {
+            $result = $this->requestRecaptchaVerification($secret, $token, $this->resolveClientIp());
+        }
+
+        if (!($result['success'] ?? false)) {
+            $codes = $result['error-codes'] ?? [];
+            $error = is_array($codes) && $codes !== [] ? implode(',', array_map('strval', $codes)) : 'success=false';
+            return ['ok' => false, 'error' => $error];
+        }
+
+        $expectedAction = $this->recaptchaAction();
+        $actualAction = (string) ($result['action'] ?? '');
+        if ($expectedAction !== '' && $actualAction !== $expectedAction) {
+            return ['ok' => false, 'error' => 'action inesperada'];
+        }
+
+        $minScore = (float) ($this->config['recaptcha_min_score'] ?? 0.5);
+        $score = $result['score'] ?? null;
+        if ($minScore > 0) {
+            if (!is_numeric($score)) {
+                return ['ok' => false, 'error' => 'score ausente'];
+            }
+            if ((float) $score < $minScore) {
+                return ['ok' => false, 'error' => 'score baixo'];
+            }
+        }
+
+        $allowedHostnames = $this->allowedRecaptchaHostnames();
+        if ($allowedHostnames !== []) {
+            $actualHostname = strtolower(trim((string) ($result['hostname'] ?? '')));
+            if ($actualHostname === '') {
+                return ['ok' => false, 'error' => 'hostname ausente'];
+            }
+            if (!in_array($actualHostname, $allowedHostnames, true)) {
+                return ['ok' => false, 'error' => 'hostname inesperado'];
+            }
+        }
+
+        return ['ok' => true, 'score' => is_numeric($score) ? (float) $score : null];
+    }
+
+    private function allowedRecaptchaHostnames(): array
+    {
+        $raw = strtolower(trim((string) ($this->config['recaptcha_allowed_hostname'] ?? '')));
+        if ($raw === '') {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(
+            preg_split('/[\s,]+/', $raw) ?: [],
+            static fn (string $hostname): bool => $hostname !== ''
+        )));
+    }
+
+    private function requestRecaptchaVerification(string $secret, string $token, string $remoteIp): array
+    {
+        $payload = http_build_query([
+            'secret' => $secret,
+            'response' => $token,
+            'remoteip' => $remoteIp,
+        ], '', '&');
+
+        if (function_exists('curl_init')) {
+            $ch = curl_init('https://www.google.com/recaptcha/api/siteverify');
+            if ($ch === false) {
+                return ['success' => false, 'error-codes' => ['curl-init-failed']];
+            }
+
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/x-www-form-urlencoded'],
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_TIMEOUT => 6,
+            ]);
+
+            $body = curl_exec($ch);
+            $error = curl_error($ch);
+            $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+            curl_close($ch);
+
+            if ($body === false || $status >= 400) {
+                return ['success' => false, 'error-codes' => ['request-failed:' . ($error !== '' ? $error : 'http-' . $status)]];
+            }
+        } else {
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'POST',
+                    'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+                    'content' => $payload,
+                    'timeout' => 6,
+                ],
+            ]);
+            $body = @file_get_contents('https://www.google.com/recaptcha/api/siteverify', false, $context);
+            if ($body === false) {
+                return ['success' => false, 'error-codes' => ['request-failed']];
+            }
+        }
+
+        $decoded = json_decode((string) $body, true);
+        if (!is_array($decoded)) {
+            return ['success' => false, 'error-codes' => ['invalid-json']];
+        }
+
+        return $decoded;
     }
 
     private function hasHitContactRateLimit(): bool
