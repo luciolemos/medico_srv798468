@@ -5,15 +5,30 @@
 {% set hero = content.hero|default({}) %}
 {% set hero_image = hero.image|default({}) %}
 {% set hero_sources = hero_image.sources|default([]) %}
-{% set hero_image_src = hero_image.src|default('assets/img/img_default_640.webp') %}
+{% set hero_image_src = hero_image.src|default('assets/img/hero/medico-640.webp') %}
 {% set hero_image_sizes = hero_image.sizes|default('(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px') %}
+{% set hero_mobile = hero_image.mobile|default({}) %}
+{% set hero_mobile_sources = hero_mobile.sources|default([]) %}
+{% set hero_mobile_media = hero_mobile.media|default('(max-width: 576px)') %}
 
 {% block title %}{{ page_title|default(seo.title|default(app_name|default('Landing de saúde'))) }}{% endblock %}
 {% block meta_description %}{{ seo.description|default('Atendimento com hora marcada, equipe organizada e retorno claro.') }}{% endblock %}
 {% block head_extra %}
+{% if hero_mobile.src|default('') %}
 <link
   rel="preload"
   as="image"
+  media="{{ hero_mobile_media }}"
+  href="{{ base_url }}/{{ hero_mobile.src }}"
+  imagesrcset="{% for source in hero_mobile_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
+  imagesizes="{{ hero_mobile.sizes|default('92vw') }}"
+  fetchpriority="high"
+>
+{% endif %}
+<link
+  rel="preload"
+  as="image"
+  {% if hero_mobile.src|default('') %}media="{{ hero_image.desktop_media|default('(min-width: 577px)') }}"{% endif %}
   href="{{ base_url }}/{{ hero_image_src }}"
   imagesrcset="{% for source in hero_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
   imagesizes="{{ hero_image_sizes }}"
@@ -114,6 +129,14 @@
       <div class="col-lg-6">
         <div class="p-0 hero-media">
           <picture>
+            {% if hero_mobile.src|default('') %}
+            <source
+              type="image/webp"
+              media="{{ hero_mobile_media }}"
+              srcset="{% for source in hero_mobile_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
+              sizes="{{ hero_mobile.sizes|default('92vw') }}"
+            >
+            {% endif %}
             <source
               type="image/webp"
               srcset="{% for source in hero_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
@@ -381,6 +404,11 @@
             </button>
           </div>
         </div>
+        {% if form.privacy_note|default('') %}
+        <p class="privacy-disclosure mb-0">
+          {{ form.privacy_note }}
+        </p>
+        {% endif %}
         {% if recaptcha_enabled ?? false %}
         <p class="recaptcha-disclosure mb-0">
           Este formulário é protegido pelo reCAPTCHA e está sujeito à

@@ -11,9 +11,9 @@ return [
         'type' => 'website',
         'twitter_card' => 'summary_large_image',
         'image' => [
-            'src' => 'assets/img/img_default.webp',
-            'width' => 1896,
-            'height' => 1067,
+            'src' => 'assets/img/social/medico-og.jpg',
+            'width' => 1200,
+            'height' => 630,
             'alt' => 'Médica em consulta com paciente no consultório',
         ],
         'schema' => [
@@ -71,13 +71,24 @@ return [
             ],
         ],
         'image' => [
-            'src' => 'assets/img/img_default_640.webp',
+            'src' => 'assets/img/hero/medico-640.webp',
             'sources' => [
-                ['path' => 'assets/img/img_default_640.webp', 'width' => 640],
-                ['path' => 'assets/img/img_default_960.webp', 'width' => 960],
-                ['path' => 'assets/img/img_default.webp', 'width' => 1896],
+                ['path' => 'assets/img/hero/medico-640.webp', 'width' => 640],
+                ['path' => 'assets/img/hero/medico-960.webp', 'width' => 960],
+                ['path' => 'assets/img/hero/medico-1896.webp', 'width' => 1896],
             ],
             'sizes' => '(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px',
+            'desktop_media' => '(min-width: 577px)',
+            'mobile' => [
+                'src' => 'assets/img/hero/medico-mobile-640.webp',
+                'sources' => [
+                    ['path' => 'assets/img/hero/medico-mobile-640.webp', 'width' => 640],
+                ],
+                'sizes' => '92vw',
+                'media' => '(max-width: 576px)',
+                'width' => 640,
+                'height' => 800,
+            ],
             'alt' => 'Médica em consulta com paciente no consultório',
             'width' => 640,
             'height' => 360,
@@ -173,6 +184,7 @@ return [
             'next' => 'Próximo',
             'submit' => 'Enviar solicitação',
         ],
+        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento. Os registros operacionais são minimizados e os backups de contato são retidos temporariamente.',
     ],
     'faq' => [
         'title' => 'Dúvidas frequentes',

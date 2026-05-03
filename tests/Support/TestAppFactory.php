@@ -72,6 +72,8 @@ final class TestAppFactory
             'storage_path' => $config['storage_path'] ?? null,
             'rate_limit_max_attempts' => $config['rate_limit_max_attempts'] ?? 5,
             'rate_limit_window_seconds' => $config['rate_limit_window_seconds'] ?? 600,
+            'lead_log_retention_days' => $config['lead_log_retention_days'] ?? 30,
+            'lead_log_hash_salt' => $config['lead_log_hash_salt'] ?? 'test-salt',
             'x_url' => $config['x_url'] ?? '#',
             'facebook_url' => $config['facebook_url'] ?? '#',
             'instagram_url' => $config['instagram_url'] ?? '#',
