@@ -24,6 +24,20 @@
   const y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
+  const ensureRecaptchaLayoutClass = () => {
+    const recaptchaConfig = window.APP && window.APP.recaptcha;
+    const isRecaptchaConfigured = !!(recaptchaConfig && recaptchaConfig.enabled);
+    const hasRecaptchaScript = !!document.querySelector('script[src*="recaptcha/api.js"]');
+    const hasRecaptchaBadge = !!document.querySelector(".grecaptcha-badge");
+
+    if (isRecaptchaConfigured || hasRecaptchaScript || hasRecaptchaBadge) {
+      document.body.classList.add("has-recaptcha");
+    }
+  };
+  ensureRecaptchaLayoutClass();
+  window.addEventListener("load", ensureRecaptchaLayoutClass, { once: true });
+  window.setTimeout(ensureRecaptchaLayoutClass, 1500);
+
   // Floating buttons (back-to-top + WhatsApp)
   const btn = document.getElementById("backToTop");
   const whatsappFloat = document.querySelector(".whatsapp-float");
