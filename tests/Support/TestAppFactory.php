@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use App\Controllers\HomeController;
+use App\Core\LandingContent;
 use App\Middleware\SecurityHeadersMiddleware;
 use Slim\App;
 use Slim\Factory\AppFactory;
@@ -16,6 +17,7 @@ final class TestAppFactory
     public static function create(array $config = []): App
     {
         $base = $config['base_url'] ?? '/medico';
+        $landingContent = $config['landing_content'] ?? LandingContent::load(dirname(__DIR__, 2), '', 'landing');
 
         $twig = Twig::create(dirname(__DIR__, 2) . '/views', [
             'cache' => false,
@@ -26,8 +28,9 @@ final class TestAppFactory
         $twig->getEnvironment()->addGlobal('app_env', 'test');
         $twig->getEnvironment()->addGlobal('app_name', $config['app_name'] ?? 'Clínica Médica');
         $twig->getEnvironment()->addGlobal('app_mark', $config['app_mark'] ?? 'M');
-        $twig->getEnvironment()->addGlobal('app_badge', $config['app_badge'] ?? 'Clínica médica');
+        $twig->getEnvironment()->addGlobal('app_badge', $config['app_badge'] ?? ($landingContent['nav']['badge'] ?? 'Clínica médica'));
         $twig->getEnvironment()->addGlobal('app_palette', $config['palette'] ?? 'blue');
+        $twig->getEnvironment()->addGlobal('landing_content', $landingContent);
         $twig->getEnvironment()->addGlobal('show_palette_selector', $config['show_palette_selector'] ?? false);
         $twig->getEnvironment()->addGlobal('recaptcha_enabled', $config['recaptcha_enabled'] ?? false);
         $twig->getEnvironment()->addGlobal('recaptcha_site_key', $config['recaptcha_site_key'] ?? '');
@@ -42,7 +45,8 @@ final class TestAppFactory
             'app_mark' => $config['app_mark'] ?? 'M',
             'app_slug' => $config['app_slug'] ?? 'medico',
             'request_prefix' => $config['request_prefix'] ?? 'MED',
-            'page_title' => $config['page_title'] ?? 'Clínica Médica | Teste',
+            'page_title' => array_key_exists('page_title', $config) ? $config['page_title'] : 'Clínica Médica | Teste',
+            'landing_content' => $landingContent,
             'palette' => $config['palette'] ?? 'blue',
             'show_palette_selector' => $config['show_palette_selector'] ?? false,
             'base_url' => $base,

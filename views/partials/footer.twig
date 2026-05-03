@@ -1,15 +1,17 @@
+{% set footer_content = landing_content.footer|default({}) %}
+
 <footer class="footer py-4 mt-5">
   <div class="container">
     <div class="row gy-3 align-items-center">
       <div class="col-12 col-md-7">
         <div class="small text-secondary-emphasis">
-          <strong>{{ app_name ?? 'Clínica Médica' }} - Clínica médica</strong><br>
+          <strong>{{ app_name ?? 'Landing de saúde' }} - {{ footer_content.label|default('Atendimento') }}</strong><br>
           © <span id="year">{{ "now"|date("Y") }}</span> — Todos os direitos reservados
         </div>
 
         <div class="small text-secondary-emphasis">
-          {{ company_address ?? 'Atendimento presencial com horário agendado' }}<br>
-          {{ company_meta ?? 'Consultas, check-ups e acompanhamento clínico' }}
+          {{ company_address ?? footer_content.address|default('Atendimento presencial com horário agendado') }}<br>
+          {{ company_meta ?? footer_content.meta|default('Consultas, check-ups e acompanhamento clínico') }}
         </div>
 
         <div class="d-flex gap-3 mt-2">
@@ -27,7 +29,7 @@
         </div>
 
         <div class="small text-secondary  mt-2 mb-5">
-          Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.
+          {{ footer_content.emergency_note|default('Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.') }}
         </div>
       </div>
     </div>

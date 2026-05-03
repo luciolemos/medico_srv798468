@@ -2,10 +2,10 @@
 <html lang="pt-br" data-theme="dark">
 <head>
   <meta charset="utf-8">
-  <title>{% block title %}{{ app_name ?? 'Clínica Médica' }}{% endblock %}</title>
+  <title>{% block title %}{{ app_name ?? 'Landing de saúde' }}{% endblock %}</title>
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="{% block meta_description %}Clínica médica com atendimento humanizado e agendamento online.{% endblock %}">
+  <meta name="description" content="{% block meta_description %}Atendimento com hora marcada, equipe organizada e retorno claro.{% endblock %}">
   {% if canonical_url is defined and canonical_url %}
   <link rel="canonical" href="{{ canonical_url|e('html_attr') }}">
   <meta property="og:url" content="{{ canonical_url|e('html_attr') }}">

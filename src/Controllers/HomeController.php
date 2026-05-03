@@ -49,6 +49,7 @@ final class HomeController
             'app_name' => $this->config['app_name'] ?? 'Clínica Médica',
             'app_mark' => $this->config['app_mark'] ?? 'M',
             'page_title' => $this->config['page_title'] ?? null,
+            'landing_content' => $this->config['landing_content'] ?? [],
             'palette' => $palette,
             'show_palette_selector' => (bool) ($this->config['show_palette_selector'] ?? false),
             'recaptcha_enabled' => $this->isRecaptchaFrontendEnabled(),

@@ -112,6 +112,58 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('/medico/assets/css/palettes/red.css', $html);
     }
 
+    public function testHomeRendersLandingContentOverrides(): void
+    {
+        $app = TestAppFactory::create([
+            'page_title' => null,
+            'base_url' => '/pediatria',
+            'landing_content' => [
+                'seo' => [
+                    'title' => 'Clínica Pediátrica | Consulta infantil',
+                    'description' => 'Pediatria com agenda organizada, acompanhamento infantil e retorno claro para responsáveis.',
+                ],
+                'nav' => [
+                    'badge' => 'Pediatria',
+                    'cta' => 'Agendar',
+                ],
+                'hero' => [
+                    'badge' => 'Pediatria com escuta para a família',
+                    'title_parts' => ['Pediatria', 'leve e segura', 'para cada fase da infância.'],
+                    'lead' => 'Consultas pediátricas, puericultura e acompanhamento do desenvolvimento com orientação clara para responsáveis.',
+                ],
+                'services' => [
+                    'title' => 'Serviços pediátricos',
+                    'text' => 'Rotina de cuidado infantil com prevenção, acompanhamento e orientação.',
+                    'items' => [
+                        ['icon' => 'heart-pulse', 'title' => 'Puericultura', 'text' => 'Acompanhamento de crescimento, desenvolvimento e rotina de saúde.'],
+                    ],
+                ],
+                'faq' => [
+                    'title' => 'Dúvidas pediátricas',
+                    'text' => 'Perguntas comuns antes do agendamento.',
+                    'items' => [
+                        ['question' => 'Atende recém-nascidos?', 'answer' => 'Sim, a equipe confirma disponibilidade e orientações no retorno.'],
+                    ],
+                ],
+                'footer' => [
+                    'label' => 'Pediatria',
+                ],
+            ],
+        ]);
+
+        $response = $this->request($app, 'GET', '/pediatria/');
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<title>Clínica Pediátrica | Consulta infantil</title>', $html);
+        self::assertStringContainsString('Pediatria com agenda organizada', $html);
+        self::assertStringContainsString('Pediatria com escuta para a família', $html);
+        self::assertStringContainsString('Serviços pediátricos', $html);
+        self::assertStringContainsString('Puericultura', $html);
+        self::assertStringContainsString('Dúvidas pediátricas', $html);
+        self::assertStringNotContainsString('Serviços da clínica', $html);
+    }
+
     public function testHomeRendersPaletteSelectorWhenEnabled(): void
     {
         $app = TestAppFactory::create([

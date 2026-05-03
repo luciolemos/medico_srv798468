@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controllers\HomeController;
 use App\Core\Env;
+use App\Core\LandingContent;
 use App\Middleware\SecurityHeadersMiddleware;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
@@ -43,6 +44,12 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
+$landingContent = LandingContent::load(
+    dirname(__DIR__),
+    (string) ($_ENV['APP_CONTENT_FILE'] ?? ''),
+    (string) ($_ENV['APP_SLUG'] ?? '')
+);
+
 $base = trim((string) ($_ENV['APP_BASE'] ?? ''));
 if ($base === '') {
     $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
@@ -80,8 +87,9 @@ $twig->getEnvironment()->addGlobal('base_url', $base);
 $twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
 $twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Clínica Médica');
 $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'M');
-$twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'Clínica Médica');
+$twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? ($landingContent['nav']['badge'] ?? 'Clínica Médica'));
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
+$twig->getEnvironment()->addGlobal('landing_content', $landingContent);
 $twig->getEnvironment()->addGlobal('show_palette_selector', $showPaletteSelector);
 $twig->getEnvironment()->addGlobal('recaptcha_enabled', $recaptchaEnabled && $recaptchaSiteKey !== '');
 $twig->getEnvironment()->addGlobal('recaptcha_site_key', $recaptchaSiteKey);
@@ -99,6 +107,7 @@ $controller = new HomeController($twig, [
     'app_slug' => $_ENV['APP_SLUG'] ?? '',
     'request_prefix' => $_ENV['APP_REQUEST_PREFIX'] ?? '',
     'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
+    'landing_content' => $landingContent,
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
     'base_url' => $base,

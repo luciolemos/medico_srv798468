@@ -16,6 +16,7 @@ Copie `.env.example` para `.env` e ajuste:
 - `APP_PAGE_TITLE`: título da página.
 - `APP_SLUG`: identificador curto da landing, por exemplo `medico`, `pediatria` ou `odontologia`.
 - `APP_REQUEST_PREFIX`: prefixo dos protocolos, por exemplo `MED`, `PED`, `ODO`.
+- `APP_CONTENT_FILE`: arquivo de conteúdo em `config/content/` sem a extensão `.php`; use `landing` para uma landing por repositório.
 - `APP_BASE`: subcaminho de publicação, por exemplo `/medico`, `/pediatria` ou `/odontologia`.
 - `APP_PALETTE`: paleta padrão da landing (`blue`, `red`, `emerald`, `amber` ou `violet`).
 - `APP_SHOW_PALETTE_SELECTOR`: use `true` em catálogo/demo para mostrar o seletor de cores; mantenha `false` na landing final.
@@ -41,8 +42,8 @@ Abra `http://127.0.0.1:8000/`.
 
 1. Copie este projeto para o novo diretório, por exemplo `/var/www/pediatria`.
 2. Remova a identidade Git herdada se o destino for outro repositório.
-3. Ajuste `.env`: `APP_BASE`, textos públicos, links sociais, WhatsApp, SMTP e reCAPTCHA.
-4. Troque imagens em `public/assets/img/` e copie/adapte textos em `views/pages/home.twig`.
+3. Ajuste `.env`: `APP_BASE`, nome público, links sociais, WhatsApp, SMTP e reCAPTCHA.
+4. Troque textos em `config/content/landing.php` e imagens em `public/assets/img/`.
 5. Rode `composer test` e `bash scripts/run-tests.sh --url "http://127.0.0.1:8000/"`.
 
 Também há um gerador para criar uma cópia limpa do protótipo:
@@ -64,9 +65,11 @@ Os scripts em `scripts/` também mantêm smoke tests de paleta, formulário e fr
 
 O conteúdo principal está em:
 
-- `views/pages/home.twig`
+- `config/content/landing.php`
 - `views/partials/navbar.twig`
 - `views/partials/footer.twig`
 - `public/assets/img/`
+
+Para protótipos com mais de uma variação no mesmo repositório, crie outro arquivo em `config/content/`, por exemplo `config/content/pediatria.php`, e aponte `APP_CONTENT_FILE="pediatria"`. Quando `APP_CONTENT_FILE` não é informado, o app tenta `APP_SLUG` e depois volta para `landing`.
 
 Após alterar templates em produção, limpe o cache Twig em `storage/cache/twig` ou rode o script de pós-update.

@@ -205,10 +205,11 @@ set_env_value "$TARGET_DIR/.env" "APP_BADGE" "$APP_NAME"
 set_env_value "$TARGET_DIR/.env" "APP_PAGE_TITLE" "$APP_NAME | Atendimento com hora marcada"
 set_env_value "$TARGET_DIR/.env" "APP_SLUG" "$SLUG"
 set_env_value "$TARGET_DIR/.env" "APP_REQUEST_PREFIX" "$REQUEST_PREFIX"
+set_env_value "$TARGET_DIR/.env" "APP_CONTENT_FILE" "landing"
 set_env_value "$TARGET_DIR/.env" "APP_BASE" "/$SLUG"
 set_env_value "$TARGET_DIR/.env" "APP_PALETTE" "$APP_PALETTE"
 
 printf '# slug=palette\n%s=%s\n' "$SLUG" "$APP_PALETTE" > "$TARGET_DIR/palettes.map"
 
 echo "[ok  ] landing criada em $TARGET_DIR"
-echo "[next] ajuste textos/imagens, rode composer install e valide com scripts/dev-local.sh"
+echo "[next] ajuste config/content/landing.php e imagens, rode composer install e valide com scripts/dev-local.sh"
