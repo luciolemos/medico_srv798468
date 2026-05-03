@@ -1143,6 +1143,10 @@ html.fx-ready .bg-blobs {
   z-index: 999;
 }
 
+body.has-recaptcha .back-to-top {
+  bottom: calc(var(--floating-btn-bottom-offset) + 4.5rem);
+}
+
 .whatsapp-float {
   position: fixed;
   left: 0.95rem;
