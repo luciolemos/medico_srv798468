@@ -146,7 +146,7 @@ else
   failures=$((failures + 1))
 fi
 
-if grep -Fq 'Recebemos sua solicitação. Protocolo:' <<< "$html_after_post"; then
+if grep -Fq 'Recebemos sua solicitação de agendamento. Protocolo:' <<< "$html_after_post"; then
   echo "[ok  ] mensagem de sucesso renderizada"
 else
   echo "[fail] mensagem de sucesso nao encontrada no HTML" >&2
