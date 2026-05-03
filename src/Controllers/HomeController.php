@@ -50,6 +50,7 @@ final class HomeController
             'app_mark' => $this->config['app_mark'] ?? 'M',
             'page_title' => $this->config['page_title'] ?? null,
             'palette' => $palette,
+            'show_palette_selector' => (bool) ($this->config['show_palette_selector'] ?? false),
             'canonical_url' => $this->canonicalHomeUrl(),
             'should_noindex' => $hasSeoVariantQuery,
             'csrf_token' => $this->issueContactCsrfToken(),

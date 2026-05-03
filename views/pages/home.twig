@@ -464,6 +464,30 @@
 
 {% include 'partials/footer.twig' %}
 
+{% if show_palette_selector ?? false %}
+{% set active_palette = palette ?? app_palette ?? 'blue' %}
+<div class="palette-fab d-none d-lg-block" data-palette-fab>
+  <button
+    type="button"
+    class="palette-fab-toggle"
+    id="paletteFabToggle"
+    aria-expanded="false"
+    aria-controls="paletteFabPanel"
+    aria-label="Abrir seletor de paletas"
+  >
+    <i class="bi bi-palette2"></i>
+    <span>Paletas</span>
+  </button>
+  <div class="palette-fab-panel" id="paletteFabPanel" role="group" aria-label="Selecionar paleta de cores">
+    <button type="button" class="palette-dot palette-dot-blue {{ active_palette == 'blue' ? 'active' : '' }}" data-palette-btn="blue" aria-label="Paleta azul" title="Blue"></button>
+    <button type="button" class="palette-dot palette-dot-red {{ active_palette == 'red' ? 'active' : '' }}" data-palette-btn="red" aria-label="Paleta vermelha" title="Red"></button>
+    <button type="button" class="palette-dot palette-dot-emerald {{ active_palette == 'emerald' ? 'active' : '' }}" data-palette-btn="emerald" aria-label="Paleta esmeralda" title="Emerald"></button>
+    <button type="button" class="palette-dot palette-dot-amber {{ active_palette == 'amber' ? 'active' : '' }}" data-palette-btn="amber" aria-label="Paleta âmbar" title="Amber"></button>
+    <button type="button" class="palette-dot palette-dot-violet {{ active_palette == 'violet' ? 'active' : '' }}" data-palette-btn="violet" aria-label="Paleta violeta" title="Violet"></button>
+  </div>
+</div>
+{% endif %}
+
 <a
   class="whatsapp-float"
   href="{{ whatsapp_url }}"

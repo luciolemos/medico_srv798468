@@ -92,7 +92,26 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Cuidado médico', $html);
         self::assertStringContainsString('Serviços da clínica', $html);
         self::assertStringNotContainsString('id="copyModeToggle"', $html);
+        self::assertStringNotContainsString('id="paletteFabToggle"', $html);
+        self::assertStringNotContainsString('data-palette-btn="red"', $html);
         self::assertStringContainsString('/medico/assets/css/palettes/red.css', $html);
+    }
+
+    public function testHomeRendersPaletteSelectorWhenEnabled(): void
+    {
+        $app = TestAppFactory::create([
+            'palette' => 'blue',
+            'base_url' => '/medico',
+            'show_palette_selector' => true,
+        ]);
+
+        $response = $this->request($app, 'GET', '/medico/?palette=emerald');
+        $html = (string) $response->getBody();
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('id="paletteFabToggle"', $html);
+        self::assertStringContainsString('data-palette-btn="emerald"', $html);
+        self::assertStringContainsString('palette-dot-emerald active', $html);
     }
 
     public function testHomeConsumesFlashStatusAndClearsItFromSession(): void

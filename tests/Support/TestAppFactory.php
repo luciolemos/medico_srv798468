@@ -27,6 +27,7 @@ final class TestAppFactory
         $twig->getEnvironment()->addGlobal('app_mark', $config['app_mark'] ?? 'M');
         $twig->getEnvironment()->addGlobal('app_badge', $config['app_badge'] ?? 'Clínica médica');
         $twig->getEnvironment()->addGlobal('app_palette', $config['palette'] ?? 'blue');
+        $twig->getEnvironment()->addGlobal('show_palette_selector', $config['show_palette_selector'] ?? false);
         $twig->getEnvironment()->addGlobal('github_url', $config['github_url'] ?? '#');
         $twig->getEnvironment()->addGlobal('x_url', $config['x_url'] ?? '#');
         $twig->getEnvironment()->addGlobal('instagram_url', $config['instagram_url'] ?? '#');
@@ -37,6 +38,7 @@ final class TestAppFactory
             'app_mark' => $config['app_mark'] ?? 'M',
             'page_title' => $config['page_title'] ?? 'Clínica Médica | Teste',
             'palette' => $config['palette'] ?? 'blue',
+            'show_palette_selector' => $config['show_palette_selector'] ?? false,
             'base_url' => $base,
             'contact_to' => array_key_exists('contact_to', $config) ? $config['contact_to'] : 'contato@example.com',
             'contact_from' => array_key_exists('contact_from', $config) ? $config['contact_from'] : 'no-reply@example.com',
