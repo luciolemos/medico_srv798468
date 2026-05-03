@@ -46,6 +46,7 @@ final class TestAppFactory
             'app_slug' => $config['app_slug'] ?? 'medico',
             'request_prefix' => $config['request_prefix'] ?? 'MED',
             'page_title' => array_key_exists('page_title', $config) ? $config['page_title'] : 'Clínica Médica | Teste',
+            'canonical_url' => $config['canonical_url'] ?? '',
             'landing_content' => $landingContent,
             'palette' => $config['palette'] ?? 'blue',
             'show_palette_selector' => $config['show_palette_selector'] ?? false,
@@ -71,6 +72,10 @@ final class TestAppFactory
             'storage_path' => $config['storage_path'] ?? null,
             'rate_limit_max_attempts' => $config['rate_limit_max_attempts'] ?? 5,
             'rate_limit_window_seconds' => $config['rate_limit_window_seconds'] ?? 600,
+            'x_url' => $config['x_url'] ?? '#',
+            'facebook_url' => $config['facebook_url'] ?? '#',
+            'instagram_url' => $config['instagram_url'] ?? '#',
+            'whatsapp_url' => $config['whatsapp_url'] ?? '#',
         ]);
 
         $app = AppFactory::create();

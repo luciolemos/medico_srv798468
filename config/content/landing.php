@@ -6,6 +6,24 @@ return [
     'seo' => [
         'title' => 'Clínica Médica | Atendimento médico com hora marcada',
         'description' => 'Clínica médica com consultas, check-ups preventivos e acompanhamento de saúde com atendimento humanizado.',
+        'site_name' => 'Clínica Médica',
+        'locale' => 'pt_BR',
+        'type' => 'website',
+        'twitter_card' => 'summary_large_image',
+        'image' => [
+            'src' => 'assets/img/img_default.webp',
+            'width' => 1896,
+            'height' => 1067,
+            'alt' => 'Médica em consulta com paciente no consultório',
+        ],
+        'schema' => [
+            'type' => 'MedicalClinic',
+            'logo' => 'assets/img/clinic-mark.svg',
+            'price_range' => '$$',
+            'area_served' => 'Natal e região',
+            'include_services' => true,
+            'include_faq' => true,
+        ],
     ],
     'nav' => [
         'badge' => 'Clínica médica',

@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\SeoMetadata;
 use PHPMailer\PHPMailer\Exception as MailException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -45,17 +46,23 @@ final class HomeController
             $response = $response->withHeader('X-Robots-Tag', 'noindex, nofollow');
         }
 
+        $landingContent = $this->landingContent();
+        $seo = new SeoMetadata($this->config, $landingContent);
+        $seoMeta = $seo->meta();
+
         return $this->twig->render($response, 'pages/home.twig', [
             'app_name' => $this->config['app_name'] ?? 'Clínica Médica',
             'app_mark' => $this->config['app_mark'] ?? 'M',
             'page_title' => $this->config['page_title'] ?? null,
-            'landing_content' => $this->config['landing_content'] ?? [],
+            'landing_content' => $landingContent,
+            'seo_meta' => $seoMeta,
+            'structured_data_json' => $seo->structuredDataJson($seoMeta),
             'palette' => $palette,
             'show_palette_selector' => (bool) ($this->config['show_palette_selector'] ?? false),
             'recaptcha_enabled' => $this->isRecaptchaFrontendEnabled(),
             'recaptcha_site_key' => (string) ($this->config['recaptcha_site_key'] ?? ''),
             'recaptcha_action' => $this->recaptchaAction(),
-            'canonical_url' => $this->canonicalHomeUrl(),
+            'canonical_url' => $seoMeta['canonical_url'],
             'should_noindex' => $hasSeoVariantQuery,
             'csrf_token' => $this->issueContactCsrfToken(),
             'allowed_palettes' => self::ALLOWED_PALETTES,
@@ -603,9 +610,10 @@ final class HomeController
         return array_key_exists('palette', $queryParams);
     }
 
-    private function canonicalHomeUrl(): string
+    private function landingContent(): array
     {
-        return rtrim($this->resolveOrigin(), '/') . '/';
+        $content = $this->config['landing_content'] ?? [];
+        return is_array($content) ? $content : [];
     }
 
     private function useSmtpDriver(): bool
@@ -781,7 +789,8 @@ HTML;
 
     private function resolveOrigin(): string
     {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $forwardedProto = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
+        $scheme = $forwardedProto === 'https' || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $base = rtrim((string) ($this->config['base_url'] ?? ''), '/');
         return $scheme . '://' . $host . ($base !== '' ? $base : '');

@@ -79,6 +79,55 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('geolocation=()', $response->getHeaderLine('Permissions-Policy'));
     }
 
+    public function testHomeRendersStructuredSeoMetadata(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/medico',
+            'whatsapp_url' => 'https://wa.me/5584999031906',
+            'facebook_url' => 'https://facebook.com/clinica-medica',
+            'instagram_url' => 'https://instagram.com',
+            'x_url' => 'https://x.com',
+        ]);
+
+        $response = $this->request($app, 'GET', '/medico/');
+        $html = (string) $response->getBody();
+        $decodedHtml = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $structuredData = $this->extractStructuredData($html);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<link rel="canonical" href="http://localhost/medico/">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:type" content="website">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:title" content="Clínica Médica | Teste">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:image" content="http://localhost/medico/assets/img/img_default.webp">', $decodedHtml);
+        self::assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $decodedHtml);
+
+        self::assertSame('https://schema.org', $structuredData['@context'] ?? null);
+        self::assertSame('MedicalClinic', $structuredData['@graph'][0]['@type'] ?? null);
+        self::assertSame('http://localhost/medico/', $structuredData['@graph'][0]['url'] ?? null);
+        self::assertSame('+5584999031906', $structuredData['@graph'][0]['telephone'] ?? null);
+        self::assertSame(['https://facebook.com/clinica-medica'], $structuredData['@graph'][0]['sameAs'] ?? []);
+        self::assertSame('OfferCatalog', $structuredData['@graph'][0]['hasOfferCatalog']['@type'] ?? null);
+        self::assertSame('FAQPage', $structuredData['@graph'][1]['@type'] ?? null);
+    }
+
+    public function testHomeUsesConfiguredCanonicalUrlForSeoMetadata(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/medico',
+            'canonical_url' => 'https://example.com/medico',
+        ]);
+
+        $response = $this->request($app, 'GET', '/medico/');
+        $html = (string) $response->getBody();
+        $decodedHtml = html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $structuredData = $this->extractStructuredData($html);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('<link rel="canonical" href="https://example.com/medico/">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:image" content="https://example.com/medico/assets/img/img_default.webp">', $decodedHtml);
+        self::assertSame('https://example.com/medico/', $structuredData['@graph'][0]['url'] ?? null);
+    }
+
     public function testHomeFallsBackToBluePaletteWhenQueryPaletteIsInvalid(): void
     {
         $app = TestAppFactory::create([
@@ -91,6 +140,8 @@ final class HomeRoutesTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('/medico/assets/css/palettes/blue.css', $html);
+        self::assertSame('noindex, nofollow', $response->getHeaderLine('X-Robots-Tag'));
+        self::assertStringContainsString('<meta name="robots" content="noindex, nofollow">', $html);
     }
 
     public function testHomeRendersClinicCopyAndPaletteStateFromQueryString(): void
@@ -121,6 +172,11 @@ final class HomeRoutesTest extends TestCase
                 'seo' => [
                     'title' => 'Clínica Pediátrica | Consulta infantil',
                     'description' => 'Pediatria com agenda organizada, acompanhamento infantil e retorno claro para responsáveis.',
+                    'schema' => [
+                        'type' => 'MedicalClinic',
+                        'area_served' => 'Natal',
+                        'include_faq' => false,
+                    ],
                 ],
                 'nav' => [
                     'badge' => 'Pediatria',
@@ -153,6 +209,7 @@ final class HomeRoutesTest extends TestCase
 
         $response = $this->request($app, 'GET', '/pediatria/');
         $html = (string) $response->getBody();
+        $structuredData = $this->extractStructuredData($html);
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('<title>Clínica Pediátrica | Consulta infantil</title>', $html);
@@ -162,6 +219,8 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Puericultura', $html);
         self::assertStringContainsString('Dúvidas pediátricas', $html);
         self::assertStringNotContainsString('Serviços da clínica', $html);
+        self::assertSame('Natal', $structuredData['@graph'][0]['areaServed'] ?? null);
+        self::assertCount(1, $structuredData['@graph']);
     }
 
     public function testHomeRendersPaletteSelectorWhenEnabled(): void
@@ -572,6 +631,16 @@ final class HomeRoutesTest extends TestCase
     {
         $request = (new ServerRequestFactory())->createServerRequest($method, $uri);
         return $app->handle($request);
+    }
+
+    private function extractStructuredData(string $html): array
+    {
+        $matched = preg_match('/<script type="application\\/ld\\+json">(.*?)<\\/script>/s', $html, $matches);
+        self::assertSame(1, $matched, 'JSON-LD script tag was not found.');
+        $decoded = json_decode($matches[1], true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($decoded);
+
+        return $decoded;
     }
 
     private function removeDirectory(string $path): void

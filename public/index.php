@@ -107,6 +107,7 @@ $controller = new HomeController($twig, [
     'app_slug' => $_ENV['APP_SLUG'] ?? '',
     'request_prefix' => $_ENV['APP_REQUEST_PREFIX'] ?? '',
     'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
+    'canonical_url' => $_ENV['APP_CANONICAL_URL'] ?? '',
     'landing_content' => $landingContent,
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
@@ -129,6 +130,10 @@ $controller = new HomeController($twig, [
     'smtp_timeout' => (int) ($_ENV['SMTP_TIMEOUT'] ?? 15),
     'rate_limit_max_attempts' => (int) ($_ENV['RATE_LIMIT_MAX_ATTEMPTS'] ?? 5),
     'rate_limit_window_seconds' => (int) ($_ENV['RATE_LIMIT_WINDOW_SECONDS'] ?? 600),
+    'x_url' => $_ENV['X_URL'] ?? '#',
+    'facebook_url' => $_ENV['FACEBOOK_URL'] ?? '#',
+    'instagram_url' => $_ENV['INSTAGRAM_URL'] ?? '#',
+    'whatsapp_url' => $_ENV['WHATSAPP_URL'] ?? '#',
 ]);
 
 $app = AppFactory::create();
