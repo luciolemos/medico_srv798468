@@ -1260,8 +1260,8 @@ body.has-recaptcha .back-to-top {
     grid-template-columns: 1fr;
   }
 
-  .whatsapp-float span {
-    font-size: 0.9rem;
+  .whatsapp-float {
+    display: none;
   }
 
   .pill {
