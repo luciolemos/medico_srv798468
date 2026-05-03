@@ -13,7 +13,7 @@ SLUG=""
 TARGET_DIR=""
 APP_NAME=""
 APP_MARK=""
-APP_PALETTE="blue"
+APP_PALETTE=""
 REQUEST_PREFIX=""
 DRY_RUN=0
 
@@ -27,8 +27,8 @@ Options:
   --base-dir DIR           Diretório base quando --target não for informado. Default: /var/www
   --name NAME              Nome público da landing. Default: slug em formato título
   --mark TEXT              Marca curta no nav/favicon textual. Default: primeira letra do nome
-  --palette VALUE          Paleta inicial: blue, red, emerald, amber ou violet. Default: blue
-  --request-prefix VALUE   Prefixo de protocolo, por exemplo PED, VET, ODO. Default: slug em maiúsculas
+  --palette VALUE          Paleta inicial: blue, red, emerald, amber ou violet. Default: preset do nicho ou blue
+  --request-prefix VALUE   Prefixo de protocolo, por exemplo PED, VET, ODO. Default: preset do nicho ou slug em maiúsculas
   --dry-run                Mostra o que seria feito sem copiar arquivos
   --help                   Mostra esta ajuda
 
@@ -59,6 +59,23 @@ sed_escape() {
   printf '%s' "$1" | sed 's/[\\&|]/\\&/g'
 }
 
+preset_value() {
+  local key="$1"
+  php -r '
+    $file = $argv[1];
+    $slug = $argv[2];
+    $key = $argv[3];
+    if (!is_file($file)) {
+        exit;
+    }
+    $presets = require $file;
+    $value = is_array($presets) ? ($presets[$slug][$key] ?? "") : "";
+    if (is_scalar($value)) {
+        echo $value;
+    }
+  ' "$SOURCE_ROOT/config/presets/niches.php" "$SLUG" "$key"
+}
+
 set_env_value() {
   local file="$1"
   local key="$2"
@@ -70,6 +87,27 @@ set_env_value() {
     sed -i "s|^${key}=.*$|${key}=\"${escaped}\"|" "$file"
   else
     printf '%s="%s"\n' "$key" "$value" >> "$file"
+  fi
+}
+
+apply_content_preset() {
+  local content_file="$TARGET_DIR/config/content/landing.php"
+  local typography
+  local schema_type
+
+  if [[ ! -f "$content_file" ]]; then
+    return
+  fi
+
+  typography="$(preset_value typography)"
+  schema_type="$(preset_value schema_type)"
+
+  if [[ -n "$typography" ]]; then
+    sed -i "s|'profile' => '[^']*'|'profile' => '$(sed_escape "$typography")'|g" "$content_file"
+  fi
+
+  if [[ -n "$schema_type" ]]; then
+    sed -i "/'schema' => \\[/,/^        \\],/ s|'type' => '[^']*'|'type' => '$(sed_escape "$schema_type")'|1" "$content_file"
   fi
 }
 
@@ -168,6 +206,11 @@ if [[ ! "$SLUG" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
   exit 1
 fi
 
+if [[ -z "$APP_PALETTE" ]]; then
+  APP_PALETTE="$(preset_value palette)"
+  APP_PALETTE="${APP_PALETTE:-blue}"
+fi
+
 if ! is_allowed_palette "$APP_PALETTE"; then
   echo "[error] paleta inválida: $APP_PALETTE" >&2
   exit 1
@@ -178,15 +221,18 @@ if [[ -z "$TARGET_DIR" ]]; then
 fi
 
 if [[ -z "$APP_NAME" ]]; then
-  APP_NAME="$(titleize_slug "$SLUG")"
+  APP_NAME="$(preset_value name)"
+  APP_NAME="${APP_NAME:-$(titleize_slug "$SLUG")}"
 fi
 
 if [[ -z "$APP_MARK" ]]; then
-  APP_MARK="$(printf '%s' "$APP_NAME" | sed 's/^[[:space:]]*//' | cut -c 1 | tr '[:lower:]' '[:upper:]')"
+  APP_MARK="$(preset_value mark)"
+  APP_MARK="${APP_MARK:-$(printf '%s' "$APP_NAME" | sed 's/^[[:space:]]*//' | cut -c 1 | tr '[:lower:]' '[:upper:]')}"
 fi
 
 if [[ -z "$REQUEST_PREFIX" ]]; then
-  REQUEST_PREFIX="$(printf '%s' "$SLUG" | tr -cd '[:alnum:]' | tr '[:lower:]' '[:upper:]' | cut -c 1-6)"
+  REQUEST_PREFIX="$(preset_value request_prefix)"
+  REQUEST_PREFIX="${REQUEST_PREFIX:-$(printf '%s' "$SLUG" | tr -cd '[:alnum:]' | tr '[:lower:]' '[:upper:]' | cut -c 1-6)}"
 fi
 
 if [[ -e "$TARGET_DIR" ]] && [[ -n "$(find "$TARGET_DIR" -mindepth 1 -maxdepth 1 -print -quit 2>/dev/null)" ]]; then
@@ -199,6 +245,7 @@ echo "[info] destino: $TARGET_DIR"
 echo "[info] slug:    $SLUG"
 echo "[info] nome:    $APP_NAME"
 echo "[info] paleta:  $APP_PALETTE"
+echo "[info] prefixo: $REQUEST_PREFIX"
 
 if [[ "$DRY_RUN" -eq 1 ]]; then
   echo "[dry ] nenhum arquivo foi copiado"
@@ -231,6 +278,7 @@ mkdir -p "$TARGET_DIR"
 mkdir -p "$TARGET_DIR/storage/cache/twig" "$TARGET_DIR/storage/logs" "$TARGET_DIR/storage/rate-limit"
 touch "$TARGET_DIR/storage/cache/twig/.gitkeep" "$TARGET_DIR/storage/logs/.gitkeep" "$TARGET_DIR/storage/rate-limit/.gitkeep"
 rename_standard_assets
+apply_content_preset
 
 cp "$TARGET_DIR/.env.example" "$TARGET_DIR/.env"
 set_env_value "$TARGET_DIR/.env" "APP_NAME" "$APP_NAME"
@@ -246,4 +294,4 @@ set_env_value "$TARGET_DIR/.env" "APP_PALETTE" "$APP_PALETTE"
 printf '# slug=palette\n%s=%s\n' "$SLUG" "$APP_PALETTE" > "$TARGET_DIR/palettes.map"
 
 echo "[ok  ] landing criada em $TARGET_DIR"
-echo "[next] ajuste config/content/landing.php e imagens, rode composer install e valide com scripts/dev-local.sh"
+echo "[next] ajuste config/content/landing.php e imagens, rode composer install e valide com php scripts/validate-landing-content.php"

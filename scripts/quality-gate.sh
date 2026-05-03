@@ -17,6 +17,9 @@ while IFS= read -r -d '' file; do
   php -l "$file" >/dev/null
 done < <(find src public routes scripts -type f -name '*.php' -print0)
 
+echo "[step] Landing content validation"
+php scripts/validate-landing-content.php --project-root "$PROJECT_ROOT" --content landing
+
 echo "[step] Shell script lint"
 while IFS= read -r -d '' file; do
   bash -n "$file"
