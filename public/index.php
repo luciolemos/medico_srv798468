@@ -37,6 +37,9 @@ if ($base === '') {
 $appEnv = strtolower((string) ($_ENV['APP_ENV'] ?? 'production'));
 $isDev = in_array($appEnv, ['dev', 'development', 'local'], true);
 $showPaletteSelector = filter_var($_ENV['APP_SHOW_PALETTE_SELECTOR'] ?? false, FILTER_VALIDATE_BOOLEAN);
+$recaptchaEnabled = filter_var($_ENV['RECAPTCHA_ENABLED'] ?? false, FILTER_VALIDATE_BOOLEAN);
+$recaptchaSiteKey = trim((string) ($_ENV['RECAPTCHA_SITE_KEY'] ?? ''));
+$recaptchaAction = trim((string) ($_ENV['RECAPTCHA_ACTION'] ?? 'contact_submit'));
 $twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
 $assetVersion = trim((string) ($_ENV['ASSET_VERSION'] ?? ''));
 if ($assetVersion === '') {
@@ -61,6 +64,9 @@ $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'M');
 $twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'Clínica Médica');
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
 $twig->getEnvironment()->addGlobal('show_palette_selector', $showPaletteSelector);
+$twig->getEnvironment()->addGlobal('recaptcha_enabled', $recaptchaEnabled && $recaptchaSiteKey !== '');
+$twig->getEnvironment()->addGlobal('recaptcha_site_key', $recaptchaSiteKey);
+$twig->getEnvironment()->addGlobal('recaptcha_action', $recaptchaAction !== '' ? $recaptchaAction : 'contact_submit');
 $twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? 'https://x.com');
@@ -75,6 +81,12 @@ $controller = new HomeController($twig, [
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
     'base_url' => $base,
+    'recaptcha_enabled' => $recaptchaEnabled,
+    'recaptcha_site_key' => $recaptchaSiteKey,
+    'recaptcha_secret_key' => trim((string) ($_ENV['RECAPTCHA_SECRET_KEY'] ?? '')),
+    'recaptcha_min_score' => (float) ($_ENV['RECAPTCHA_MIN_SCORE'] ?? 0.5),
+    'recaptcha_allowed_hostname' => trim((string) ($_ENV['RECAPTCHA_ALLOWED_HOSTNAME'] ?? '')),
+    'recaptcha_action' => $recaptchaAction !== '' ? $recaptchaAction : 'contact_submit',
     'contact_to' => $_ENV['CONTACT_TO'] ?? null,
     'contact_from' => $_ENV['CONTACT_FROM'] ?? null,
     'mail_driver' => $_ENV['MAIL_DRIVER'] ?? 'mail',

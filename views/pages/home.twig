@@ -301,6 +301,16 @@
 
       <form class="row g-3 js-lead-form" action="{{ base_url }}/contato" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token|default('') }}">
+        {% if recaptcha_enabled ?? false %}
+        <input
+          type="hidden"
+          name="recaptcha_token"
+          id="recaptchaToken"
+          value=""
+          data-recaptcha-site-key="{{ recaptcha_site_key|e('html_attr') }}"
+          data-recaptcha-action="{{ recaptcha_action|default('contact_submit')|e('html_attr') }}"
+        >
+        {% endif %}
         <div class="visually-hidden" aria-hidden="true">
           <label for="contact-website">Website</label>
           <input type="text" id="contact-website" name="website" value="" tabindex="-1" autocomplete="off">

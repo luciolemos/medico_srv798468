@@ -344,6 +344,8 @@
     const submitButton = document.getElementById("leadFormSubmit");
     const formStatusLiveRegion = document.getElementById("leadFormStatus");
     const phoneInput = leadForm.querySelector("#cta-telefone");
+    const recaptchaTokenInput = leadForm.querySelector("[data-recaptcha-site-key][data-recaptcha-action]");
+    let isSubmittingWithRecaptcha = false;
     let currentStep = 1;
 
     const setFormStatus = (text) => {
@@ -436,7 +438,24 @@
       });
     }
 
+    const executeRecaptcha = () => {
+      if (!recaptchaTokenInput) return Promise.resolve("");
+      const siteKey = (recaptchaTokenInput.getAttribute("data-recaptcha-site-key") || "").trim();
+      const action = (recaptchaTokenInput.getAttribute("data-recaptcha-action") || "contact_submit").trim() || "contact_submit";
+      if (!siteKey || !window.grecaptcha || typeof window.grecaptcha.ready !== "function" || typeof window.grecaptcha.execute !== "function") {
+        return Promise.reject(new Error("recaptcha_unavailable"));
+      }
+
+      return new Promise((resolve, reject) => {
+        window.grecaptcha.ready(() => {
+          window.grecaptcha.execute(siteKey, { action }).then(resolve).catch(reject);
+        });
+      });
+    };
+
     leadForm.addEventListener("submit", (event) => {
+      if (isSubmittingWithRecaptcha) return;
+
       if (currentStep !== totalSteps) {
         event.preventDefault();
         if (validateStep(currentStep)) setStep(totalSteps, true);
@@ -449,6 +468,26 @@
       emitAnalyticsEvent("lead_form_submit_attempt", {
         current_step: currentStep
       });
+
+      if (recaptchaTokenInput) {
+        event.preventDefault();
+        if (submitButton) submitButton.disabled = true;
+        setFormStatus("Validando segurança do formulário.");
+
+        executeRecaptcha()
+          .then((token) => {
+            recaptchaTokenInput.value = token || "";
+            isSubmittingWithRecaptcha = true;
+            leadForm.submit();
+          })
+          .catch(() => {
+            if (submitButton) submitButton.disabled = false;
+            setFormStatus("Não foi possível validar o reCAPTCHA. Atualize a página e tente novamente.");
+            emitAnalyticsEvent("lead_form_recaptcha_error", {
+              current_step: currentStep
+            });
+          });
+      }
     });
 
     const hasStep2Errors = leadForm.querySelector('[data-step-field="2"] .is-invalid');
