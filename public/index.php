@@ -33,7 +33,10 @@ if ($assetVersion === '') {
     $assetVersion = (string) max(
         (int) (@filemtime(__DIR__ . '/assets/css/app.css') ?: 0),
         (int) (@filemtime(__DIR__ . '/assets/css/landing.css') ?: 0),
-        (int) (@filemtime(__DIR__ . '/assets/js/landing.js') ?: 0)
+        (int) (@filemtime(__DIR__ . '/assets/js/landing.js') ?: 0),
+        (int) (@filemtime(__DIR__ . '/assets/vendor/bootstrap/bootstrap.min.css') ?: 0),
+        (int) (@filemtime(__DIR__ . '/assets/vendor/bootstrap/bootstrap.bundle.min.js') ?: 0),
+        (int) (@filemtime(__DIR__ . '/assets/vendor/bootstrap-icons/bootstrap-icons.css') ?: 0)
     );
 }
 
