@@ -53,6 +53,7 @@ $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue'
 $twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? 'https://x.com');
+$twig->getEnvironment()->addGlobal('facebook_url', $_ENV['FACEBOOK_URL'] ?? 'https://facebook.com');
 $twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? 'https://instagram.com');
 $twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? 'https://wa.me/5584999031906');
 

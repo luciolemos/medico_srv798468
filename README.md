@@ -15,9 +15,14 @@ Copie `.env.example` para `.env` e ajuste:
 - `APP_NAME`: nome público da clínica.
 - `APP_PAGE_TITLE`: título da página.
 - `APP_BASE`: subcaminho de publicação, por exemplo `/medico`.
+- `FACEBOOK_URL`: link oficial do Facebook.
 - `WHATSAPP_URL`: link oficial de WhatsApp.
 - `CONTACT_TO` e `CONTACT_FROM`: emails usados pelo formulário.
 - Configurações `SMTP_*`, se `MAIL_DRIVER="smtp"`.
+- `RECAPTCHA_ENABLED`: mantenha `false` em `srv798468.hstgr.cloud`; use `true` apenas no `.env` real de produção em `natalcode.com.br/medico`.
+- `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `RECAPTCHA_ALLOWED_HOSTNAME`: configure somente no `.env` não versionado da produção.
+
+O arquivo `.env` não é versionado. Não coloque chaves secretas de reCAPTCHA em `.env.example`, README ou arquivos de backup versionados.
 
 ## Execução Local
 
