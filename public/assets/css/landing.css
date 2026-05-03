@@ -520,10 +520,6 @@ button:active {
   object-fit: contain;
 }
 
-html[data-theme="light"] .navbar-logo {
-  filter: brightness(0) saturate(100%);
-}
-
 .hero {
   position: relative;
 }

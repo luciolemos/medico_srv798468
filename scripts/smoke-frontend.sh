@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Frontend smoke test for SSR copy mode and analytics hooks.
+# Frontend smoke test for core clinic content and analytics hooks.
 #
 # Usage:
-#   scripts/smoke-frontend.sh --url "https://srv798468.hstgr.cloud/natalcloud/"
+#   scripts/smoke-frontend.sh --url "https://example.com/medico/"
 
 BASE_URL=""
 TIMEOUT=20
@@ -15,12 +15,12 @@ Usage:
   scripts/smoke-frontend.sh --url URL [--timeout SECONDS]
 
 Options:
-  --url URL           Base URL da landing (ex.: https://host/natalcloud/)
+  --url URL           Base URL da clínica (ex.: https://host/medico/)
   --timeout SECONDS   Timeout por request curl (default: 20)
   --help              Mostra esta ajuda
 
 Notas:
-  - Valida sinais de regressao em SSR de copy mode e hooks de analytics no JS.
+  - Valida sinais de regressao no conteúdo principal e hooks de analytics no JS.
 USAGE
 }
 
@@ -87,12 +87,10 @@ echo "[info] JS URL: $JS_URL"
 
 failures=0
 
-html_growth="$(curl -sS -L --max-time "$TIMEOUT" "${BASE_URL}?copy=growth")"
-assert_contains "$html_growth" 'data-copy-mode="growth"' 'SSR copy mode growth' || failures=$((failures + 1))
-assert_contains "$html_growth" 'Copy: Growth' 'label de copy mode growth' || failures=$((failures + 1))
-
-html_invalid_copy="$(curl -sS -L --max-time "$TIMEOUT" "${BASE_URL}?copy=invalido")"
-assert_contains "$html_invalid_copy" 'data-copy-mode="soft"' 'fallback SSR copy mode soft' || failures=$((failures + 1))
+home_html="$(curl -sS -L --max-time "$TIMEOUT" "$BASE_URL")"
+assert_contains "$home_html" 'Cuidado médico' 'hero clínica presente' || failures=$((failures + 1))
+assert_contains "$home_html" 'Serviços da clínica' 'serviços da clínica presentes' || failures=$((failures + 1))
+assert_contains "$home_html" 'Solicite seu agendamento' 'formulário de agendamento presente' || failures=$((failures + 1))
 
 landing_js="$(curl -sS -L --max-time "$TIMEOUT" "$JS_URL")"
 assert_contains "$landing_js" 'window.dataLayer.push' 'hook dataLayer presente' || failures=$((failures + 1))

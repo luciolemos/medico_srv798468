@@ -1,34 +1,21 @@
 const { test, expect } = require('@playwright/test');
 
-test('palette switch updates CSS and persists after reload', async ({ page }) => {
+test('clinic landing renders core content and contact flow', async ({ page }) => {
   await page.goto('./');
 
-  const paletteLink = page.locator('#paletteStylesheet');
-  await expect(paletteLink).toHaveAttribute('href', /\/assets\/css\/palettes\/[a-z]+\.css/);
+  await expect(page.getByRole('heading', { name: /Cuidado médico/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Serviços da clínica/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Solicite seu agendamento/i })).toBeVisible();
 
-  const paletteFabToggle = page.getByRole('button', { name: /Abrir seletor de paletas/i });
-  if (await paletteFabToggle.isVisible()) {
-    await paletteFabToggle.click();
-  }
+  await page.getByRole('link', { name: /Agendar consulta/i }).first().click();
+  await expect(page.locator('#form-orcamento')).toBeInViewport();
 
-  const redButton = page.locator('[data-palette-btn="red"]:visible').first();
-  await expect(redButton).toBeVisible();
-  await redButton.click();
+  await page.locator('#cta-nome').fill('Paciente Teste');
+  await page.locator('#cta-telefone').fill('(84) 99999-9999');
+  await page.locator('#cta-email').fill('paciente@example.com');
+  await page.getByRole('button', { name: /Próximo/i }).click();
 
-  await expect(page).toHaveURL(/palette=red/);
-  await expect(paletteLink).toHaveAttribute('href', /\/assets\/css\/palettes\/red\.css/);
-
-  await page.reload();
-  await expect(paletteLink).toHaveAttribute('href', /\/assets\/css\/palettes\/red\.css/);
-});
-
-test('copy toggle navigates to growth and back to soft', async ({ page }) => {
-  await page.goto('./');
-
-  const copyToggle = page.locator('#copyModeToggle');
-  await copyToggle.click();
-  await expect(page).toHaveURL(/copy=growth/);
-
-  await page.locator('#copyModeToggle').click();
-  await expect(page).not.toHaveURL(/copy=growth/);
+  await expect(page.locator('#cta-mensagem')).toBeVisible();
+  await page.locator('#cta-mensagem').fill('Gostaria de agendar uma consulta clínica.');
+  await expect(page.getByRole('button', { name: /Enviar solicitação/i })).toBeVisible();
 });

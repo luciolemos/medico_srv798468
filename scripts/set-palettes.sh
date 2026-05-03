@@ -4,8 +4,8 @@ set -euo pipefail
 # Batch update APP_PALETTE across multiple site .env files.
 #
 # Usage:
-#   scripts/set-palettes.sh --dry-run natalcode=blue natalcode-red=red
-#   scripts/set-palettes.sh --base-dir /var/www natalcode=blue natalcode-amber=amber
+#   scripts/set-palettes.sh --dry-run medico=blue medico-red=red
+#   scripts/set-palettes.sh --base-dir /var/www medico=blue medico-amber=amber
 #   scripts/set-palettes.sh --from-file mappings.txt
 #
 # Mapping file format (one per line):

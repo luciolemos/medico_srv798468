@@ -25,7 +25,15 @@ final class Env
             $key = trim($key);
             $value = trim($value, " \t\n\r\0\x0B\"");
 
-            if ($key === '' || isset($_ENV[$key])) {
+            if ($key === '') {
+                continue;
+            }
+
+            $existing = getenv($key);
+            if (isset($_ENV[$key]) || $existing !== false) {
+                if (!isset($_ENV[$key]) && $existing !== false) {
+                    $_ENV[$key] = (string) $existing;
+                }
                 continue;
             }
 

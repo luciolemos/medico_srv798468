@@ -251,44 +251,6 @@
     });
   });
 
-  // Copy mode toggle (soft <-> growth)
-  const copyModeToggle = document.getElementById("copyModeToggle");
-  if (copyModeToggle) {
-    const isValidCopyMode = (value) => value === "soft" || value === "growth";
-    const getCurrentCopyMode = () => {
-      const fromData = copyModeToggle.getAttribute("data-copy-mode");
-      return isValidCopyMode(fromData) ? fromData : "soft";
-    };
-
-    const updateCopyToggleUi = (mode) => {
-      const current = isValidCopyMode(mode) ? mode : "soft";
-      const next = current === "growth" ? "soft" : "growth";
-      const currentLabel = current === "growth" ? "Growth" : "Soft";
-      const nextLabel = next === "growth" ? "Growth" : "Soft";
-      copyModeToggle.textContent = `Copy: ${currentLabel}`;
-      copyModeToggle.setAttribute("title", `Alternar para ${nextLabel}`);
-      copyModeToggle.setAttribute("aria-label", `Alternar copy para modo ${nextLabel}`);
-    };
-
-    const buildNextCopyUrl = (nextMode) => {
-      const url = new URL(window.location.href);
-      if (nextMode === "soft") {
-        url.searchParams.delete("copy");
-      } else {
-        url.searchParams.set("copy", "growth");
-      }
-      return url.toString();
-    };
-
-    updateCopyToggleUi(getCurrentCopyMode());
-
-    copyModeToggle.addEventListener("click", () => {
-      const current = getCurrentCopyMode();
-      const next = current === "growth" ? "soft" : "growth";
-      window.location.assign(buildNextCopyUrl(next));
-    });
-  }
-
   // In-page smooth scroll with focus management
   document.addEventListener("click", (event) => {
     const anchor = event.target.closest('a[href^="#"]');
@@ -316,7 +278,6 @@
 
   // CTA + form tracking (GA4 dataLayer/gtag + Meta Pixel fbq)
   const query = new URLSearchParams(window.location.search);
-  const copyMode = query.get("copy") === "growth" ? "growth" : "soft";
   const activePalette =
     document.documentElement.getAttribute("data-palette") ||
     query.get("palette") ||
@@ -325,7 +286,6 @@
 
   const emitAnalyticsEvent = (eventName, payload = {}) => {
     const basePayload = {
-      copy_mode: copyMode,
       palette: activePalette,
       page_path: window.location.pathname,
       page_url: window.location.href,
@@ -371,90 +331,6 @@
       cta_type: href.startsWith("#") ? "anchor" : "link"
     });
   });
-
-  // Quick-proof randomizer: picks one testimonial on each page load
-  const quickProofRoot = document.querySelector(".js-quick-proof");
-  if (quickProofRoot) {
-    const quickProofAvatar = document.getElementById("quickProofAvatar");
-    const quickProofText = document.getElementById("quickProofText");
-    const quickProofMeta = document.getElementById("quickProofMeta");
-    const testimonialCards = Array.from(document.querySelectorAll("#depoimentos .quote-card"));
-
-    const testimonialPool = testimonialCards
-      .map((card) => {
-        const img = card.querySelector("img.avatar");
-        const text = card.querySelector("p.text-secondary-emphasis");
-        const name = card.querySelector(".fw-semibold");
-        const meta = card.querySelector(".small.text-secondary-emphasis");
-        return {
-          avatarSrc: img ? img.getAttribute("src") || "" : "",
-          avatarSrcSet: img ? img.getAttribute("srcset") || "" : "",
-          avatarAlt: img ? img.getAttribute("alt") || "Cliente da NatalCode" : "Cliente da NatalCode",
-          quote: text ? (text.textContent || "").trim() : "",
-          who: name ? (name.textContent || "").trim() : "",
-          detail: meta ? (meta.textContent || "").trim() : ""
-        };
-      })
-      .filter((item) => item.quote !== "" && item.who !== "");
-
-    let lastIndex = -1;
-    const storageKey = "quick_proof_last_index";
-    const readStoredIndex = () => {
-      try {
-        const raw = window.sessionStorage.getItem(storageKey);
-        const parsed = Number.parseInt(raw || "-1", 10);
-        return Number.isInteger(parsed) ? parsed : -1;
-      } catch (e) {
-        return -1;
-      }
-    };
-    const storeIndex = (index) => {
-      try {
-        window.sessionStorage.setItem(storageKey, String(index));
-      } catch (e) {}
-    };
-
-    const pickNextIndex = () => {
-      if (testimonialPool.length <= 1) return 0;
-      const previous = readStoredIndex();
-      let next = Math.floor(Math.random() * testimonialPool.length);
-      let guard = 0;
-      while ((next === previous || next === lastIndex) && guard < 12) {
-        next = Math.floor(Math.random() * testimonialPool.length);
-        guard += 1;
-      }
-      return next;
-    };
-
-    const paintQuickProof = (entry) => {
-      if (!entry || !quickProofText || !quickProofMeta) return;
-      if (quickProofAvatar && entry.avatarSrc) {
-        quickProofAvatar.setAttribute("src", entry.avatarSrc);
-        if (entry.avatarSrcSet) {
-          quickProofAvatar.setAttribute("srcset", entry.avatarSrcSet);
-        } else {
-          quickProofAvatar.removeAttribute("srcset");
-        }
-        quickProofAvatar.setAttribute("sizes", "56px");
-        quickProofAvatar.setAttribute("alt", entry.avatarAlt || "Cliente da NatalCode");
-      }
-      quickProofText.textContent = `"${entry.quote.replace(/^\"|\"$/g, "")}"`;
-      quickProofMeta.textContent = entry.detail ? `${entry.who} • ${entry.detail}` : entry.who;
-    };
-
-    const applyRandomQuickProof = () => {
-      const nextIndex = pickNextIndex();
-      const nextEntry = testimonialPool[nextIndex];
-      if (!nextEntry) return;
-      lastIndex = nextIndex;
-      storeIndex(nextIndex);
-      paintQuickProof(nextEntry);
-    };
-
-    if (testimonialPool.length) {
-      applyRandomQuickProof();
-    }
-  }
 
   // Lead form wizard (2 steps)
   const leadForm = document.querySelector(".js-lead-form");
@@ -644,136 +520,4 @@
   window.addEventListener("load", setActiveLink);
   window.addEventListener("hashchange", setActiveLink);
 
-  // Tablet carousels (projects + testimonials): arrows + pagination dots
-  const tabletRange = window.matchMedia("(min-width: 768px) and (max-width: 1366px)");
-  const carouselTargets = [
-    { sectionId: "projects", gridSelector: ".projects-grid", label: "projetos" },
-    { sectionId: "depoimentos", gridSelector: ".testimonials-grid", label: "depoimentos" }
-  ];
-
-  const createTabletCarousel = ({ sectionId, gridSelector, label }) => {
-    const section = document.getElementById(sectionId);
-    if (!section) return null;
-    const grid = section.querySelector(gridSelector);
-    if (!grid) return null;
-    const slides = Array.from(grid.children);
-    if (!slides.length) return null;
-
-    const controls = document.createElement("div");
-    controls.className = "tablet-carousel-controls";
-    controls.setAttribute("role", "group");
-    controls.setAttribute("aria-label", `Navegacao de ${label}`);
-
-    const prevBtn = document.createElement("button");
-    prevBtn.type = "button";
-    prevBtn.className = "tablet-carousel-arrow";
-    prevBtn.setAttribute("aria-label", "Slide anterior");
-    prevBtn.innerHTML = '<i class="bi bi-chevron-left" aria-hidden="true"></i>';
-
-    const nextBtn = document.createElement("button");
-    nextBtn.type = "button";
-    nextBtn.className = "tablet-carousel-arrow";
-    nextBtn.setAttribute("aria-label", "Proximo slide");
-    nextBtn.innerHTML = '<i class="bi bi-chevron-right" aria-hidden="true"></i>';
-
-    const dots = document.createElement("div");
-    dots.className = "tablet-carousel-dots";
-    dots.setAttribute("aria-label", `Paginacao de ${label}`);
-
-    const dotButtons = slides.map((_, index) => {
-      const dot = document.createElement("button");
-      dot.type = "button";
-      dot.className = "tablet-carousel-dot";
-      dot.setAttribute("aria-label", `Ir para slide ${index + 1}`);
-      dot.addEventListener("click", () => scrollToIndex(index));
-      dots.appendChild(dot);
-      return dot;
-    });
-
-    controls.appendChild(prevBtn);
-    controls.appendChild(dots);
-    controls.appendChild(nextBtn);
-    grid.insertAdjacentElement("afterend", controls);
-
-    let activeIndex = 0;
-    let scrollTicking = false;
-
-    const getNearestIndex = () => {
-      const viewportCenter = grid.scrollLeft + (grid.clientWidth / 2);
-      let nearest = 0;
-      let nearestDiff = Number.POSITIVE_INFINITY;
-      slides.forEach((slide, idx) => {
-        const slideCenter = slide.offsetLeft + (slide.clientWidth / 2);
-        const diff = Math.abs(slideCenter - viewportCenter);
-        if (diff < nearestDiff) {
-          nearestDiff = diff;
-          nearest = idx;
-        }
-      });
-      return nearest;
-    };
-
-    const syncUi = () => {
-      activeIndex = getNearestIndex();
-      prevBtn.disabled = activeIndex <= 0;
-      nextBtn.disabled = activeIndex >= slides.length - 1;
-      dotButtons.forEach((dot, idx) => {
-        dot.classList.toggle("active", idx === activeIndex);
-        if (idx === activeIndex) {
-          dot.setAttribute("aria-current", "true");
-        } else {
-          dot.removeAttribute("aria-current");
-        }
-      });
-    };
-
-    const scrollToIndex = (index) => {
-      const clamped = Math.max(0, Math.min(index, slides.length - 1));
-      const target = slides[clamped];
-      if (!target) return;
-      grid.scrollTo({
-        left: target.offsetLeft,
-        behavior: "smooth"
-      });
-    };
-
-    prevBtn.addEventListener("click", () => scrollToIndex(activeIndex - 1));
-    nextBtn.addEventListener("click", () => scrollToIndex(activeIndex + 1));
-
-    grid.addEventListener("scroll", () => {
-      if (scrollTicking) return;
-      scrollTicking = true;
-      window.requestAnimationFrame(() => {
-        syncUi();
-        scrollTicking = false;
-      });
-    }, { passive: true });
-
-    const onViewportChange = () => {
-      controls.hidden = !tabletRange.matches;
-      if (tabletRange.matches) syncUi();
-    };
-    onViewportChange();
-
-    return { syncUi, onViewportChange };
-  };
-
-  const carouselInstances = carouselTargets
-    .map(createTabletCarousel)
-    .filter(Boolean);
-
-  const refreshCarousels = () => {
-    carouselInstances.forEach((instance) => {
-      instance.onViewportChange();
-      instance.syncUi();
-    });
-  };
-
-  if (tabletRange.addEventListener) {
-    tabletRange.addEventListener("change", refreshCarousels);
-  } else if (tabletRange.addListener) {
-    tabletRange.addListener(refreshCarousels);
-  }
-  window.addEventListener("resize", refreshCarousels);
-  window.addEventListener("load", refreshCarousels);
 })();

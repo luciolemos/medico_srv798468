@@ -14,7 +14,7 @@ final class TestAppFactory
 {
     public static function create(array $config = []): App
     {
-        $base = $config['base_url'] ?? '/natalcode';
+        $base = $config['base_url'] ?? '/medico';
 
         $twig = Twig::create(dirname(__DIR__, 2) . '/views', [
             'cache' => false,
@@ -23,9 +23,9 @@ final class TestAppFactory
 
         $twig->getEnvironment()->addGlobal('base_url', $base);
         $twig->getEnvironment()->addGlobal('app_env', 'test');
-        $twig->getEnvironment()->addGlobal('app_name', $config['app_name'] ?? 'NatalCode');
-        $twig->getEnvironment()->addGlobal('app_mark', $config['app_mark'] ?? 'N');
-        $twig->getEnvironment()->addGlobal('app_badge', $config['app_badge'] ?? 'PHP 8.3+');
+        $twig->getEnvironment()->addGlobal('app_name', $config['app_name'] ?? 'Clínica Médica');
+        $twig->getEnvironment()->addGlobal('app_mark', $config['app_mark'] ?? 'M');
+        $twig->getEnvironment()->addGlobal('app_badge', $config['app_badge'] ?? 'Clínica médica');
         $twig->getEnvironment()->addGlobal('app_palette', $config['palette'] ?? 'blue');
         $twig->getEnvironment()->addGlobal('github_url', $config['github_url'] ?? '#');
         $twig->getEnvironment()->addGlobal('x_url', $config['x_url'] ?? '#');
@@ -33,9 +33,9 @@ final class TestAppFactory
         $twig->getEnvironment()->addGlobal('whatsapp_url', $config['whatsapp_url'] ?? '#');
 
         $controller = new HomeController($twig, [
-            'app_name' => $config['app_name'] ?? 'NatalCode',
-            'app_mark' => $config['app_mark'] ?? 'N',
-            'page_title' => $config['page_title'] ?? 'NatalCode | Teste',
+            'app_name' => $config['app_name'] ?? 'Clínica Médica',
+            'app_mark' => $config['app_mark'] ?? 'M',
+            'page_title' => $config['page_title'] ?? 'Clínica Médica | Teste',
             'palette' => $config['palette'] ?? 'blue',
             'base_url' => $base,
             'contact_to' => array_key_exists('contact_to', $config) ? $config['contact_to'] : 'contato@example.com',

@@ -1,84 +1,36 @@
 <footer class="footer py-4 mt-5">
   <div class="container">
-
     <div class="row gy-3 align-items-center">
-
-      {# Marca / copyright #}
       <div class="col-12 col-md-7">
-        <div class="d-flex justify-content-start mb-3">
-          <a href="https://bravuhost.com/central/aff.php?aff=8123" target="_blank" rel="noopener noreferrer" class="affiliate-banner" title="Bravulink - Hospedagem de Sites e email profissional.">
-            <img
-              src="{{ base_url }}/assets/img/outras/bravulink.png"
-              alt="BravuHost"
-              class="img-fluid affiliate-logo"
-              width="310"
-              height="100"
-              loading="lazy"
-              decoding="async"
-              fetchpriority="low"
-            >
-          </a>
-        </div>
-
         <div class="small text-secondary-emphasis">
-          <strong>{{ app_name ?? 'NatalCloud' }} - Landing pages e soluções web</strong><br>
+          <strong>{{ app_name ?? 'Clínica Médica' }} - Clínica médica</strong><br>
           © <span id="year">{{ "now"|date("Y") }}</span> — Todos os direitos reservados
         </div>
-                {# Dados institucionais #}
+
         <div class="small text-secondary-emphasis">
-          {{ company_address ?? 'Atendimento remoto · Brasil' }}<br>
-          {{ company_meta ?? 'Template base para projetos PHP 8.4+ · Twig · Bootstrap' }}
+          {{ company_address ?? 'Atendimento presencial com horário agendado' }}<br>
+          {{ company_meta ?? 'Consultas, check-ups e acompanhamento clínico' }}
         </div>
 
         <div class="d-flex gap-3 mt-2">
-          <a class="footer-link" href="/labs/" target="_blank" rel="noopener noreferrer" aria-label="Labs">
-            <i class="bi bi-grid-1x2"></i>
+          <a class="footer-link" href="#form-orcamento" aria-label="Agendar consulta">
+            <i class="bi bi-calendar2-check"></i>
           </a>
 
-          <a class="footer-link" href="/labs/admin" target="_blank" rel="noopener noreferrer" aria-label="Admin Labs">
-            <i class="bi bi-sliders"></i>
-          </a>
-
-          <a class="footer-link" href="{{ github_url ?? '#' }}" aria-label="GitHub">
-            <i class="bi bi-github"></i>
-          </a>
-
-          <a class="footer-link" href="#cta" aria-label="Começar">
-            <i class="bi bi-rocket-takeoff"></i>
-          </a>
-
-          <a class="footer-link" href="{{ x_url ?? 'https://x.com' }}" target="_blank" rel="noopener noreferrer" aria-label="X">
-            <i class="bi bi-twitter-x"></i>
-          </a>
-
-          <a class="footer-link" href="{{ instagram_url ?? 'https://instagram.com' }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+          <a class="footer-link" href="{{ instagram_url ?? '#' }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
             <i class="bi bi-instagram"></i>
           </a>
 
-          <a class="footer-link" href="{{ whatsapp_url ?? 'https://wa.me/5584998087340' }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+          <a class="footer-link" href="{{ whatsapp_url ?? '#' }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
             <i class="bi bi-whatsapp"></i>
           </a>
         </div>
 
         <div class="small text-secondary  mt-2 mb-5">
-          natalcode.com.br · PHP 8.4+ · Twig · Bootstrap
+          Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.
         </div>
-
-
-
       </div>
-
-      {# Links / ações #}
-{#       <div class="col-12 col-md-5">
-        <div class="d-flex justify-content-md-end">
-          <a href="https://bravuhost.com/central/aff.php?aff=8123" target="_blank" rel="noopener noreferrer" class="affiliate-banner" title="Bravulink - Hospedagem de Sites e email profissional.">
-            <img src="{{ base_url }}/assets/img/outras/bravulink.png" alt="BravuHost" class="img-fluid" style="max-width: 150px; height: auto;">
-          </a>
-        </div>
-      </div> #}
-
     </div>
-
   </div>
 </footer>
 

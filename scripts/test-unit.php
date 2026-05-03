@@ -61,8 +61,8 @@ function buildController(string $paletteFromConfig = 'blue'): HomeController
     ]);
 
     return new HomeController($twig, [
-        'app_name' => 'NatalCloud Test',
-        'app_mark' => 'N',
+        'app_name' => 'Clínica Médica Test',
+        'app_mark' => 'M',
         'palette' => $paletteFromConfig,
         'base_url' => '',
     ]);
@@ -77,21 +77,6 @@ function renderPaletteFromHome(HomeController $controller, string $uri): string
     $html = (string) $rendered->getBody();
 
     if (preg_match('~/assets/css/palettes/([a-z]+)\.css~', $html, $matches) === 1) {
-        return $matches[1];
-    }
-
-    return '';
-}
-
-function renderCopyModeFromHome(HomeController $controller, string $uri): string
-{
-    $requestFactory = new ServerRequestFactory();
-    $request = $requestFactory->createServerRequest('GET', $uri);
-    $response = new Response();
-    $rendered = $controller->home($request, $response);
-    $html = (string) $rendered->getBody();
-
-    if (preg_match('/data-copy-mode="([a-z]+)"/', $html, $matches) === 1) {
         return $matches[1];
     }
 
@@ -151,20 +136,14 @@ $_COOKIE = ['palette' => 'naovalida'];
 $palette = renderPaletteFromHome(buildController('naovalida'), 'http://localhost/?palette=invalida');
 $t->assertSame('blue', $palette, 'palette: fallback final para blue');
 
-$copyMode = renderCopyModeFromHome(buildController('blue'), 'http://localhost/?copy=growth');
-$t->assertSame('growth', $copyMode, 'copy mode: query growth aplicada no SSR');
-
-$copyMode = renderCopyModeFromHome(buildController('blue'), 'http://localhost/?copy=invalido');
-$t->assertSame('soft', $copyMode, 'copy mode: fallback para soft quando valor invalido');
-
 $controller = buildController('blue');
 
 $validData = [
     'nome' => 'Fulano',
     'telefone' => '(84) 99999-0000',
     'email' => 'fulano@example.com',
-    'empresa' => 'Empresa',
-    'mensagem' => 'Preciso de uma landing page.',
+    'empresa' => 'Particular',
+    'mensagem' => 'Gostaria de agendar uma consulta clínica.',
 ];
 $errors = callValidateContact($controller, $validData);
 $t->assertSame([], $errors, 'contact: payload valido sem erros');

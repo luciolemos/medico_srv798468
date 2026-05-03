@@ -4,8 +4,8 @@ set -euo pipefail
 # Smoke test for SSR palette behavior (query/cookie/default).
 #
 # Usage:
-#   scripts/smoke-palette.sh --url "https://srv798468.hstgr.cloud/natalcloud/"
-#   scripts/smoke-palette.sh --url "http://localhost/natalcloud/" --default blue
+#   scripts/smoke-palette.sh --url "https://example.com/medico/"
+#   scripts/smoke-palette.sh --url "http://localhost/medico/" --default blue
 
 BASE_URL=""
 DEFAULT_PALETTE="blue"
@@ -17,7 +17,7 @@ Usage:
   scripts/smoke-palette.sh --url URL [--default PALETTE] [--timeout SECONDS]
 
 Options:
-  --url URL           Base URL da landing (ex.: https://host/natalcloud/)
+  --url URL           Base URL da clínica (ex.: https://host/medico/)
   --default PALETTE   Paleta esperada sem query/cookie (default: blue)
   --timeout SECONDS   Timeout por request curl (default: 20)
   --help              Mostra esta ajuda
