@@ -36,6 +36,7 @@ if ($base === '') {
 }
 $appEnv = strtolower((string) ($_ENV['APP_ENV'] ?? 'production'));
 $isDev = in_array($appEnv, ['dev', 'development', 'local'], true);
+$showPaletteSelector = filter_var($_ENV['APP_SHOW_PALETTE_SELECTOR'] ?? false, FILTER_VALIDATE_BOOLEAN);
 $twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
 $assetVersion = trim((string) ($_ENV['ASSET_VERSION'] ?? ''));
 if ($assetVersion === '') {
@@ -59,6 +60,7 @@ $twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Clínica M�
 $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'M');
 $twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'Clínica Médica');
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
+$twig->getEnvironment()->addGlobal('show_palette_selector', $showPaletteSelector);
 $twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? 'https://x.com');
@@ -71,6 +73,7 @@ $controller = new HomeController($twig, [
     'app_mark' => $_ENV['APP_MARK'] ?? 'M',
     'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
+    'show_palette_selector' => $showPaletteSelector,
     'base_url' => $base,
     'contact_to' => $_ENV['CONTACT_TO'] ?? null,
     'contact_from' => $_ENV['CONTACT_FROM'] ?? null,

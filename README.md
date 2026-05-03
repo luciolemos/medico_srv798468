@@ -15,6 +15,8 @@ Copie `.env.example` para `.env` e ajuste:
 - `APP_NAME`: nome público da clínica.
 - `APP_PAGE_TITLE`: título da página.
 - `APP_BASE`: subcaminho de publicação, por exemplo `/medico`.
+- `APP_PALETTE`: paleta padrão da landing (`blue`, `red`, `emerald`, `amber` ou `violet`).
+- `APP_SHOW_PALETTE_SELECTOR`: use `true` em catálogo/demo para mostrar o seletor de cores; mantenha `false` na landing final.
 - `FACEBOOK_URL`: link oficial do Facebook.
 - `WHATSAPP_URL`: link oficial de WhatsApp.
 - `CONTACT_TO` e `CONTACT_FROM`: emails usados pelo formulário.

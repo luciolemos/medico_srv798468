@@ -47,6 +47,30 @@
         </ul>
 
         <div class="nav-actions d-flex align-items-stretch align-items-lg-center gap-2 mt-3 mt-lg-0 ms-lg-3">
+          {% if show_palette_selector ?? false %}
+          {% set active_palette = palette ?? app_palette ?? 'blue' %}
+          {% set palettes = allowed_palettes ?? ['blue', 'red', 'emerald', 'amber', 'violet'] %}
+          {% set palette_labels = {
+            'blue': 'azul',
+            'red': 'vermelha',
+            'emerald': 'esmeralda',
+            'amber': 'ambar',
+            'violet': 'violeta'
+          } %}
+          <div class="palette-swatches palette-swatches-inline" role="group" aria-label="Selecionar paleta de cores">
+            {% for palette_name in palettes %}
+            <button
+              type="button"
+              class="palette-dot palette-dot-{{ palette_name }} {{ active_palette == palette_name ? 'active' : '' }}"
+              data-palette-btn="{{ palette_name }}"
+              aria-label="Paleta {{ palette_labels[palette_name]|default(palette_name) }}"
+              title="{{ palette_name|capitalize }}"
+              aria-pressed="{{ active_palette == palette_name ? 'true' : 'false' }}"
+            ></button>
+            {% endfor %}
+          </div>
+          {% endif %}
+
           <a class="btn btn-sm btn-primary nav-action-btn cta-track" href="#form-orcamento" data-cta-id="nav_schedule">
             Agendar
           </a>
