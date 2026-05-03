@@ -2,18 +2,37 @@
 
 declare(strict_types=1);
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 use App\Controllers\HomeController;
 use App\Core\Env;
+use App\Middleware\SecurityHeadersMiddleware;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
 require __DIR__ . '/../src/Core/Env.php';
 Env::load(__DIR__ . '/../.env');
+
+if (session_status() === PHP_SESSION_NONE) {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+    $sessionBase = trim((string) ($_ENV['APP_BASE'] ?? ''));
+    $sessionPath = '/';
+    if ($sessionBase !== '' && $sessionBase !== '/') {
+        $sessionPath = '/' . trim($sessionBase, '/') . '/';
+    }
+
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => $sessionPath,
+        'domain' => '',
+        'secure' => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_file($autoload)) {
@@ -69,14 +88,16 @@ $twig->getEnvironment()->addGlobal('recaptcha_site_key', $recaptchaSiteKey);
 $twig->getEnvironment()->addGlobal('recaptcha_action', $recaptchaAction !== '' ? $recaptchaAction : 'contact_submit');
 $twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
-$twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? 'https://x.com');
-$twig->getEnvironment()->addGlobal('facebook_url', $_ENV['FACEBOOK_URL'] ?? 'https://facebook.com');
-$twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? 'https://instagram.com');
-$twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? 'https://wa.me/5584999031906');
+$twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('facebook_url', $_ENV['FACEBOOK_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? '#');
 
 $controller = new HomeController($twig, [
     'app_name' => $_ENV['APP_NAME'] ?? 'Clínica Médica',
     'app_mark' => $_ENV['APP_MARK'] ?? 'M',
+    'app_slug' => $_ENV['APP_SLUG'] ?? '',
+    'request_prefix' => $_ENV['APP_REQUEST_PREFIX'] ?? '',
     'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
@@ -106,6 +127,7 @@ $app->setBasePath($base);
 $app->add(TwigMiddleware::create($app, $twig));
 
 $app->addErrorMiddleware($isDev, $isDev, $isDev);
+$app->add(new SecurityHeadersMiddleware());
 
 $routes = require __DIR__ . '/../routes/web.php';
 $routes($app, $controller);

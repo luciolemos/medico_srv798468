@@ -384,6 +384,15 @@
             </button>
           </div>
         </div>
+        {% if recaptcha_enabled ?? false %}
+        <p class="recaptcha-disclosure mb-0">
+          Este formulário é protegido pelo reCAPTCHA e está sujeito à
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>
+          e aos
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Termos de Serviço</a>
+          do Google.
+        </p>
+        {% endif %}
       </form>
     </div>
   </div>

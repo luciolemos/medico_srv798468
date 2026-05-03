@@ -64,6 +64,21 @@ final class HomeRoutesTest extends TestCase
         self::assertStringNotContainsString('//assets/', $html);
     }
 
+    public function testHomeAddsBaselineSecurityHeaders(): void
+    {
+        $app = TestAppFactory::create([
+            'base_url' => '/medico',
+        ]);
+
+        $response = $this->request($app, 'GET', '/medico/');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('nosniff', $response->getHeaderLine('X-Content-Type-Options'));
+        self::assertSame('SAMEORIGIN', $response->getHeaderLine('X-Frame-Options'));
+        self::assertSame('strict-origin-when-cross-origin', $response->getHeaderLine('Referrer-Policy'));
+        self::assertStringContainsString('geolocation=()', $response->getHeaderLine('Permissions-Policy'));
+    }
+
     public function testHomeFallsBackToBluePaletteWhenQueryPaletteIsInvalid(): void
     {
         $app = TestAppFactory::create([
@@ -132,6 +147,7 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('name="recaptcha_token"', $html);
         self::assertStringContainsString('data-recaptcha-site-key="site-key-123"', $html);
         self::assertStringContainsString('data-recaptcha-action="contact_submit"', $html);
+        self::assertStringContainsString('Política de Privacidade', $html);
     }
 
     public function testHomeConsumesFlashStatusAndClearsItFromSession(): void
@@ -217,7 +233,10 @@ final class HomeRoutesTest extends TestCase
         $capturedMessage = [];
 
         $app = TestAppFactory::create([
-            'base_url' => '/medico',
+            'app_name' => 'Clínica Pediátrica',
+            'app_slug' => 'pediatria',
+            'request_prefix' => 'PED',
+            'base_url' => '/pediatria',
             'storage_path' => $this->storagePath,
             'mail_sender' => static function (array $payload) use (&$capturedMessage): array {
                 $capturedMessage = $payload;
@@ -225,7 +244,7 @@ final class HomeRoutesTest extends TestCase
             },
         ]);
 
-        $response = $this->submitContactForm($app, '/medico', [
+        $response = $this->submitContactForm($app, '/pediatria', [
             'nome' => 'Lucio Lemos',
             'telefone' => '(84) 99999-9999',
             'email' => 'lucio@example.com',
@@ -234,12 +253,15 @@ final class HomeRoutesTest extends TestCase
         ]);
 
         self::assertSame(302, $response->getStatusCode());
-        self::assertSame('/medico/#form-orcamento', $response->getHeaderLine('Location'));
+        self::assertSame('/pediatria/#form-orcamento', $response->getHeaderLine('Location'));
         self::assertSame('success', $_SESSION['form_flash']['status']['type'] ?? null);
         self::assertSame('lead_form_submit_success', $_SESSION['form_flash']['status']['tracking_event'] ?? null);
-        self::assertStringContainsString('Recebemos sua solicitação de agendamento. Protocolo:', $_SESSION['form_flash']['status']['message'] ?? '');
+        self::assertMatchesRegularExpression('/Protocolo: PED-\d{8}-[A-F0-9]{4}/', $_SESSION['form_flash']['status']['message'] ?? '');
         self::assertSame('contato@example.com', $capturedMessage['to'] ?? null);
         self::assertSame('lucio@example.com', $capturedMessage['reply_to'] ?? null);
+        self::assertMatchesRegularExpression('/^PED-\d{8}-[A-F0-9]{4}$/', $capturedMessage['request_id'] ?? '');
+        self::assertMatchesRegularExpression('/^pediatria_\d{14}_[a-f0-9]{12}$/', $capturedMessage['event_id'] ?? '');
+        self::assertStringContainsString('Clínica Pediátrica | Nova solicitação de agendamento', $capturedMessage['subject'] ?? '');
         self::assertStringContainsString('Nova solicitação de agendamento', $capturedMessage['html_body'] ?? '');
         self::assertFileDoesNotExist($this->storagePath . '/logs/contatos-fallback.log');
         self::assertFileExists($this->storagePath . '/logs/lead-events.log');
@@ -414,7 +436,7 @@ final class HomeRoutesTest extends TestCase
         self::assertSame(302, $response->getStatusCode());
         self::assertSame('/medico/#form-orcamento', $response->getHeaderLine('Location'));
         self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
-        self::assertStringContainsString('Nao foi possivel processar o envio', $_SESSION['form_flash']['status']['message'] ?? '');
+        self::assertStringContainsString('Não foi possível processar o envio', $_SESSION['form_flash']['status']['message'] ?? '');
         self::assertFileDoesNotExist($this->storagePath . '/logs/lead-events.log');
     }
 

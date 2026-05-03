@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Support;
 
 use App\Controllers\HomeController;
+use App\Middleware\SecurityHeadersMiddleware;
 use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
@@ -39,6 +40,8 @@ final class TestAppFactory
         $controller = new HomeController($twig, [
             'app_name' => $config['app_name'] ?? 'Clínica Médica',
             'app_mark' => $config['app_mark'] ?? 'M',
+            'app_slug' => $config['app_slug'] ?? 'medico',
+            'request_prefix' => $config['request_prefix'] ?? 'MED',
             'page_title' => $config['page_title'] ?? 'Clínica Médica | Teste',
             'palette' => $config['palette'] ?? 'blue',
             'show_palette_selector' => $config['show_palette_selector'] ?? false,
@@ -70,6 +73,7 @@ final class TestAppFactory
         $app->setBasePath($base);
         $app->add(TwigMiddleware::create($app, $twig));
         $app->addErrorMiddleware(true, true, true);
+        $app->add(new SecurityHeadersMiddleware());
 
         $routes = require dirname(__DIR__, 2) . '/routes/web.php';
         $routes($app, $controller);

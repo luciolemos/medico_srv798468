@@ -51,7 +51,7 @@ jobs:
 
       - name: Start SMTP sandbox (Mailpit)
         timeout-minutes: 2
-        run: docker run -d --name medico-mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit:latest
+        run: docker run -d --name landing-mailpit -p 1025:1025 -p 8025:8025 axllent/mailpit:latest
 
       - name: Wait for Mailpit
         timeout-minutes: 2
@@ -60,8 +60,8 @@ jobs:
 
       - name: Start local server
         run: |
-          php -S 127.0.0.1:8000 -t public >/tmp/medico-php-server.log 2>&1 &
-          echo $! > /tmp/medico-php-server.pid
+          php -S 127.0.0.1:8000 -t public >/tmp/landing-php-server.log 2>&1 &
+          echo $! > /tmp/landing-php-server.pid
 
       - name: Wait for local server
         timeout-minutes: 2
@@ -100,10 +100,10 @@ jobs:
       - name: Stop local server
         if: always()
         run: |
-          if [ -f /tmp/medico-php-server.pid ]; then
-            kill "$(cat /tmp/medico-php-server.pid)" || true
+          if [ -f /tmp/landing-php-server.pid ]; then
+            kill "$(cat /tmp/landing-php-server.pid)" || true
           fi
 
       - name: Stop SMTP sandbox
         if: always()
-        run: docker rm -f medico-mailpit || true
+        run: docker rm -f landing-mailpit || true

@@ -1,6 +1,6 @@
 {
-  "name": "agency/medico",
-  "description": "Landing page de clínica médica em Slim 4 e Twig.",
+  "name": "agency/health-landing-template",
+  "description": "Protótipo de landing page de saúde em Slim 4 e Twig.",
   "license": "proprietary",
   "type": "project",
   "require": {
