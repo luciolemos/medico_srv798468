@@ -1,37 +1,45 @@
 {% set footer_content = landing_content.footer|default({}) %}
+{% set social_links = [
+  {'href': facebook_url|default(''), 'icon': 'facebook', 'label': 'Facebook'},
+  {'href': instagram_url|default(''), 'icon': 'instagram', 'label': 'Instagram'},
+  {'href': whatsapp_url|default(''), 'icon': 'whatsapp', 'label': 'WhatsApp'}
+] %}
 
-<footer class="footer py-4 mt-5">
+<footer class="footer mt-5">
   <div class="container">
-    <div class="row gy-3 align-items-center">
-      <div class="col-12 col-md-7">
-        <div class="small text-secondary-emphasis">
-          <strong>{{ app_name ?? 'Landing de saúde' }} - {{ footer_content.label|default('Atendimento') }}</strong><br>
-          © <span id="year">{{ "now"|date("Y") }}</span> — Todos os direitos reservados
+    <div class="footer-main">
+      <div>
+        <div class="footer-title">
+          {{ app_name ?? 'Landing de saúde' }} - {{ footer_content.label|default('Atendimento') }}
         </div>
 
-        <div class="small text-secondary-emphasis">
+        <div class="footer-meta small">
           {{ company_address ?? footer_content.address|default('Atendimento presencial com horário agendado') }}<br>
           {{ company_meta ?? footer_content.meta|default('Consultas, check-ups e acompanhamento clínico') }}
         </div>
-
-        <div class="d-flex gap-3 mt-2">
-          <a class="footer-link" href="{{ facebook_url ?? '#' }}" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-            <i class="bi bi-facebook"></i>
-          </a>
-
-          <a class="footer-link" href="{{ instagram_url ?? '#' }}" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-            <i class="bi bi-instagram"></i>
-          </a>
-
-          <a class="footer-link" href="{{ whatsapp_url ?? '#' }}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-            <i class="bi bi-whatsapp"></i>
-          </a>
-        </div>
-
-        <div class="small text-secondary  mt-2 mb-5">
-          {{ footer_content.emergency_note|default('Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.') }}
-        </div>
       </div>
+
+      <nav class="footer-social" aria-label="Redes sociais">
+        {% for social in social_links %}
+          {% if social.href and social.href != '#' %}
+            <a class="footer-link" href="{{ social.href }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.label }}">
+              <i class="bi bi-{{ social.icon }}"></i>
+            </a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    </div>
+
+    <div class="footer-note small">
+      {{ footer_content.emergency_note|default('Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.') }}
+    </div>
+
+    <div class="footer-bottom small">
+      <span>© <span id="year">{{ "now"|date("Y") }}</span> — Todos os direitos reservados</span>
+
+      {% if footer_content.credit|default('') %}
+        <span class="footer-credit">{{ footer_content.credit }}</span>
+      {% endif %}
     </div>
   </div>
 </footer>

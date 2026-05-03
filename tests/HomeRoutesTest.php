@@ -159,6 +159,7 @@ final class HomeRoutesTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('Cuidado médico', $html);
         self::assertStringContainsString('Serviços da clínica', $html);
+        self::assertStringContainsString('Desenvolvido por NatalCode - Soluções Digitais', $html);
         self::assertStringNotContainsString('id="copyModeToggle"', $html);
         self::assertStringNotContainsString('id="paletteFabToggle"', $html);
         self::assertStringNotContainsString('data-palette-btn="red"', $html);
