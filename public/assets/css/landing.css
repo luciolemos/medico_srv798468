@@ -530,9 +530,64 @@ button:active {
   border-top: 1px solid var(--stroke-soft);
 }
 
+.footer-main,
+.footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.footer-main {
+  padding: 1.55rem 0 1.1rem;
+}
+
+.footer-title {
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.footer-meta,
+.footer-note,
+.footer-bottom,
 .footer-credit {
   color: var(--muted);
   line-height: 1.55;
+}
+
+.footer-note {
+  max-width: 920px;
+  padding: 0 0 1.1rem;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.95rem 0 calc(1.15rem + 3.35rem);
+}
+
+.footer-social {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 576px) {
+  .footer-main,
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer-main {
+    gap: 1rem;
+  }
+
+  .footer-bottom {
+    gap: 0.35rem;
+    padding-right: 3.9rem;
+    padding-bottom: calc(1.15rem + 2.7rem);
+  }
 }
 
 .section-divider {
@@ -1638,6 +1693,10 @@ html[data-theme="light"] .card-variant-docs:hover .text-bg-success-subtle {
 
 html[data-theme="light"] .footer {
   background: linear-gradient(180deg, rgba(var(--light-surface-rgb), 0.92), rgba(var(--light-surface-strong-rgb), 0.98));
+}
+
+html[data-theme="light"] .footer-bottom {
+  border-top-color: rgba(var(--light-accent-rgb), 0.18);
 }
 
 html[data-theme="light"] .pill,
