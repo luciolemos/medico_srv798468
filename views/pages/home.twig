@@ -404,6 +404,11 @@
             </button>
           </div>
         </div>
+        {% if form.privacy_note|default('') %}
+        <p class="privacy-disclosure mb-0">
+          {{ form.privacy_note }}
+        </p>
+        {% endif %}
         {% if recaptcha_enabled ?? false %}
         <p class="recaptcha-disclosure mb-0">
           Este formulário é protegido pelo reCAPTCHA e está sujeito à

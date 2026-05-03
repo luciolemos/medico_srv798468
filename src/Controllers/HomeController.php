@@ -145,7 +145,7 @@ final class HomeController
         $to = $this->config['contact_to'] ?? null;
         if (!$to) {
             $reason = 'CONTACT_TO ausente no .env';
-            $this->persistFallbackLead($data, $reason);
+            $this->persistFallbackLead($data, $reason, $eventId, $requestId);
             $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
             $this->setFormFlash([
                 'type' => 'warning',
@@ -181,7 +181,7 @@ final class HomeController
 
             if (!is_array($result) || !($result['ok'] ?? false)) {
                 $reason = 'mail_sender falhou: ' . (($result['error'] ?? 'erro desconhecido'));
-                $this->persistFallbackLead($data, $reason);
+                $this->persistFallbackLead($data, $reason, $eventId, $requestId);
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
@@ -195,7 +195,7 @@ final class HomeController
         } elseif ($this->useSmtpDriver()) {
             if (!$this->isSmtpConfigured()) {
                 $reason = 'SMTP selecionado, mas incompleto no .env';
-                $this->persistFallbackLead($data, $reason);
+                $this->persistFallbackLead($data, $reason, $eventId, $requestId);
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
@@ -210,7 +210,7 @@ final class HomeController
             $smtpResult = $this->sendViaSmtp($to, $subject, $textBody, $htmlBody, $from, $replyTo);
             if (!$smtpResult['ok']) {
                 $reason = 'SMTP falhou: ' . ($smtpResult['error'] ?? 'erro desconhecido');
-                $this->persistFallbackLead($data, $reason);
+                $this->persistFallbackLead($data, $reason, $eventId, $requestId);
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
@@ -224,7 +224,7 @@ final class HomeController
         } else {
             if (!$this->canUseNativeMail()) {
                 $reason = 'Transporte de email indisponível (sendmail_path inválido)';
-                $this->persistFallbackLead($data, $reason);
+                $this->persistFallbackLead($data, $reason, $eventId, $requestId);
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
@@ -248,7 +248,7 @@ final class HomeController
             $sent = mail($to, $subject, $textBody, implode("\r\n", $headers));
             if (!$sent) {
                 $reason = 'mail() retornou false';
-                $this->persistFallbackLead($data, $reason);
+                $this->persistFallbackLead($data, $reason, $eventId, $requestId);
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
@@ -830,7 +830,7 @@ HTML;
         return $binary !== '' && is_executable($binary);
     }
 
-    private function persistFallbackLead(array $data, string $reason): void
+    private function persistFallbackLead(array $data, string $reason, string $eventId = '', string $requestId = ''): void
     {
         $logDir = $this->storagePath() . '/logs';
         $logFile = $logDir . '/contatos-fallback.log';
@@ -841,13 +841,17 @@ HTML;
 
         $entry = [
             'timestamp' => date('c'),
+            'event_id' => $eventId,
+            'request_id' => $requestId,
             'reason' => $reason,
+            'contains_personal_data' => true,
+            'retention_days' => $this->leadLogRetentionDays(),
             'nome' => $data['nome'] ?? '',
             'telefone' => $data['telefone'] ?? '',
             'email' => $data['email'] ?? '',
             'empresa' => $data['empresa'] ?? '',
             'mensagem' => $data['mensagem'] ?? '',
-            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+            'ip_hash' => $this->hashForLog($this->resolveClientIp()),
         ];
 
         @file_put_contents($logFile, json_encode($entry, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
@@ -918,16 +922,97 @@ HTML;
             'request_id' => $requestId,
             'result' => $result,
             'reason' => $reason,
-            'nome' => $data['nome'] ?? '',
-            'telefone' => $data['telefone'] ?? '',
-            'email' => $data['email'] ?? '',
-            'empresa' => $data['empresa'] ?? '',
-            'mensagem' => $data['mensagem'] ?? '',
-            'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
-            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '',
+            'contains_personal_data' => false,
+            'retention_days' => $this->leadLogRetentionDays(),
+            'lead' => $this->leadEventSummary($data),
+            'ip_hash' => $this->hashForLog($this->resolveClientIp()),
+            'user_agent_hash' => $this->hashForLog((string) ($_SERVER['HTTP_USER_AGENT'] ?? '')),
         ];
 
         @file_put_contents($logFile, json_encode($entry, JSON_UNESCAPED_UNICODE) . PHP_EOL, FILE_APPEND);
+    }
+
+    private function leadEventSummary(array $data): array
+    {
+        $message = trim((string) ($data['mensagem'] ?? ''));
+
+        return [
+            'name_masked' => $this->maskName((string) ($data['nome'] ?? '')),
+            'phone_masked' => $this->maskPhone((string) ($data['telefone'] ?? '')),
+            'email_masked' => $this->maskEmail((string) ($data['email'] ?? '')),
+            'company_present' => trim((string) ($data['empresa'] ?? '')) !== '',
+            'message_length' => mb_strlen($message),
+            'message_hash' => $message !== '' ? $this->hashForLog($message) : '',
+        ];
+    }
+
+    private function maskName(string $name): string
+    {
+        $words = preg_split('/\s+/', trim($name)) ?: [];
+        $masked = [];
+        foreach ($words as $word) {
+            $first = mb_substr($word, 0, 1);
+            if ($first === '') {
+                continue;
+            }
+
+            $masked[] = $first . '***';
+        }
+
+        return implode(' ', $masked);
+    }
+
+    private function maskPhone(string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', $phone) ?? '';
+        if ($digits === '') {
+            return '';
+        }
+
+        $last = substr($digits, -4);
+        return str_repeat('*', max(strlen($digits) - 4, 0)) . $last;
+    }
+
+    private function maskEmail(string $email): string
+    {
+        $email = trim($email);
+        if ($email === '' || !str_contains($email, '@')) {
+            return '';
+        }
+
+        [$local, $domain] = explode('@', $email, 2);
+        $first = mb_substr($local, 0, 1);
+        return ($first !== '' ? $first : '*') . '***@' . $domain;
+    }
+
+    private function hashForLog(string $value): string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return '';
+        }
+
+        return hash_hmac('sha256', $value, $this->leadLogHashSalt());
+    }
+
+    private function leadLogHashSalt(): string
+    {
+        $configured = trim((string) ($this->config['lead_log_hash_salt'] ?? ''));
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        return implode('|', [
+            (string) ($this->config['app_slug'] ?? 'landing'),
+            (string) ($this->config['base_url'] ?? ''),
+            (string) ($this->config['app_name'] ?? ''),
+        ]);
+    }
+
+    private function leadLogRetentionDays(): int
+    {
+        $days = (int) ($this->config['lead_log_retention_days'] ?? 30);
+        return $days > 0 ? $days : 30;
     }
 
     private function storagePath(): string

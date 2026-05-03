@@ -11,9 +11,9 @@ return [
         'type' => 'website',
         'twitter_card' => 'summary_large_image',
         'image' => [
-            'src' => 'assets/img/social/medico-og.webp',
-            'width' => 1896,
-            'height' => 1067,
+            'src' => 'assets/img/social/medico-og.jpg',
+            'width' => 1200,
+            'height' => 630,
             'alt' => 'Médica em consulta com paciente no consultório',
         ],
         'schema' => [
@@ -87,7 +87,7 @@ return [
                 'sizes' => '92vw',
                 'media' => '(max-width: 576px)',
                 'width' => 640,
-                'height' => 360,
+                'height' => 800,
             ],
             'alt' => 'Médica em consulta com paciente no consultório',
             'width' => 640,
@@ -184,6 +184,7 @@ return [
             'next' => 'Próximo',
             'submit' => 'Enviar solicitação',
         ],
+        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento. Os registros operacionais são minimizados e os backups de contato são retidos temporariamente.',
     ],
     'faq' => [
         'title' => 'Dúvidas frequentes',

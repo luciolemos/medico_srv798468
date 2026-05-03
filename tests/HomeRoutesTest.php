@@ -100,7 +100,7 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('<link rel="canonical" href="http://localhost/medico/">', $decodedHtml);
         self::assertStringContainsString('<meta property="og:type" content="website">', $decodedHtml);
         self::assertStringContainsString('<meta property="og:title" content="Clínica Médica | Teste">', $decodedHtml);
-        self::assertStringContainsString('<meta property="og:image" content="http://localhost/medico/assets/img/social/medico-og.webp">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:image" content="http://localhost/medico/assets/img/social/medico-og.jpg">', $decodedHtml);
         self::assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $decodedHtml);
 
         self::assertSame('https://schema.org', $structuredData['@context'] ?? null);
@@ -126,7 +126,7 @@ final class HomeRoutesTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('<link rel="canonical" href="https://example.com/medico/">', $decodedHtml);
-        self::assertStringContainsString('<meta property="og:image" content="https://example.com/medico/assets/img/social/medico-og.webp">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:image" content="https://example.com/medico/assets/img/social/medico-og.jpg">', $decodedHtml);
         self::assertSame('https://example.com/medico/', $structuredData['@graph'][0]['url'] ?? null);
     }
 
@@ -260,6 +260,7 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('name="recaptcha_token"', $html);
         self::assertStringContainsString('data-recaptcha-site-key="site-key-123"', $html);
         self::assertStringContainsString('data-recaptcha-action="contact_submit"', $html);
+        self::assertStringContainsString('Ao enviar, você autoriza o uso dos dados informados', $html);
         self::assertStringContainsString('Política de Privacidade', $html);
     }
 
@@ -378,6 +379,15 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Nova solicitação de agendamento', $capturedMessage['html_body'] ?? '');
         self::assertFileDoesNotExist($this->storagePath . '/logs/contatos-fallback.log');
         self::assertFileExists($this->storagePath . '/logs/lead-events.log');
+        $leadLog = file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '';
+        self::assertStringContainsString('"contains_personal_data":false', $leadLog);
+        self::assertStringContainsString('"email_masked":"l***@example.com"', $leadLog);
+        self::assertStringContainsString('"phone_masked":"*******9999"', $leadLog);
+        self::assertStringContainsString('"message_length":41', $leadLog);
+        self::assertStringNotContainsString('Lucio Lemos', $leadLog);
+        self::assertStringNotContainsString('lucio@example.com', $leadLog);
+        self::assertStringNotContainsString('Gostaria de agendar uma consulta clínica.', $leadLog);
+        self::assertStringNotContainsString('127.0.0.1', $leadLog);
     }
 
     public function testContatoWithRecaptchaEnabledAcceptsValidToken(): void
@@ -473,8 +483,15 @@ final class HomeRoutesTest extends TestCase
         self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
         self::assertFileExists($this->storagePath . '/logs/contatos-fallback.log');
         self::assertFileExists($this->storagePath . '/logs/lead-events.log');
-        self::assertStringContainsString('CONTACT_TO ausente no .env', file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '');
-        self::assertStringContainsString('"result":"failure"', file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '');
+        $fallbackLog = file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '';
+        $leadLog = file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '';
+        self::assertStringContainsString('CONTACT_TO ausente no .env', $fallbackLog);
+        self::assertStringContainsString('"contains_personal_data":true', $fallbackLog);
+        self::assertStringContainsString('Lucio Lemos', $fallbackLog);
+        self::assertStringContainsString('"result":"failure"', $leadLog);
+        self::assertStringContainsString('"contains_personal_data":false', $leadLog);
+        self::assertStringNotContainsString('Lucio Lemos', $leadLog);
+        self::assertStringNotContainsString('lucio@example.com', $leadLog);
     }
 
     public function testContatoWithCustomSenderFailureCreatesWarningAndFailureLogs(): void
@@ -498,8 +515,12 @@ final class HomeRoutesTest extends TestCase
         self::assertSame(302, $response->getStatusCode());
         self::assertSame('warning', $_SESSION['form_flash']['status']['type'] ?? null);
         self::assertStringContainsString('lead_form_submit_failure', $_SESSION['form_flash']['status']['tracking_event'] ?? '');
-        self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '');
-        self::assertStringContainsString('mail_sender falhou: smtp offline', file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '');
+        $leadLog = file_get_contents($this->storagePath . '/logs/lead-events.log') ?: '';
+        $fallbackLog = file_get_contents($this->storagePath . '/logs/contatos-fallback.log') ?: '';
+        self::assertStringContainsString('mail_sender falhou: smtp offline', $leadLog);
+        self::assertStringContainsString('mail_sender falhou: smtp offline', $fallbackLog);
+        self::assertStringNotContainsString('lucio@example.com', $leadLog);
+        self::assertStringContainsString('lucio@example.com', $fallbackLog);
     }
 
     public function testContatoRejectsInvalidCsrfToken(): void

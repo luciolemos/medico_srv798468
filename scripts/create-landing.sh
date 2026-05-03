@@ -92,12 +92,16 @@ rename_standard_assets() {
   if [[ -f "$TARGET_DIR/public/assets/img/hero/medico-mobile-640.webp" ]]; then
     mv "$TARGET_DIR/public/assets/img/hero/medico-mobile-640.webp" "$TARGET_DIR/public/assets/img/hero/${SLUG}-mobile-640.webp"
   fi
+  if [[ -f "$TARGET_DIR/public/assets/img/social/medico-og.jpg" ]]; then
+    mv "$TARGET_DIR/public/assets/img/social/medico-og.jpg" "$TARGET_DIR/public/assets/img/social/${SLUG}-og.jpg"
+  fi
   if [[ -f "$TARGET_DIR/public/assets/img/social/medico-og.webp" ]]; then
     mv "$TARGET_DIR/public/assets/img/social/medico-og.webp" "$TARGET_DIR/public/assets/img/social/${SLUG}-og.webp"
   fi
 
   if [[ -f "$content_file" ]]; then
     sed -i "s|assets/img/hero/medico-|assets/img/hero/$(sed_escape "$SLUG")-|g" "$content_file"
+    sed -i "s|assets/img/social/medico-og.jpg|assets/img/social/$(sed_escape "$SLUG")-og.jpg|g" "$content_file"
     sed -i "s|assets/img/social/medico-og.webp|assets/img/social/$(sed_escape "$SLUG")-og.webp|g" "$content_file"
   fi
 }

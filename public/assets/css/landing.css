@@ -947,12 +947,14 @@ html.fx-ready .hero-media img {
   color: var(--text);
 }
 
+.privacy-disclosure,
 .recaptcha-disclosure {
   color: var(--muted);
   font-size: 0.78rem;
   line-height: 1.45;
 }
 
+.privacy-disclosure a,
 .recaptcha-disclosure a {
   color: var(--text);
   font-weight: 600;
