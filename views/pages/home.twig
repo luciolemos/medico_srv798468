@@ -1,6 +1,7 @@
 {% extends 'base.twig' %}
 
-{% block title %}{{ page_title ?? 'NatalCode — Landing SaaS em PHP 8.4+' }}{% endblock %}
+{% block title %}{{ page_title ?? 'Clínica Médica | Atendimento médico com hora marcada' }}{% endblock %}
+{% block meta_description %}Clínica médica com consultas, check-ups preventivos e acompanhamento de saúde com atendimento humanizado.{% endblock %}
 {% block head_extra %}
 <link
   rel="preload"
@@ -11,84 +12,65 @@
   fetchpriority="high"
 >
 {% endblock %}
-{# Define o modo de copy da página.
-   - `soft`: tom mais institucional e técnico.
-   - `growth`: tom mais comercial e orientado a conversão imediata.
-   Essa flag é consumida em vários textos abaixo para trocar a narrativa sem duplicar template. #}
-{% set copy_mode = copy_mode ?? 'soft' %}
-{% set is_growth = copy_mode == 'growth' %}
 
 {% block content %}
 
-{# Fundo decorativo global.
-   Esses blobs são puramente visuais (sem semântica) e ajudam a dar identidade.
-   `aria-hidden="true"` evita ruído para leitores de tela. #}
 <div class="bg-blobs" aria-hidden="true">
   <span class="blob blob-1"></span>
   <span class="blob blob-2"></span>
   <span class="blob blob-3"></span>
 </div>
 
-{# Âncora inicial usada pelo menu para navegação one-page (#top). #}
 <div id="top" class="top-anchor"></div>
-{# Navbar extraída para partial para facilitar manutenção/reuso entre templates. #}
 {% include 'partials/navbar.twig' %}
 
-{# HERO (acima da dobra):
-   - Apresenta proposta de valor, CTA principal e prova rápida.
-   - Usa animações CSS leves para dar ritmo visual.
-   - Mistura copy dinâmica (soft/growth) e elementos fixos de branding. #}
 <header class="hero py-5 py-lg-6">
   <div class="container position-relative">
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-lg-6">
         <div class="hero-badge mb-3">
-          <i class="bi bi-stars"></i>
-          <span>{{ hero_badge ?? (is_growth ? 'Versão Growth: copy orientada a lead e fechamento' : 'Arquitetura enxuta, visual premium e foco em conversão') }}</span>
+          <i class="bi bi-heart-pulse"></i>
+          <span>Clínica médica com atendimento humanizado</span>
         </div>
 
         <h1 class="display-5 fw-bold lh-sm mb-3 hero-title-motion">
-          <span class="hero-title-part hero-title-part-1">{{ hero_title_prefix ?? (is_growth ? 'Lance sua landing em' : 'Sua plataforma') }}</span>
-          <span class="text-gradient hero-title-part hero-title-part-2 hero-title-highlight">{{ hero_title_highlight ?? (is_growth ? '24h' : 'pronta para escalar') }}</span>
-          <span class="hero-title-part hero-title-part-3">{{ hero_title_suffix ?? (is_growth ? 'e transforme tráfego em leads qualificados.' : 'com alta performance e linguagem de produto.') }}</span>
+          <span class="hero-title-part hero-title-part-1">Cuidado médico</span>
+          <span class="text-gradient hero-title-part hero-title-part-2 hero-title-highlight">próximo e seguro</span>
+          <span class="hero-title-part hero-title-part-3">para acompanhar sua saúde em cada etapa.</span>
         </h1>
 
         <p class="lead text-secondary-emphasis mb-4">
-          {{ hero_lead ?? (is_growth ? 'Base pronta em PHP 8.4 + Twig, com design premium, CTA forte e estrutura para escalar sem retrabalho.' : 'Interface com identidade SaaS, stack moderna (PHP 8.4+, Twig e Bootstrap) e blocos prontos para proposta de valor, prova social e CTA.') }}
+          Consultas clínicas, check-ups preventivos e acompanhamento contínuo com escuta atenta, agenda organizada e orientação clara para o próximo passo do cuidado.
         </p>
 
         <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3">
           <a class="btn btn-primary btn-lg px-4 cta-track" href="#form-orcamento" data-cta-id="hero_primary">
-            {{ cta_primary ?? (is_growth ? 'Quero minha landing agora' : 'Solicitar versão') }} <i class="bi bi-arrow-right-short"></i>
+            Agendar consulta <i class="bi bi-arrow-right-short"></i>
           </a>
-          <a class="btn btn-outline-light btn-lg px-4 cta-track" href="#docs" data-cta-id="hero_secondary">
-            {{ cta_secondary ?? (is_growth ? 'Ver demo ao vivo' : 'Explorar arquitetura') }} <i class="bi bi-journal-text ms-1"></i>
+          <a class="btn btn-outline-light btn-lg px-4 cta-track" href="#features" data-cta-id="hero_secondary">
+            Ver atendimentos <i class="bi bi-clipboard2-pulse ms-1"></i>
           </a>
         </div>
 
         <div class="d-flex flex-wrap gap-3 mt-4 small text-secondary-emphasis">
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-shield-check"></i><span>Segurança desde a base</span>
+            <i class="bi bi-shield-check"></i><span>Prontuário seguro</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-lightning-charge"></i><span>Performance + observabilidade</span>
+            <i class="bi bi-calendar2-check"></i><span>Horário agendado</span>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-braces"></i><span>Código limpo com PSR-4</span>
+            <i class="bi bi-person-heart"></i><span>Escuta acolhedora</span>
           </div>
         </div>
 
-        {# Prova social compacta na hero.
-           O conteúdo é atualizado via JS (quick-proof randomizer) a cada carregamento,
-           reutilizando os depoimentos cadastrados na seção #depoimentos. #}
-        <div class="hero-proof glass mt-3 js-quick-proof">
+        <div class="hero-proof glass mt-3">
           <div class="proof-avatars" aria-hidden="true">
             <img
-              id="quickProofAvatar"
               src="{{ base_url }}/assets/img/avatars/face2_96.webp"
               srcset="{{ base_url }}/assets/img/avatars/face2_96.webp 96w, {{ base_url }}/assets/img/avatars/face2_160.webp 160w"
               sizes="56px"
-              alt="Cliente atendido"
+              alt=""
               width="56"
               height="56"
               loading="lazy"
@@ -97,9 +79,9 @@
             >
           </div>
           <div class="proof-copy">
-            <strong>Depoimento de cliente</strong>
-            <span id="quickProofText">"Conseguimos lançar rápido com visual premium e narrativa objetiva."</span>
-            <span id="quickProofMeta">Camila Rocha • São Paulo/SP • SaaS B2B</span>
+            <strong>Atendimento com continuidade</strong>
+            <span>Da primeira consulta ao retorno, a equipe orienta exames, encaminhamentos e acompanhamento.</span>
+            <span>Canal direto para agendamento e confirmação.</span>
           </div>
         </div>
       </div>
@@ -114,10 +96,10 @@
             >
             <img
               src="{{ base_url }}/assets/img/img_default_640.webp"
-              alt="Prévia visual da base"
+              alt="Médica em consulta com paciente no consultório"
               class="img-fluid"
               width="640"
-              height="405"
+              height="360"
               loading="eager"
               decoding="sync"
               fetchpriority="high"
@@ -125,236 +107,73 @@
           </picture>
         </div>
 
-        {# Bloco de métricas de percepção.
-           Não é telemetria em tempo real; são indicadores de posicionamento técnico/comercial. #}
         <div class="hero-metrics mt-3">
           <div class="metric glass">
-            <div class="metric-kpi">290px+</div>
-            <div class="metric-label">Mobile-first real</div>
+            <div class="metric-kpi">Seg-Sex</div>
+            <div class="metric-label">Agenda clínica</div>
           </div>
           <div class="metric glass">
-            <div class="metric-kpi">&lt; 2s</div>
-            <div class="metric-label">LCP otimizado*</div>
+            <div class="metric-kpi">24h</div>
+            <div class="metric-label">Confirmação</div>
           </div>
           <div class="metric glass">
-            <div class="metric-kpi">CSS</div>
-            <div class="metric-label">Motion elegante</div>
+            <div class="metric-kpi">Retorno</div>
+            <div class="metric-label">Acompanhado</div>
           </div>
         </div>
-
-        <p class="small text-secondary-emphasis mt-2 mb-0">
-          *Dependente de servidor/CDN/imagens. A base já ajuda com estrutura e boas práticas.
-        </p>
       </div>
     </div>
-
   </div>
 </header>
 
-{# STACK STRIP:
-   Seção curta para reforçar credibilidade técnica antes dos benefícios detalhados. #}
 <section class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">{{ is_growth ? 'Base técnica pronta para escalar' : 'Stack moderna, estável e auditável' }}</h2>
+      <h2 class="fw-bold">Atendimento para diferentes momentos da sua saúde</h2>
       <p class="text-secondary-emphasis mb-0">
-        {{ is_growth ? 'Arquitetura enxuta para lançar rápido, medir resultados e evoluir sem retrabalho.' : 'Tecnologias consolidadas para performance, manutenção previsível e evolução contínua do produto.' }}
+        Uma clínica organizada para prevenção, diagnóstico inicial, acompanhamento e orientação médica responsável.
       </p>
     </div>
     <div class="row g-3 align-items-center justify-content-center">
       <div class="col-12">
         <div class="d-flex flex-wrap gap-2 justify-content-center">
-          <span class="pill"><i class="bi bi-filetype-php"></i> PHP 8.4+</span>
-          <span class="pill"><i class="bi bi-server"></i> Apache 2.4</span>
-          <span class="pill"><i class="bi bi-box"></i> Composer</span>
-          <span class="pill"><i class="bi bi-braces-asterisk"></i> Twig</span>
-          <span class="pill"><i class="bi bi-database"></i> MySQL</span>
-          <span class="pill"><i class="bi bi-bootstrap"></i> Bootstrap 5.3</span>
-          <span class="pill"><i class="bi bi-code-slash"></i> VS Code</span>
-          <span class="pill"><i class="bi bi-terminal"></i> WSL</span>
-          <span class="pill"><i class="bi bi-hdd-stack"></i> Ubuntu 24</span>
-          <span class="pill"><i class="bi bi-git"></i> Git</span>
+          <span class="pill"><i class="bi bi-heart-pulse"></i> Clínica geral</span>
+          <span class="pill"><i class="bi bi-clipboard2-check"></i> Check-up preventivo</span>
+          <span class="pill"><i class="bi bi-activity"></i> Acompanhamento contínuo</span>
+          <span class="pill"><i class="bi bi-capsule"></i> Orientação terapêutica</span>
+          <span class="pill"><i class="bi bi-file-medical"></i> Exames e encaminhamentos</span>
+          <span class="pill"><i class="bi bi-calendar2-check"></i> Consulta com hora marcada</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-{# FEATURES:
-   Explica os benefícios da base/template.
-   A lista padrão muda conforme o modo de copy, mas pode ser sobrescrita por `features`
-   vinda do controller para personalizações sem mexer no Twig. #}
 <section id="features" class="py-5 py-lg-6 section-tech">
   <div class="container">
-      <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">{{ is_growth ? 'Por que essa landing converte melhor' : 'O que você entrega com essa base' }}</h2>
-      <p class="text-secondary-emphasis mb-0">
-        {{ is_growth ? 'Menos fricção na jornada, mais clareza de oferta e mais ação no botão principal.' : 'Uma landing com cara de produto tech, pronta para vender melhor sem inflar complexidade.' }}
-      </p>
-    </div>
-
-    <div class="row g-3 g-lg-4">
-      {# Fonte de dados dos cards de benefício.
-         Mantemos a estrutura em array para facilitar manutenção, ordenação e A/B. #}
-      {% set default_features = is_growth
-        ? [
-          {'icon':'rocket-takeoff','title':'Mais conversão','text':'Copy orientada a decisão com proposta de valor clara acima da dobra.'},
-          {'icon':'shield-lock','title':'Mais confiança','text':'Base segura e organizada para publicar sem medo de retrabalho técnico.'},
-          {'icon':'diagram-3','title':'Mais clareza comercial','text':'Mensagem de produto, prova social e CTA alinhados para acelerar fechamento.'},
-          {'icon':'phone','title':'Mais resultado no mobile','text':'Fluxo de leitura e clique pensado para telas pequenas desde o início.'},
-          {'icon':'speedometer2','title':'Mais velocidade de entrega','text':'Front enxuto para ir de ideia a página publicada em poucas horas.'},
-          {'icon':'journal-text','title':'Mais controle','text':'Documentação técnica para evoluir o projeto sem depender de improviso.'},
-        ]
-        : [
-          {'icon':'rocket-takeoff','title':'Narrativa de conversão','text':'Hero objetivo, prova social estratégica e CTAs pensados para decisão rápida.'},
-          {'icon':'shield-lock','title':'Base segura','text':'Pronta para CSRF, escapes no template e validações consistentes desde o início.'},
-          {'icon':'diagram-3','title':'Arquitetura profissional','text':'Organização clara para evoluir produto sem virar monolito confuso.'},
-          {'icon':'phone','title':'Experiência mobile-first','text':'Layout confiável em telas pequenas sem sacrificar legibilidade ou CTA.'},
-          {'icon':'speedometer2','title':'Front leve e rápido','text':'CSS moderno, animações equilibradas e JS enxuto para manter fluidez.'},
-          {'icon':'journal-text','title':'Documentação operacional','text':'Visão de stack, ciclo de execução e boas práticas centralizadas em /docs/tech.'},
-        ]
-      %}
-      {% set features = features ?? default_features %}
-
-      {# Renderização dos cards de benefício. #}
-      {% for f in features %}
-      <div class="col-md-6 col-lg-4">
-        <div class="feature-card hover-lift glass card-variant-feature h-100 p-4">
-          <div class="feature-icon"><i class="bi bi-{{ f.icon }}"></i></div>
-          <h3 class="h5 fw-semibold mt-3">{{ f.title }}</h3>
-          <p class="text-secondary-emphasis mb-0">{{ f.text }}</p>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-{# PROJECTS / CASES:
-   Mostra exemplos visuais de entregas para tangibilizar qualidade e reduzir objeção.
-   Também alimenta o carrossel em tablet via JS (scroll-snap + setas/bolinhas). #}
-<section id="projects" class="py-5 py-lg-6 section-showcase section-tech">
-  <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Casos e entregas recentes</h2>
+      <h2 class="fw-bold">Serviços da clínica</h2>
       <p class="text-secondary-emphasis mb-0">
-        Referências de páginas lançadas com posicionamento técnico, clareza comercial e bom desempenho.
+        Atendimento médico para queixas do dia a dia, prevenção e seguimento de condições que precisam de cuidado regular.
       </p>
     </div>
 
-    {# Fonte de dados dos cases.
-       Pode ser injetada externamente pelo controller; se não vier, usa fallback local. #}
-    {% set projects = projects ?? [
-      {
-        'image':'/assets/img/projetos/note1.webp',
-        'alt':'Projeto de landing page para SaaS',
-        'icon':'lightning-charge',
-        'title':'Landing para SaaS B2B',
-        'text':'Fluxo de conversão direto com proposta clara, prova social e CTA de demonstração.'
-      },
-      {
-        'image':'/assets/img/projetos/note2.webp',
-        'alt':'Projeto de página institucional de plataforma',
-        'icon':'house-gear',
-        'title':'Institucional de plataforma técnica',
-        'text':'Mensagem de produto, diferenciais técnicos e argumento comercial no mesmo fluxo.'
-      },
-      {
-        'image':'/assets/img/projetos/note3.webp',
-        'alt':'Projeto de landing para lançamento de MVP',
-        'icon':'tools',
-        'title':'Lançamento de MVP',
-        'text':'Sections modulares com FAQ, métricas e caminho simples até deploy em VPS.'
-      },
+    {% set services = services ?? [
+      {'icon':'heart-pulse','title':'Consulta clínica','text':'Avaliação de sintomas, histórico de saúde, exame físico e orientação do plano de cuidado.'},
+      {'icon':'clipboard2-pulse','title':'Check-up preventivo','text':'Revisão de saúde, fatores de risco, solicitação de exames e leitura dos resultados em consulta.'},
+      {'icon':'activity','title':'Acompanhamento contínuo','text':'Seguimento de pressão alta, diabetes, alterações metabólicas e outras condições crônicas.'},
+      {'icon':'person-heart','title':'Saúde da família','text':'Cuidado para adultos e idosos com comunicação clara para pacientes e familiares.'},
+      {'icon':'capsule','title':'Revisão de medicações','text':'Conferência de uso, horários, interações relatadas e adesão ao tratamento prescrito.'},
+      {'icon':'hospital','title':'Encaminhamentos','text':'Orientação para especialistas, exames complementares e retorno com os resultados.'},
     ] %}
 
-    <div class="row g-3 g-lg-4 projects-grid">
-      {# Grid de cards de cases. #}
-      {% for p in projects %}
-      <div class="col-12 col-lg-4">
-        <div class="quote-card hover-lift glass card-variant-showcase p-4 h-100">
-          <img
-            src="{{ base_url }}{{ p.image }}"
-            alt="{{ p.alt }}"
-            class="img-fluid project-thumb mb-3"
-            loading="lazy"
-            decoding="async"
-            width="1200"
-            height="900"
-          >
-          <div class="d-flex align-items-center gap-2 mb-2">
-            <i class="bi bi-{{ p.icon }}"></i>
-            <span class="fw-semibold">{{ p.title }}</span>
-          </div>
-          <p class="text-secondary-emphasis mb-0">{{ p.text }}</p>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-{# DEPOIMENTOS:
-   Prova social principal da página.
-   Esses dados são usados em dois lugares:
-   1) seção completa de depoimentos;
-   2) card resumido da hero (randomizado por JS). #}
-<section id="depoimentos" class="py-5 py-lg-6 section-proof section-tech">
-  <div class="container">
-    <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">{{ is_growth ? 'Resultados de quem já aplicou' : 'Times que confiam na entrega' }}</h2>
-      <p class="text-secondary-emphasis mb-0">
-        {{ is_growth ? 'Provas reais de melhoria de clareza comercial e geração de leads.' : 'Depoimentos de quem usou a base em contextos reais de lançamento.' }}
-      </p>
-    </div>
-
-    <div class="row g-3 g-lg-4 testimonials-grid">
-      {# Lista-base de depoimentos por narrativa (soft/growth). #}
-      {% set default_testimonials = is_growth
-        ? [
-          {'name':'Camila Rocha','region':'São Paulo/SP','service':'SaaS B2B','text':'Depois da nova landing, o CTA principal começou a gerar leads com mais consistência já no primeiro mês.'},
-          {'name':'Bruno Martins','region':'Belo Horizonte/MG','service':'Plataforma tech','text':'A proposta ficou muito mais fácil de entender. As reuniões passaram a começar com mais interesse comercial.'},
-          {'name':'Marina Duarte','region':'Curitiba/PR','service':'MVP','text':'Publicamos rápido, testamos oferta em dias e ajustamos a copy com base em dados reais de clique.'},
-        ]
-        : [
-          {'name':'Camila Rocha','region':'São Paulo/SP','service':'SaaS B2B','text':'Conseguimos lançar rápido com visual premium e narrativa objetiva. O CTA principal ganhou mais cliques nas primeiras semanas.'},
-          {'name':'Bruno Martins','region':'Belo Horizonte/MG','service':'Plataforma tech','text':'A página comunica stack, produto e proposta comercial sem ruído. Ficou técnica na medida certa para vender com clareza.'},
-          {'name':'Marina Duarte','region':'Curitiba/PR','service':'MVP','text':'Estrutura modular, fácil de adaptar e simples de publicar. Reduziu tempo de implementação e acelerou nosso lançamento.'},
-        ]
-      %}
-      {% set testimonials = testimonials ?? default_testimonials %}
-      {# Mapa de avatares usados na prova social.
-         O índice do loop define qual imagem exibir em cada card. #}
-      {% set testimonial_avatar_keys = [
-        'face1',
-        'face9',
-        'face11',
-      ] %}
-
-      {# Renderização dos depoimentos.
-         O avatar é resolvido com módulo (%) para evitar índice fora do array. #}
-      {% for t in testimonials %}
-      {% set avatar_key = testimonial_avatar_keys|length > 0 ? testimonial_avatar_keys[loop.index0 % (testimonial_avatar_keys|length)] : 'face2' %}
+    <div class="row g-3 g-lg-4">
+      {% for service in services %}
       <div class="col-md-6 col-lg-4">
-        <div class="quote-card hover-lift glass card-variant-proof h-100 p-4">
-          <div class="d-flex justify-content-center mb-3">
-            <img
-              src="{{ base_url }}/assets/img/avatars/{{ avatar_key }}_96.webp"
-              srcset="{{ base_url }}/assets/img/avatars/{{ avatar_key }}_96.webp 96w, {{ base_url }}/assets/img/avatars/{{ avatar_key }}_160.webp 160w"
-              sizes="64px"
-              alt="Foto de {{ t.name }}"
-              class="avatar"
-              loading="lazy"
-              decoding="async"
-              width="64"
-              height="64"
-            >
-          </div>
-          <div class="quote-stars mb-2" aria-label="Avaliação 5 de 5 estrelas">★★★★★</div>
-          <div class="quote-mark">“</div>
-          <p class="text-secondary-emphasis mb-3">{{ t.text }}</p>
-          <div class="fw-semibold">{{ t.name }}</div>
-          <div class="small text-secondary-emphasis">{{ t.region }} • {{ t.service }}</div>
+        <div class="feature-card hover-lift glass card-variant-feature h-100 p-4">
+          <div class="feature-icon"><i class="bi bi-{{ service.icon }}"></i></div>
+          <h3 class="h5 fw-semibold mt-3">{{ service.title }}</h3>
+          <p class="text-secondary-emphasis mb-0">{{ service.text }}</p>
         </div>
       </div>
       {% endfor %}
@@ -362,88 +181,62 @@
   </div>
 </section>
 
-{# HOW IT WORKS:
-   Seção educacional para explicar pipeline técnico de forma acessível.
-   Ajuda na confiança de leads mais técnicos e reduz fricção no fechamento. #}
 <section id="how" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Como funciona (pipeline resumido)</h2>
+      <h2 class="fw-bold">Como funciona o atendimento</h2>
       <p class="text-secondary-emphasis mb-0">
-        Do rewrite ao HTML final, com fluxo previsível para manter velocidade de desenvolvimento.
+        Um fluxo simples para reduzir espera, organizar informações e deixar claro o próximo passo.
       </p>
     </div>
 
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-lg-6">
         <ol class="steps">
-          <li><span class="step-num">1</span> Apache recebe <code>GET /</code></li>
-          <li><span class="step-num">2</span> <code>public/index.php</code> (front controller)</li>
-          <li><span class="step-num">3</span> Router encontra rota em <code>routes/web.php</code></li>
-          <li><span class="step-num">4</span> Controller executa lógica e chama Model</li>
-          <li><span class="step-num">5</span> Twig renderiza e devolve o HTML final</li>
+          <li><span class="step-num">1</span> Você solicita o agendamento pelo formulário ou WhatsApp</li>
+          <li><span class="step-num">2</span> A equipe confirma horário, dados básicos e motivo da consulta</li>
+          <li><span class="step-num">3</span> A consulta é realizada com escuta, exame e orientação médica</li>
+          <li><span class="step-num">4</span> Exames, receitas e encaminhamentos são organizados quando necessários</li>
+          <li><span class="step-num">5</span> O retorno acompanha resultados e evolução do cuidado</li>
         </ol>
       </div>
 
       <div class="col-lg-6">
         <div class="quote-card hover-lift glass card-variant-docs p-4">
           <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="fw-semibold">Checklist da landing</div>
-            <span class="badge text-bg-success-subtle border border-success-subtle">Pronto</span>
+            <div class="fw-semibold">Diferenciais no atendimento</div>
+            <span class="badge text-bg-success-subtle border border-success-subtle">Clínica</span>
           </div>
           <ul class="checklist mb-0">
-            <li><i class="bi bi-check2-circle"></i> Hero com estética SaaS e CTA forte</li>
-            <li><i class="bi bi-check2-circle"></i> Motion progressivo no scroll</li>
-            <li><i class="bi bi-check2-circle"></i> Cards de benefício e prova social</li>
-            <li><i class="bi bi-check2-circle"></i> Responsividade real até 290px</li>
-            <li><i class="bi bi-check2-circle"></i> Contraste otimizado em dark/light</li>
+            <li><i class="bi bi-check2-circle"></i> Agenda com confirmação prévia</li>
+            <li><i class="bi bi-check2-circle"></i> Orientação clara antes e depois da consulta</li>
+            <li><i class="bi bi-check2-circle"></i> Ambiente reservado e acolhedor</li>
+            <li><i class="bi bi-check2-circle"></i> Histórico clínico organizado com segurança</li>
+            <li><i class="bi bi-check2-circle"></i> Encaminhamento responsável quando necessário</li>
           </ul>
         </div>
       </div>
-
     </div>
   </div>
 </section>
 
-{# DOCS:
-   Reforça governança técnica e manutenção contínua.
-   Posiciona o projeto como base de engenharia e não só "layout pronto". #}
-<section id="docs" class="py-5 py-lg-6 section-tech">
+<section id="estrutura" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold mb-2">Documentação de engenharia</h2>
-      <p class="text-secondary-emphasis mb-3">
-        Tudo em <code>/docs/tech</code>: arquitetura, segurança, router, observabilidade e padrões para manter qualidade em escala.
+      <h2 class="fw-bold mb-2">Estrutura pensada para o paciente</h2>
+      <p class="text-secondary-emphasis mb-0">
+        A experiência de atendimento combina acolhimento, organização e segurança das informações.
       </p>
-      <div>
-        <a class="btn btn-outline-light cta-track" href="#cta" data-cta-id="docs_primary">
-          Ver blueprint técnico <i class="bi bi-arrow-right-short"></i>
-        </a>
-      </div>
     </div>
 
-    {# Cards-resumo da documentação técnica. #}
-    {% set docs_cards = [
-      {
-        'icon': 'diagram-3',
-        'title': 'Arquitetura',
-        'text': 'Request lifecycle, MVC e organização do código.'
-      },
-      {
-        'icon': 'shield-lock',
-        'title': 'Segurança',
-        'text': 'CSRF, uploads hardening, sessões e PDO seguro.'
-      },
-      {
-        'icon': 'eye',
-        'title': 'Observabilidade',
-        'text': 'Monitoramento de performance, logs JSONL e coleta de eventos para diagnostico.'
-      }
+    {% set structure_cards = [
+      {'icon': 'door-open', 'title': 'Recepção organizada', 'text': 'Chegada orientada, confirmação de dados e suporte para dúvidas antes da consulta.'},
+      {'icon': 'shield-lock', 'title': 'Privacidade', 'text': 'Dados de contato e informações clínicas tratados com cuidado e acesso restrito.'},
+      {'icon': 'clipboard2-check', 'title': 'Plano de cuidado', 'text': 'Registro das orientações, pedidos de exame e próximos passos para acompanhamento.'},
     ] %}
 
     <div class="row g-3 g-lg-4">
-      {# Renderização dos cards de docs. #}
-      {% for item in docs_cards %}
+      {% for item in structure_cards %}
       <div class="col-md-6 col-lg-4">
         <div class="quote-card hover-lift glass card-variant-docs p-4 h-100">
           <div class="d-flex align-items-center gap-2">
@@ -457,103 +250,42 @@
   </div>
 </section>
 
-{# LABS LINKS:
-   Atalhos operacionais para ferramentas internas do ecossistema Labs.
-   Abre em nova aba por serem rotas administrativas/documentais externas ao fluxo da landing. #}
-<section id="labs-links" class="py-5 py-lg-6 section-tech">
-  <div class="container">
-    <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Acessos do Labs</h2>
-      <p class="text-secondary-emphasis mb-0">
-        Atalhos para operação, administração e documentação do painel.
-      </p>
-    </div>
-
-    {# Fonte de dados dos links de operação do Labs. #}
-    {% set labs_cards = [
-      {
-        'href': '/labs/',
-        'icon': 'grid-1x2',
-        'title': 'Painel Labs',
-        'text': 'Gerencie sites, templates e reprovisionamento em um só lugar.'
-      },
-      {
-        'href': '/labs/admin',
-        'icon': 'sliders',
-        'title': 'Admin Labs',
-        'text': 'Configure sites, slugs, templates e ações administrativas.'
-      },
-      {
-        'href': '/labs/readme',
-        'icon': 'journal-code',
-        'title': 'README Labs',
-        'text': 'Veja a documentação operacional e técnica do painel.'
-      }
-    ] %}
-
-    <div class="row g-3 g-lg-4">
-      {# Renderização dos atalhos operacionais. #}
-      {% for item in labs_cards %}
-      <div class="col-md-6 col-lg-4">
-        <a class="quote-card hover-lift glass card-variant-docs p-4 h-100 d-block text-decoration-none" href="{{ item.href }}" target="_blank" rel="noopener">
-          <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-{{ item.icon }}"></i><span class="fw-semibold">{{ item.title }}</span>
-          </div>
-          <p class="text-secondary-emphasis mt-2 mb-0">{{ item.text }}</p>
-        </a>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-{# CTA FINAL:
-   Reforço de decisão antes do formulário.
-   CTA primário leva para #form-orcamento e também dispara tracking (classe `cta-track`). #}
 <section id="cta" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">{{ is_growth ? 'Pronto para colocar sua operação no ar hoje?' : 'Quer subir sua landing tech hoje?' }}</h2>
+      <h2 class="fw-bold">Precisa marcar uma consulta?</h2>
       <p class="text-secondary-emphasis mb-0">
-        {{ is_growth ? 'Receba a base, personalize em minutos e comece a captar leads ainda esta semana.' : 'Estrutura pronta para publicar rápido, validar com usuários e evoluir com base em dados.' }}
+        Envie seus dados e a equipe retorna para confirmar o melhor horário disponível.
       </p>
     </div>
 
     <div class="cta-box glass cta-box-no-bg p-4 p-lg-5 text-center">
       <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3">
         <a class="btn btn-primary btn-lg px-4 cta-track" href="#form-orcamento" data-cta-id="final_primary">
-          {{ is_growth ? 'Começar implementação' : 'Quero essa base' }} <i class="bi bi-download ms-1"></i>
+          Solicitar agendamento <i class="bi bi-calendar2-check ms-1"></i>
         </a>
-        <a class="btn btn-outline-light btn-lg px-4 cta-track" href="#features" data-cta-id="final_secondary">
-          Ver funcionalidades <i class="bi bi-arrow-up-right ms-1"></i>
+        <a class="btn btn-outline-light btn-lg px-4 cta-track" href="{{ whatsapp_url }}" target="_blank" rel="noopener" data-cta-id="final_whatsapp">
+          Falar no WhatsApp <i class="bi bi-whatsapp ms-1"></i>
         </a>
       </div>
 
       <div class="small text-secondary-emphasis mt-3">
-        Dica: em Apache/Nginx, exponha direto a pasta <code>/public</code> para manter a estrutura correta.
+        Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.
       </div>
     </div>
   </div>
 </section>
 
-{# FORMULÁRIO DE CONTATO:
-   - Envia POST para `/contato` (backend Slim/HomeController::contact).
-   - Usa wizard de 2 etapas com validação progressiva no front (landing.js).
-   - Exibe estado de retorno (`form_status`) vindo do backend (sucesso/aviso/erro).
-   - Em caso de envio, publica metadados de rastreio (event_id/request_id) no HTML
-     para analytics no client-side. #}
 <section id="form-orcamento" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Solicite uma proposta</h2>
+      <h2 class="fw-bold">Solicite seu agendamento</h2>
       <p class="text-secondary-emphasis mb-0">
-        Envie seu contexto e retornamos com direcionamento técnico e comercial.
+        Informe seus contatos e o motivo da consulta para receber retorno da equipe.
       </p>
     </div>
 
     <div class="cta-box glass p-4 p-lg-5">
-      {# Feedback pós-submit (flash de sessão do backend).
-         Também serve como fonte para eventos de analytics no front. #}
       {% if form_status %}
         {% set alert_class = form_status.type == 'success' ? 'success' : (form_status.type == 'warning' ? 'warning' : 'danger') %}
         <div
@@ -567,9 +299,6 @@
         </div>
       {% endif %}
 
-      {# Form principal:
-         - Classe `.js-lead-form` conecta com o wizard JS.
-         - `action` respeita `base_url` para funcionar em subdiretório (APP_BASE). #}
       <form class="row g-3 js-lead-form" action="{{ base_url }}/contato" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token|default('') }}">
         <div class="visually-hidden" aria-hidden="true">
@@ -581,17 +310,16 @@
             <div class="form-step-progress-bar" id="leadFormProgressBar"></div>
           </div>
           <div class="form-step-labels">
-            <span class="form-step-label active" data-form-step-label="1">1. Contato</span>
-            <span class="form-step-label" data-form-step-label="2">2. Escopo</span>
+            <span class="form-step-label active" data-form-step-label="1">1. Dados</span>
+            <span class="form-step-label" data-form-step-label="2">2. Consulta</span>
           </div>
           <div class="visually-hidden" id="leadFormStatus" aria-live="polite"></div>
         </div>
 
-        {# Etapa 1: dados básicos de contato (nome, telefone, email). #}
         <div class="col-12 form-step" data-form-step="1">
           <div class="row g-3">
             <div class="col-12 col-md-6" data-step-field="1">
-              <label class="form-label text-secondary-emphasis" for="cta-nome">Nome</label>
+              <label class="form-label text-secondary-emphasis" for="cta-nome">Nome completo</label>
               <input class="form-control form-control-lg{{ form_errors.nome is defined ? ' is-invalid' : '' }}" type="text" id="cta-nome" name="nome" value="{{ form_data.nome|e }}" autocomplete="name" required>
               {% if form_errors.nome is defined %}
                 <div class="invalid-feedback d-block">Informe seu nome.</div>
@@ -614,22 +342,21 @@
           </div>
         </div>
 
-        {# Etapa 2: escopo da necessidade + campo opcional de empresa/projeto. #}
         <div class="col-12 form-step d-none" data-form-step="2">
           <div class="row g-3">
             <div class="col-12" data-step-field="2">
-              <label class="form-label text-secondary-emphasis" for="cta-mensagem">O que você precisa?</label>
-              <textarea class="form-control form-control-lg{{ form_errors.mensagem is defined ? ' is-invalid' : '' }}" id="cta-mensagem" name="mensagem" rows="3" minlength="10" placeholder="Ex.: Landing SaaS, página institucional, migração e otimização de conversão." required>{{ form_data.mensagem|e }}</textarea>
+              <label class="form-label text-secondary-emphasis" for="cta-mensagem">Motivo da consulta</label>
+              <textarea class="form-control form-control-lg{{ form_errors.mensagem is defined ? ' is-invalid' : '' }}" id="cta-mensagem" name="mensagem" rows="3" minlength="10" placeholder="Ex.: Gostaria de agendar uma consulta clínica na próxima semana." required>{{ form_data.mensagem|e }}</textarea>
               {% if form_errors.mensagem is defined %}
                 <div class="invalid-feedback d-block">Descreva brevemente sua necessidade.</div>
               {% endif %}
             </div>
             <div class="col-12" data-step-field="2">
               <details class="optional-fields">
-                <summary>Adicionar empresa/projeto (opcional)</summary>
+                <summary>Adicionar convênio ou observações (opcional)</summary>
                 <div class="row g-3 mt-1">
                   <div class="col-12">
-                    <label class="form-label text-secondary-emphasis" for="cta-empresa">Empresa / Projeto</label>
+                    <label class="form-label text-secondary-emphasis" for="cta-empresa">Convênio / observações</label>
                     <input class="form-control form-control-lg" type="text" id="cta-empresa" name="empresa" value="{{ form_data.empresa|e }}">
                   </div>
                 </div>
@@ -643,7 +370,7 @@
           <div class="ms-sm-auto d-flex gap-2">
             <button class="btn btn-outline-light btn-lg px-4" type="button" id="leadFormNext">Próximo</button>
             <button class="btn btn-primary btn-lg px-4 btn-submit-email cta-track d-none" type="submit" id="leadFormSubmit" data-cta-id="form_submit">
-              Enviar por email <i class="bi bi-envelope ms-1"></i>
+              Enviar solicitação <i class="bi bi-envelope ms-1"></i>
             </button>
           </div>
         </div>
@@ -652,15 +379,12 @@
   </div>
 </section>
 
-{# FAQ:
-   Seção de tratamento de objeções.
-   Usa Accordion do Bootstrap para reduzir altura da página sem esconder conteúdo crítico. #}
 <section id="faq" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">FAQ técnico-comercial</h2>
+      <h2 class="fw-bold">Dúvidas frequentes</h2>
       <p class="text-secondary-emphasis mb-0">
-        Respostas objetivas para dúvidas frequentes antes da implementação.
+        Informações essenciais antes de solicitar seu agendamento.
       </p>
     </div>
 
@@ -670,12 +394,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
-                Funciona no meu stack MVC/Twig atual?
+                Quais atendimentos a clínica realiza?
               </button>
             </h3>
             <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Sim. A página já está em Twig; mantenha os assets em <code>/public/assets</code> e conecte suas rotas.
+                A clínica realiza consultas médicas, check-ups preventivos, revisão de exames, acompanhamento de condições crônicas e encaminhamentos quando necessário.
               </div>
             </div>
           </div>
@@ -683,12 +407,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
-                Essa landing fica leve em produção?
+                Como confirmo meu horário?
               </button>
             </h3>
             <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Sim. A base usa Bootstrap + JS enxuto + animações CSS leves. Para ultra performance, é só reduzir motion e manter a estrutura.
+                Após o envio do formulário, a equipe entra em contato por WhatsApp ou email para confirmar disponibilidade, horário e orientações de chegada.
               </div>
             </div>
           </div>
@@ -696,12 +420,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
-                E se meu app estiver em subdiretório?
+                Devo levar exames anteriores?
               </button>
             </h3>
             <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Se você servir por <code>/site1/public</code>, use paths relativos ou helper de assets (ex.: <code>asset()</code>).
+                Sim, quando possível. Exames, receitas em uso e relatórios anteriores ajudam o médico a entender seu histórico com mais precisão.
               </div>
             </div>
           </div>
@@ -709,12 +433,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q4">
-                Dá para adaptar sem quebrar minha identidade visual?
+                Atende convênio?
               </button>
             </h3>
             <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                Sim. Tipografia, paleta, espaçamentos e blocos podem ser ajustados sem perder a estrutura de conversão já validada.
+                Informe seu convênio no campo de observações. A equipe confirma cobertura, disponibilidade e condições de atendimento no retorno.
               </div>
             </div>
           </div>
@@ -722,12 +446,12 @@
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
               <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q5">
-                Como integrar captação de leads com meu CRM?
+                Este site substitui uma consulta médica?
               </button>
             </h3>
             <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                O formulário pode enviar para email, webhook ou endpoint próprio. Assim você conecta com CRM, automação e funil comercial.
+                Não. O site facilita contato e agendamento. Orientações, diagnóstico e tratamento dependem de avaliação médica adequada.
               </div>
             </div>
           </div>
@@ -738,34 +462,8 @@
   </div>
 </section>
 
-{# Rodapé compartilhado (links institucionais e créditos). #}
 {% include 'partials/footer.twig' %}
-{# Resolve a paleta ativa para refletir estado visual atual no seletor flutuante. #}
-{% set active_palette = palette ?? app_palette ?? 'blue' %}
-{# FAB de paletas (desktop):
-   muda apenas o tema visual (CSS de paleta) sem alterar estrutura da landing. #}
-<div class="palette-fab d-none d-lg-block" data-palette-fab>
-  <button
-    type="button"
-    class="palette-fab-toggle"
-    id="paletteFabToggle"
-    aria-expanded="false"
-    aria-controls="paletteFabPanel"
-    aria-label="Abrir seletor de paletas"
-  >
-    <i class="bi bi-palette2"></i>
-    <span>Paletas</span>
-  </button>
-  <div class="palette-fab-panel" id="paletteFabPanel" role="group" aria-label="Selecionar paleta de cores">
-    <button type="button" class="palette-dot palette-dot-blue {{ active_palette == 'blue' ? 'active' : '' }}" data-palette-btn="blue" aria-label="Paleta azul" title="Blue"></button>
-    <button type="button" class="palette-dot palette-dot-red {{ active_palette == 'red' ? 'active' : '' }}" data-palette-btn="red" aria-label="Paleta vermelha" title="Red"></button>
-    <button type="button" class="palette-dot palette-dot-emerald {{ active_palette == 'emerald' ? 'active' : '' }}" data-palette-btn="emerald" aria-label="Paleta esmeralda" title="Emerald"></button>
-    <button type="button" class="palette-dot palette-dot-amber {{ active_palette == 'amber' ? 'active' : '' }}" data-palette-btn="amber" aria-label="Paleta âmbar" title="Amber"></button>
-    <button type="button" class="palette-dot palette-dot-violet {{ active_palette == 'violet' ? 'active' : '' }}" data-palette-btn="violet" aria-label="Paleta violeta" title="Violet"></button>
-  </div>
-</div>
-{# CTA flutuante de WhatsApp:
-   link de contato rápido que pode ser adaptado dinamicamente pelo JS conforme contexto de scroll. #}
+
 <a
   class="whatsapp-float"
   href="{{ whatsapp_url }}"

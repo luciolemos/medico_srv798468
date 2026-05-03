@@ -1,6 +1,6 @@
 {
-  "name": "agency/natalcode",
-  "description": "Base de landing page em Slim 4 e Twig para projetos web em PHP.",
+  "name": "agency/medico",
+  "description": "Landing page de clínica médica em Slim 4 e Twig.",
   "license": "proprietary",
   "type": "project",
   "require": {

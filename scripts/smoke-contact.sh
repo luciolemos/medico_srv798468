@@ -4,7 +4,7 @@ set -euo pipefail
 # Smoke test for contact form HTTP behavior.
 #
 # Usage:
-#   scripts/smoke-contact.sh --url "https://srv798468.hstgr.cloud/natalcloud/"
+#   scripts/smoke-contact.sh --url "https://example.com/medico/"
 #   scripts/smoke-contact.sh --url "http://127.0.0.1:8000/"
 
 BASE_URL=""
@@ -16,7 +16,7 @@ Usage:
   scripts/smoke-contact.sh --url URL [--timeout SECONDS]
 
 Options:
-  --url URL           Base URL da landing (ex.: https://host/natalcloud/)
+  --url URL           Base URL da clínica (ex.: https://host/medico/)
   --timeout SECONDS   Timeout por request curl (default: 20)
   --help              Mostra esta ajuda
 

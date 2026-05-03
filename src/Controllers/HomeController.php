@@ -24,11 +24,6 @@ final class HomeController
         $queryParams = $request->getQueryParams();
         $hasSeoVariantQuery = $this->hasSeoVariantQuery($queryParams);
 
-        $copyMode = (string) ($request->getQueryParams()['copy'] ?? 'soft');
-        if (!in_array($copyMode, ['soft', 'growth'], true)) {
-            $copyMode = 'soft';
-        }
-
         $paletteFromQuery = strtolower((string) ($queryParams['palette'] ?? ''));
         $paletteFromCookie = strtolower((string) ($_COOKIE[self::PALETTE_COOKIE_NAME] ?? ''));
         $paletteFromConfig = strtolower((string) ($this->config['palette'] ?? 'blue'));
@@ -51,10 +46,9 @@ final class HomeController
         }
 
         return $this->twig->render($response, 'pages/home.twig', [
-            'app_name' => $this->config['app_name'] ?? 'NatalCloud',
-            'app_mark' => $this->config['app_mark'] ?? 'A',
+            'app_name' => $this->config['app_name'] ?? 'Clínica Médica',
+            'app_mark' => $this->config['app_mark'] ?? 'M',
             'page_title' => $this->config['page_title'] ?? null,
-            'copy_mode' => $copyMode,
             'palette' => $palette,
             'canonical_url' => $this->canonicalHomeUrl(),
             'should_noindex' => $hasSeoVariantQuery,
@@ -80,7 +74,7 @@ final class HomeController
         if (!$this->hasValidCsrfToken((string) ($post['csrf_token'] ?? ''))) {
             $this->setFormFlash([
                 'type' => 'error',
-                'message' => 'Sua sessao expirou ou o formulario ficou invalido. Atualize a pagina e tente novamente.',
+                'message' => 'Sua sessão expirou ou o formulário ficou inválido. Atualize a página e tente novamente.',
             ]);
             return $this->redirectToForm($response);
         }
@@ -129,7 +123,7 @@ final class HomeController
             $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
             $this->setFormFlash([
                 'type' => 'warning',
-                'message' => 'Recebemos sua solicitação, mas o e-mail de destino não está configurado no servidor. Entre em contato também pelo WhatsApp.',
+                'message' => 'Recebemos sua solicitação de agendamento, mas o e-mail de destino não está configurado no servidor. Entre em contato também pelo WhatsApp.',
                 'event_id' => $eventId,
                 'request_id' => $requestId,
                 'tracking_event' => 'lead_form_submit_failure',
@@ -138,7 +132,7 @@ final class HomeController
         }
 
         $submittedAt = date('d/m/Y H:i:s');
-        $subject = 'NatalCode | Nova solicitação - Protocolo ' . $requestId;
+        $subject = 'Clínica Médica | Nova solicitação de agendamento - Protocolo ' . $requestId;
         $textBody = $this->buildLeadTextBody($eventId, $requestId, $submittedAt, $data);
         $htmlBody = $this->buildLeadHtmlBody($eventId, $requestId, $submittedAt, $data);
 
@@ -165,7 +159,7 @@ final class HomeController
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
-                    'message' => 'Recebemos sua solicitação, mas o envio de e-mail falhou no servidor. Entre em contato também pelo WhatsApp.',
+                    'message' => 'Recebemos sua solicitação de agendamento, mas o envio de e-mail falhou no servidor. Entre em contato também pelo WhatsApp.',
                     'event_id' => $eventId,
                     'request_id' => $requestId,
                     'tracking_event' => 'lead_form_submit_failure',
@@ -179,7 +173,7 @@ final class HomeController
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
-                    'message' => 'Recebemos sua solicitação, mas o SMTP está incompleto no servidor. Entre em contato também pelo WhatsApp.',
+                    'message' => 'Recebemos sua solicitação de agendamento, mas o SMTP está incompleto no servidor. Entre em contato também pelo WhatsApp.',
                     'event_id' => $eventId,
                     'request_id' => $requestId,
                     'tracking_event' => 'lead_form_submit_failure',
@@ -194,7 +188,7 @@ final class HomeController
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
-                    'message' => 'Recebemos sua solicitação, mas o envio de e-mail falhou no SMTP. Entre em contato também pelo WhatsApp.',
+                    'message' => 'Recebemos sua solicitação de agendamento, mas o envio de e-mail falhou no SMTP. Entre em contato também pelo WhatsApp.',
                     'event_id' => $eventId,
                     'request_id' => $requestId,
                     'tracking_event' => 'lead_form_submit_failure',
@@ -208,7 +202,7 @@ final class HomeController
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
-                    'message' => 'Recebemos sua solicitação, mas o servidor de e-mail não está configurado. Entre em contato também pelo WhatsApp.',
+                    'message' => 'Recebemos sua solicitação de agendamento, mas o servidor de e-mail não está configurado. Entre em contato também pelo WhatsApp.',
                     'event_id' => $eventId,
                     'request_id' => $requestId,
                     'tracking_event' => 'lead_form_submit_failure',
@@ -232,7 +226,7 @@ final class HomeController
                 $this->persistLeadEvent($eventId, $requestId, 'failure', $reason, $data);
                 $this->setFormFlash([
                     'type' => 'warning',
-                    'message' => 'Recebemos sua solicitação, mas o envio de e-mail falhou no servidor. Entre em contato também pelo WhatsApp.',
+                    'message' => 'Recebemos sua solicitação de agendamento, mas o envio de e-mail falhou no servidor. Entre em contato também pelo WhatsApp.',
                     'event_id' => $eventId,
                     'request_id' => $requestId,
                     'tracking_event' => 'lead_form_submit_failure',
@@ -244,7 +238,7 @@ final class HomeController
         $this->persistLeadEvent($eventId, $requestId, 'success', 'Email enviado com sucesso', $data);
         $this->setFormFlash([
             'type' => 'success',
-            'message' => 'Recebemos sua solicitação. Protocolo: ' . $requestId . '. Em breve retornaremos no WhatsApp/e-mail.',
+            'message' => 'Recebemos sua solicitação de agendamento. Protocolo: ' . $requestId . '. Em breve retornaremos no WhatsApp/e-mail.',
             'event_id' => $eventId,
             'request_id' => $requestId,
             'tracking_event' => 'lead_form_submit_success',
@@ -436,7 +430,7 @@ final class HomeController
 
     private function hasSeoVariantQuery(array $queryParams): bool
     {
-        return array_key_exists('palette', $queryParams) || array_key_exists('copy', $queryParams);
+        return array_key_exists('palette', $queryParams);
     }
 
     private function canonicalHomeUrl(): string
@@ -488,15 +482,10 @@ final class HomeController
                 $mail->SMTPAutoTLS = false;
             }
 
-            $mail->setFrom($from, 'NatalCode');
+            $mail->setFrom($from, (string) ($this->config['app_name'] ?? 'Clínica Médica'));
             $mail->addAddress($to);
             if ($replyTo !== null) {
                 $mail->addReplyTo($replyTo);
-            }
-
-            $brandImagePath = dirname(__DIR__, 2) . '/public/assets/img/natalcode/natalcode_logo_horizontal_black_1158x314.png';
-            if (is_file($brandImagePath)) {
-                $mail->addEmbeddedImage($brandImagePath, 'natalcode_brand', 'natalcode_logo_horizontal_black_1158x314.png', 'base64', 'image/png');
             }
 
             $mail->Subject = $subject;
@@ -514,10 +503,10 @@ final class HomeController
     private function buildLeadTextBody(string $eventId, string $requestId, string $submittedAt, array $data): string
     {
         $lines = [
-            'NOVO LEAD - NATALCODE',
+            'NOVA SOLICITAÇÃO DE AGENDAMENTO',
             str_repeat('=', 34),
             'Protocolo: ' . $requestId,
-            'ID do lead: ' . $eventId,
+            'ID do evento: ' . $eventId,
             'Data/Hora: ' . $submittedAt,
             'Origem: ' . $this->resolveOrigin(),
             '',
@@ -525,9 +514,9 @@ final class HomeController
             '- Nome: ' . $data['nome'],
             '- Telefone/WhatsApp: ' . $data['telefone'],
             '- Email: ' . ($data['email'] !== '' ? $data['email'] : '-'),
-            '- Empresa/Projeto: ' . ($data['empresa'] !== '' ? $data['empresa'] : '-'),
+            '- Convênio/Observações: ' . ($data['empresa'] !== '' ? $data['empresa'] : '-'),
             '',
-            'MENSAGEM',
+            'MOTIVO DA CONSULTA',
             str_repeat('-', 34),
             $data['mensagem'],
         ];
@@ -540,30 +529,29 @@ final class HomeController
         $name = htmlspecialchars((string) ($data['nome'] ?? '-'), ENT_QUOTES, 'UTF-8');
         $phone = htmlspecialchars((string) ($data['telefone'] ?? '-'), ENT_QUOTES, 'UTF-8');
         $email = htmlspecialchars((string) (($data['email'] ?? '') !== '' ? $data['email'] : '-'), ENT_QUOTES, 'UTF-8');
-        $company = htmlspecialchars((string) (($data['empresa'] ?? '') !== '' ? $data['empresa'] : '-'), ENT_QUOTES, 'UTF-8');
+        $notes = htmlspecialchars((string) (($data['empresa'] ?? '') !== '' ? $data['empresa'] : '-'), ENT_QUOTES, 'UTF-8');
         $message = nl2br(htmlspecialchars((string) ($data['mensagem'] ?? ''), ENT_QUOTES, 'UTF-8'));
         $safeEventId = htmlspecialchars($eventId, ENT_QUOTES, 'UTF-8');
         $safeRequestId = htmlspecialchars($requestId, ENT_QUOTES, 'UTF-8');
         $safeSubmittedAt = htmlspecialchars($submittedAt, ENT_QUOTES, 'UTF-8');
         $safeOrigin = htmlspecialchars($this->resolveOrigin(), ENT_QUOTES, 'UTF-8');
 
-        $brandUrl = 'cid:natalcode_brand';
         $normalizedWhatsapp = $this->normalizeWhatsappNumber((string) ($data['telefone'] ?? ''));
-        $whatsMessage = rawurlencode('Olá! Recebemos sua solicitação. Protocolo: ' . $requestId . '. Vamos continuar por aqui.');
+        $whatsMessage = rawurlencode('Olá! Recebemos sua solicitação de agendamento. Protocolo: ' . $requestId . '. Vamos continuar por aqui.');
         $whatsHref = $normalizedWhatsapp !== null ? 'https://wa.me/' . $normalizedWhatsapp . '?text=' . $whatsMessage : '#';
         $safeWhatsHref = htmlspecialchars($whatsHref, ENT_QUOTES, 'UTF-8');
         $safeReplyHref = htmlspecialchars('mailto:' . (($data['email'] ?? '') !== '' ? $data['email'] : ''), ENT_QUOTES, 'UTF-8');
+
+        $brandName = htmlspecialchars((string) ($this->config['app_name'] ?? 'Clínica Médica'), ENT_QUOTES, 'UTF-8');
 
         return <<<HTML
 <div style="background:#f6f8fb;padding:16px;font-family:Arial,sans-serif;color:#111827;">
   <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="max-width:680px;margin:0 auto;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
     <tr>
       <td style="padding:16px;background:#ffffff;color:#111827;border-bottom:1px solid #e5e7eb;">
-        <div style="margin-bottom:10px;">
-          <img src="{$brandUrl}" alt="NatalCode" style="display:block;width:260px;max-width:100%;height:auto;">
-        </div>
-        <div style="font-size:18px;line-height:1.3;font-weight:700;">Nova solicitação comercial</div>
-        <div style="font-size:13px;color:#4b5563;margin-top:4px;">Lead recebido no site</div>
+        <div style="font-size:20px;line-height:1.3;font-weight:800;">{$brandName}</div>
+        <div style="font-size:18px;line-height:1.3;font-weight:700;margin-top:8px;">Nova solicitação de agendamento</div>
+        <div style="font-size:13px;color:#4b5563;margin-top:4px;">Contato recebido pelo site da clínica</div>
       </td>
     </tr>
 
@@ -593,11 +581,11 @@ final class HomeController
         </div>
 
         <div style="margin-bottom:16px;padding:12px;border:1px solid #eef2f7;border-radius:8px;background:#ffffff;">
-          <div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Empresa/Projeto</div>
-          <div style="font-size:15px;line-height:1.4;">{$company}</div>
+          <div style="font-size:12px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em;">Convênio/Observações</div>
+          <div style="font-size:15px;line-height:1.4;">{$notes}</div>
         </div>
 
-        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Mensagem</div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;">Motivo da consulta</div>
         <div style="padding:12px;border:1px solid #e5e7eb;border-radius:8px;background:#f8fafc;line-height:1.6;font-size:14px;word-break:break-word;">
           {$message}
         </div>
@@ -689,18 +677,18 @@ HTML;
     private function newTrackingEventId(): string
     {
         try {
-            return 'natalcode_' . date('YmdHis') . '_' . bin2hex(random_bytes(6));
+            return 'medico_' . date('YmdHis') . '_' . bin2hex(random_bytes(6));
         } catch (\Throwable $e) {
-            return 'natalcode_' . date('YmdHis') . '_' . substr(sha1((string) microtime(true)), 0, 12);
+            return 'medico_' . date('YmdHis') . '_' . substr(sha1((string) microtime(true)), 0, 12);
         }
     }
 
     private function newRequestId(): string
     {
         try {
-            return 'NAT-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
+            return 'MED-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
         } catch (\Throwable $e) {
-            return 'NAT-' . date('Ymd') . '-' . strtoupper(substr(sha1((string) microtime(true)), 0, 4));
+            return 'MED-' . date('Ymd') . '-' . strtoupper(substr(sha1((string) microtime(true)), 0, 4));
         }
     }
 

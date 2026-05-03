@@ -4,7 +4,7 @@ set -euo pipefail
 # Unified local test runner.
 #
 # Usage:
-#   scripts/run-tests.sh --url "https://srv798468.hstgr.cloud/natalcloud/"
+#   scripts/run-tests.sh --url "https://example.com/medico/"
 #   scripts/run-tests.sh --url "http://127.0.0.1:8000/" --with-contact-success
 
 BASE_URL=""

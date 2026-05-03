@@ -43,9 +43,9 @@ $twig = Twig::create(__DIR__ . '/../views', [
 ]);
 $twig->getEnvironment()->addGlobal('base_url', $base);
 $twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
-$twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'NatalCloud');
-$twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'A');
-$twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'PHP 8.4+');
+$twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Clínica Médica');
+$twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'M');
+$twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'Clínica Médica');
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
 $twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
@@ -54,8 +54,8 @@ $twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? 'h
 $twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? 'https://wa.me/5584998087340');
 
 $controller = new HomeController($twig, [
-    'app_name' => $_ENV['APP_NAME'] ?? 'NatalCloud',
-    'app_mark' => $_ENV['APP_MARK'] ?? 'A',
+    'app_name' => $_ENV['APP_NAME'] ?? 'Clínica Médica',
+    'app_mark' => $_ENV['APP_MARK'] ?? 'M',
     'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
     'base_url' => $base,

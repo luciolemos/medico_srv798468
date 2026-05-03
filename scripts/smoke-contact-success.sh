@@ -108,8 +108,8 @@ curl -sS --max-time "$TIMEOUT" \
   --data-urlencode "nome=Contato Smoke" \
   --data-urlencode "telefone=(84) 99999-0000" \
   --data-urlencode "email=smoke@example.test" \
-  --data-urlencode "empresa=NatalCloud QA" \
-  --data-urlencode "mensagem=Mensagem automatizada de smoke test com SMTP sandbox."
+  --data-urlencode "empresa=Particular" \
+  --data-urlencode "mensagem=Gostaria de agendar uma consulta clínica via smoke test."
 
 status="$(awk 'toupper($1) ~ /^HTTP\// {code=$2} END{print code}' "$headers_file")"
 location="$(awk 'BEGIN{IGNORECASE=1} /^Location:/ {sub(/^Location:[[:space:]]*/, "", $0); gsub(/\r/, "", $0); loc=$0} END{print loc}' "$headers_file")"

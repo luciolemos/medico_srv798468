@@ -14,12 +14,12 @@ final class EnvTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fixturePath = sys_get_temp_dir() . '/natalcode-env-test.env';
-        $this->missingFixturePath = sys_get_temp_dir() . '/natalcode-env-missing.env';
+        $this->fixturePath = sys_get_temp_dir() . '/medico-env-test.env';
+        $this->missingFixturePath = sys_get_temp_dir() . '/medico-env-missing.env';
         file_put_contents($this->fixturePath, <<<ENV
-APP_NAME="NatalCode Test"
-APP_BASE="/natalcode"
-APP_PAGE_TITLE="NatalCode | Teste"
+APP_NAME="Clínica Médica Test"
+APP_BASE="/medico"
+APP_PAGE_TITLE="Clínica Médica | Teste"
 ENV);
 
         @unlink($this->missingFixturePath);
@@ -50,9 +50,9 @@ ENV);
     {
         Env::load($this->fixturePath);
 
-        self::assertSame('NatalCode Test', $_ENV['APP_NAME'] ?? null);
-        self::assertSame('/natalcode', $_ENV['APP_BASE'] ?? null);
-        self::assertSame('NatalCode | Teste', $_ENV['APP_PAGE_TITLE'] ?? null);
+        self::assertSame('Clínica Médica Test', $_ENV['APP_NAME'] ?? null);
+        self::assertSame('/medico', $_ENV['APP_BASE'] ?? null);
+        self::assertSame('Clínica Médica | Teste', $_ENV['APP_PAGE_TITLE'] ?? null);
     }
 
     public function testDoesNotOverrideExistingValues(): void

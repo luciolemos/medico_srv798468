@@ -2,8 +2,8 @@
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="{{ base_url ?? '/' }}">
       <img
-        src="{{ base_url ?? '' }}/assets/img/brands/white.png"
-        alt="{{ app_name ?? 'NatalCloud' }}"
+        src="{{ base_url ?? '' }}/assets/img/clinic-mark.svg"
+        alt="{{ app_name ?? 'Clínica Médica' }}"
         class="navbar-logo"
         width="38"
         height="38"
@@ -11,10 +11,10 @@
         decoding="async"
         fetchpriority="low"
       >
-      <span class="fw-semibold">{{ app_name ?? 'NatalCloud' }}</span>
+      <span class="fw-semibold">{{ app_name ?? 'Clínica Médica' }}</span>
 
       <span class="badge rounded-pill text-bg-primary-subtle border border-primary-subtle ms-2 d-none d-sm-inline">
-        {{ app_badge ?? 'PHP 8.4+' }}
+        {{ app_badge ?? 'Clínica médica' }}
       </span>
     </a>
 
@@ -39,51 +39,17 @@
       <div class="nav-collapse-inner w-100">
         <ul class="navbar-nav nav-main ms-auto align-items-lg-center gap-lg-2">
         <li class="nav-item nav-priority-1"><a class="nav-link" href="#top">Home</a></li>
-        <li class="nav-item nav-priority-1"><a class="nav-link" href="#features">Recursos</a></li>
-        <li class="nav-item nav-priority-1"><a class="nav-link" href="#projects">Projetos</a></li>
-        <li class="nav-item nav-priority-3"><a class="nav-link" href="#depoimentos">Clientes</a></li>
-        <li class="nav-item nav-priority-2"><a class="nav-link" href="#how">Como funciona</a></li>
-        <li class="nav-item nav-priority-3"><a class="nav-link" href="#docs">Docs</a></li>
-        <li class="nav-item nav-priority-3"><a class="nav-link" href="#labs-links">Labs</a></li>
-        <li class="nav-item nav-priority-3"><a class="nav-link" href="#cta">Oferta</a></li>
-        <li class="nav-item nav-priority-2"><a class="nav-link" href="#form-orcamento">Contato</a></li>
-        <li class="nav-item nav-priority-2"><a class="nav-link" href="#faq">FAQ</a></li>
+        <li class="nav-item nav-priority-1"><a class="nav-link" href="#features">Serviços</a></li>
+        <li class="nav-item nav-priority-2"><a class="nav-link" href="#how">Atendimento</a></li>
+        <li class="nav-item nav-priority-3"><a class="nav-link" href="#estrutura">Estrutura</a></li>
+        <li class="nav-item nav-priority-2"><a class="nav-link" href="#form-orcamento">Agendar</a></li>
+        <li class="nav-item nav-priority-2"><a class="nav-link" href="#faq">Dúvidas</a></li>
         </ul>
 
         <div class="nav-actions d-flex align-items-stretch align-items-lg-center gap-2 mt-3 mt-lg-0 ms-lg-3">
-          {% set active_palette = palette ?? app_palette ?? 'blue' %}
-          {% set palettes = allowed_palettes ?? ['blue', 'red', 'emerald', 'amber', 'violet'] %}
-          {% set palette_labels = {
-            'blue': 'azul',
-            'red': 'vermelha',
-            'emerald': 'esmeralda',
-            'amber': 'ambar',
-            'violet': 'violeta'
-          } %}
-          <div class="palette-swatches palette-swatches-inline" role="group" aria-label="Selecionar paleta de cores">
-            {% for palette_name in palettes %}
-            <button
-              type="button"
-              class="palette-dot palette-dot-{{ palette_name }} {{ active_palette == palette_name ? 'active' : '' }}"
-              data-palette-btn="{{ palette_name }}"
-              aria-label="Paleta {{ palette_labels[palette_name]|default(palette_name) }}"
-              title="{{ palette_name|capitalize }}"
-              aria-pressed="{{ active_palette == palette_name ? 'true' : 'false' }}"
-            ></button>
-            {% endfor %}
-          </div>
-
-          <button
-            class="btn btn-sm btn-outline-light nav-action-btn"
-            id="copyModeToggle"
-            type="button"
-            data-copy-mode="{{ copy_mode ?? 'soft' }}"
-            aria-label="Alternar modo de copy"
-            title="Alternar copy"
-          >
-            Copy: {{ (copy_mode ?? 'soft') == 'growth' ? 'Growth' : 'Soft' }}
-          </button>
-
+          <a class="btn btn-sm btn-primary nav-action-btn cta-track" href="#form-orcamento" data-cta-id="nav_schedule">
+            Agendar
+          </a>
           <button class="btn btn-sm btn-outline-light nav-quick-btn d-none d-lg-inline-flex" id="themeToggle" type="button" aria-label="Alternar tema" title="Alternar tema">
             <i class="bi bi-moon-stars"></i>
           </button>
