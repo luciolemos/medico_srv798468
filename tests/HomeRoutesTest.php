@@ -60,7 +60,9 @@ final class HomeRoutesTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('<title>Clínica Médica | Root</title>', $html);
         self::assertStringContainsString('href="/assets/css/landing.css?v=', $html);
-        self::assertStringContainsString('src="/assets/img/img_default_640.webp"', $html);
+        self::assertStringContainsString('src="/assets/img/hero/medico-640.webp"', $html);
+        self::assertStringContainsString('media="(max-width: 576px)"', $html);
+        self::assertStringContainsString('/assets/img/hero/medico-mobile-640.webp', $html);
         self::assertStringNotContainsString('//assets/', $html);
     }
 
@@ -98,7 +100,7 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('<link rel="canonical" href="http://localhost/medico/">', $decodedHtml);
         self::assertStringContainsString('<meta property="og:type" content="website">', $decodedHtml);
         self::assertStringContainsString('<meta property="og:title" content="Clínica Médica | Teste">', $decodedHtml);
-        self::assertStringContainsString('<meta property="og:image" content="http://localhost/medico/assets/img/img_default.webp">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:image" content="http://localhost/medico/assets/img/social/medico-og.webp">', $decodedHtml);
         self::assertStringContainsString('<meta name="twitter:card" content="summary_large_image">', $decodedHtml);
 
         self::assertSame('https://schema.org', $structuredData['@context'] ?? null);
@@ -124,7 +126,7 @@ final class HomeRoutesTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('<link rel="canonical" href="https://example.com/medico/">', $decodedHtml);
-        self::assertStringContainsString('<meta property="og:image" content="https://example.com/medico/assets/img/img_default.webp">', $decodedHtml);
+        self::assertStringContainsString('<meta property="og:image" content="https://example.com/medico/assets/img/social/medico-og.webp">', $decodedHtml);
         self::assertSame('https://example.com/medico/', $structuredData['@graph'][0]['url'] ?? null);
     }
 

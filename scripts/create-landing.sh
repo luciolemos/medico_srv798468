@@ -73,6 +73,35 @@ set_env_value() {
   fi
 }
 
+rename_standard_assets() {
+  local content_file="$TARGET_DIR/config/content/landing.php"
+
+  if [[ "$SLUG" == "medico" ]]; then
+    return
+  fi
+
+  if [[ -f "$TARGET_DIR/public/assets/img/hero/medico-640.webp" ]]; then
+    mv "$TARGET_DIR/public/assets/img/hero/medico-640.webp" "$TARGET_DIR/public/assets/img/hero/${SLUG}-640.webp"
+  fi
+  if [[ -f "$TARGET_DIR/public/assets/img/hero/medico-960.webp" ]]; then
+    mv "$TARGET_DIR/public/assets/img/hero/medico-960.webp" "$TARGET_DIR/public/assets/img/hero/${SLUG}-960.webp"
+  fi
+  if [[ -f "$TARGET_DIR/public/assets/img/hero/medico-1896.webp" ]]; then
+    mv "$TARGET_DIR/public/assets/img/hero/medico-1896.webp" "$TARGET_DIR/public/assets/img/hero/${SLUG}-1896.webp"
+  fi
+  if [[ -f "$TARGET_DIR/public/assets/img/hero/medico-mobile-640.webp" ]]; then
+    mv "$TARGET_DIR/public/assets/img/hero/medico-mobile-640.webp" "$TARGET_DIR/public/assets/img/hero/${SLUG}-mobile-640.webp"
+  fi
+  if [[ -f "$TARGET_DIR/public/assets/img/social/medico-og.webp" ]]; then
+    mv "$TARGET_DIR/public/assets/img/social/medico-og.webp" "$TARGET_DIR/public/assets/img/social/${SLUG}-og.webp"
+  fi
+
+  if [[ -f "$content_file" ]]; then
+    sed -i "s|assets/img/hero/medico-|assets/img/hero/$(sed_escape "$SLUG")-|g" "$content_file"
+    sed -i "s|assets/img/social/medico-og.webp|assets/img/social/$(sed_escape "$SLUG")-og.webp|g" "$content_file"
+  fi
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --target)
@@ -197,6 +226,7 @@ mkdir -p "$TARGET_DIR"
 
 mkdir -p "$TARGET_DIR/storage/cache/twig" "$TARGET_DIR/storage/logs" "$TARGET_DIR/storage/rate-limit"
 touch "$TARGET_DIR/storage/cache/twig/.gitkeep" "$TARGET_DIR/storage/logs/.gitkeep" "$TARGET_DIR/storage/rate-limit/.gitkeep"
+rename_standard_assets
 
 cp "$TARGET_DIR/.env.example" "$TARGET_DIR/.env"
 set_env_value "$TARGET_DIR/.env" "APP_NAME" "$APP_NAME"

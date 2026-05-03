@@ -22,7 +22,7 @@ final class SeoMetadata
             $seo['description'] ?? null,
             'Atendimento com hora marcada, equipe organizada e retorno claro.'
         );
-        $imageSrc = $this->firstNonEmpty($image['src'] ?? null, 'assets/img/img_default.webp');
+        $imageSrc = $this->firstNonEmpty($image['src'] ?? null, 'assets/img/social/medico-og.webp');
 
         return [
             'title' => $this->firstNonEmpty(

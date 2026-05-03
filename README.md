@@ -44,7 +44,7 @@ Abra `http://127.0.0.1:8000/`.
 1. Copie este projeto para o novo diretório, por exemplo `/var/www/pediatria`.
 2. Remova a identidade Git herdada se o destino for outro repositório.
 3. Ajuste `.env`: `APP_BASE`, nome público, links sociais, WhatsApp, SMTP e reCAPTCHA.
-4. Troque textos em `config/content/landing.php` e imagens em `public/assets/img/`.
+4. Troque textos em `config/content/landing.php` e imagens em `public/assets/img/hero/` e `public/assets/img/social/`.
 5. Rode `composer test` e `bash scripts/run-tests.sh --url "http://127.0.0.1:8000/"`.
 
 Também há um gerador para criar uma cópia limpa do protótipo:
@@ -74,5 +74,7 @@ O conteúdo principal está em:
 Para protótipos com mais de uma variação no mesmo repositório, crie outro arquivo em `config/content/`, por exemplo `config/content/pediatria.php`, e aponte `APP_CONTENT_FILE="pediatria"`. Quando `APP_CONTENT_FILE` não é informado, o app tenta `APP_SLUG` e depois volta para `landing`.
 
 A seção `seo` em `config/content/landing.php` controla título, descrição, Open Graph, Twitter Card e JSON-LD. Para novos nichos, ajuste principalmente `seo.schema.type`, por exemplo `MedicalClinic`, `Dentist` ou `VeterinaryCare`, além de imagem social, área atendida e serviços.
+
+As imagens principais seguem nomes padronizados: `public/assets/img/hero/{slug}-640.webp`, `{slug}-960.webp`, `{slug}-1896.webp`, `{slug}-mobile-640.webp` e `public/assets/img/social/{slug}-og.webp`. O gerador renomeia os placeholders para o slug novo; depois substitua esses arquivos por imagens finais do nicho.
 
 Após alterar templates em produção, limpe o cache Twig em `storage/cache/twig` ou rode o script de pós-update.
