@@ -1,9 +1,11 @@
+{% set nav_content = landing_content.nav|default({}) %}
+
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top py-3 nav-glass">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center gap-2" href="{{ base_url ?? '/' }}">
       <img
         src="{{ base_url ?? '' }}/assets/img/clinic-mark.svg"
-        alt="{{ app_name ?? 'Clínica Médica' }}"
+        alt="{{ app_name ?? 'Landing de saúde' }}"
         class="navbar-logo"
         width="38"
         height="38"
@@ -11,10 +13,10 @@
         decoding="async"
         fetchpriority="low"
       >
-      <span class="fw-semibold">{{ app_name ?? 'Clínica Médica' }}</span>
+      <span class="fw-semibold">{{ app_name ?? 'Landing de saúde' }}</span>
 
       <span class="badge rounded-pill text-bg-primary-subtle border border-primary-subtle ms-2 d-none d-sm-inline">
-        {{ app_badge ?? 'Clínica médica' }}
+        {{ app_badge ?? nav_content.badge|default('Atendimento') }}
       </span>
     </a>
 
@@ -72,7 +74,7 @@
           {% endif %}
 
           <a class="btn btn-sm btn-primary nav-action-btn cta-track" href="#form-orcamento" data-cta-id="nav_schedule">
-            Agendar
+            {{ nav_content.cta|default('Agendar') }}
           </a>
           <button class="btn btn-sm btn-outline-light nav-quick-btn d-none d-lg-inline-flex" id="themeToggle" type="button" aria-label="Alternar tema" title="Alternar tema">
             <i class="bi bi-moon-stars"></i>

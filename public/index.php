@@ -2,18 +2,38 @@
 
 declare(strict_types=1);
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 use App\Controllers\HomeController;
 use App\Core\Env;
+use App\Core\LandingContent;
+use App\Middleware\SecurityHeadersMiddleware;
 use Slim\Factory\AppFactory;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
 require __DIR__ . '/../src/Core/Env.php';
 Env::load(__DIR__ . '/../.env');
+
+if (session_status() === PHP_SESSION_NONE) {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+    $sessionBase = trim((string) ($_ENV['APP_BASE'] ?? ''));
+    $sessionPath = '/';
+    if ($sessionBase !== '' && $sessionBase !== '/') {
+        $sessionPath = '/' . trim($sessionBase, '/') . '/';
+    }
+
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => $sessionPath,
+        'domain' => '',
+        'secure' => $isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
 
 $autoload = __DIR__ . '/../vendor/autoload.php';
 if (!is_file($autoload)) {
@@ -23,6 +43,12 @@ if (!is_file($autoload)) {
 }
 
 require $autoload;
+
+$landingContent = LandingContent::load(
+    dirname(__DIR__),
+    (string) ($_ENV['APP_CONTENT_FILE'] ?? ''),
+    (string) ($_ENV['APP_SLUG'] ?? '')
+);
 
 $base = trim((string) ($_ENV['APP_BASE'] ?? ''));
 if ($base === '') {
@@ -61,23 +87,28 @@ $twig->getEnvironment()->addGlobal('base_url', $base);
 $twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
 $twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Clínica Médica');
 $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'M');
-$twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? 'Clínica Médica');
+$twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? ($landingContent['nav']['badge'] ?? 'Clínica Médica'));
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
+$twig->getEnvironment()->addGlobal('landing_content', $landingContent);
 $twig->getEnvironment()->addGlobal('show_palette_selector', $showPaletteSelector);
 $twig->getEnvironment()->addGlobal('recaptcha_enabled', $recaptchaEnabled && $recaptchaSiteKey !== '');
 $twig->getEnvironment()->addGlobal('recaptcha_site_key', $recaptchaSiteKey);
 $twig->getEnvironment()->addGlobal('recaptcha_action', $recaptchaAction !== '' ? $recaptchaAction : 'contact_submit');
 $twig->getEnvironment()->addGlobal('asset_version', $assetVersion);
 $twig->getEnvironment()->addGlobal('github_url', $_ENV['GITHUB_URL'] ?? '#');
-$twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? 'https://x.com');
-$twig->getEnvironment()->addGlobal('facebook_url', $_ENV['FACEBOOK_URL'] ?? 'https://facebook.com');
-$twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? 'https://instagram.com');
-$twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? 'https://wa.me/5584999031906');
+$twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('facebook_url', $_ENV['FACEBOOK_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? '#');
 
 $controller = new HomeController($twig, [
     'app_name' => $_ENV['APP_NAME'] ?? 'Clínica Médica',
     'app_mark' => $_ENV['APP_MARK'] ?? 'M',
+    'app_slug' => $_ENV['APP_SLUG'] ?? '',
+    'request_prefix' => $_ENV['APP_REQUEST_PREFIX'] ?? '',
     'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
+    'canonical_url' => $_ENV['APP_CANONICAL_URL'] ?? '',
+    'landing_content' => $landingContent,
     'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
     'base_url' => $base,
@@ -99,6 +130,10 @@ $controller = new HomeController($twig, [
     'smtp_timeout' => (int) ($_ENV['SMTP_TIMEOUT'] ?? 15),
     'rate_limit_max_attempts' => (int) ($_ENV['RATE_LIMIT_MAX_ATTEMPTS'] ?? 5),
     'rate_limit_window_seconds' => (int) ($_ENV['RATE_LIMIT_WINDOW_SECONDS'] ?? 600),
+    'x_url' => $_ENV['X_URL'] ?? '#',
+    'facebook_url' => $_ENV['FACEBOOK_URL'] ?? '#',
+    'instagram_url' => $_ENV['INSTAGRAM_URL'] ?? '#',
+    'whatsapp_url' => $_ENV['WHATSAPP_URL'] ?? '#',
 ]);
 
 $app = AppFactory::create();
@@ -106,6 +141,7 @@ $app->setBasePath($base);
 $app->add(TwigMiddleware::create($app, $twig));
 
 $app->addErrorMiddleware($isDev, $isDev, $isDev);
+$app->add(new SecurityHeadersMiddleware());
 
 $routes = require __DIR__ . '/../routes/web.php';
 $routes($app, $controller);

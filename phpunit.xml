@@ -5,7 +5,7 @@
     colors="true"
 >
     <testsuites>
-        <testsuite name="Medico Test Suite">
+        <testsuite name="Health Landing Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

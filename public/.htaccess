@@ -1,3 +1,9 @@
+Options -Indexes
+
+<FilesMatch "^\.|^(?:composer\.(?:json|lock)|package(?:-lock)?\.json|phpunit\.xml|README\.md|.*\.log)$">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_headers.c>
   Header append Vary Accept-Encoding
 

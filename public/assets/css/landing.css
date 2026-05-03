@@ -947,6 +947,17 @@ html.fx-ready .hero-media img {
   color: var(--text);
 }
 
+.recaptcha-disclosure {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.recaptcha-disclosure a {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .section-heading {
   margin-bottom: 2rem !important;
 }

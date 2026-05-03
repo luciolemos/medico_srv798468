@@ -44,11 +44,11 @@
     }
 
     const attach = (badge) => {
-      if (badge.dataset.medicoBadgeToggleReady === "true") {
+      if (badge.dataset.landingBadgeToggleReady === "true") {
         return;
       }
 
-      badge.dataset.medicoBadgeToggleReady = "true";
+      badge.dataset.landingBadgeToggleReady = "true";
       badge.classList.remove("is-expanded");
 
       const setExpanded = (isExpanded) => {

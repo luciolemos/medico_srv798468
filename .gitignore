@@ -4,8 +4,12 @@
 /storage/rate-limit/
 .phpunit.cache/
 .env
+.env.*
+!.env.example
 .DS_Store
 .idea/
 .vscode/
 node_modules/
+test-results/
+playwright-report/
 *.log

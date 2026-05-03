@@ -34,7 +34,7 @@ sed -i 's|^APP_BASE=.*$|APP_BASE=""|' .env
 sed -i 's|^APP_ENV=.*$|APP_ENV="dev"|' .env
 
 echo "[step] Subindo servidor local PHP"
-php -S 127.0.0.1:8000 -t public >/tmp/medico-lighthouse-local-php.log 2>&1 &
+php -S 127.0.0.1:8000 -t public >/tmp/landing-lighthouse-local-php.log 2>&1 &
 PHP_PID=$!
 
 echo "[step] Aguardando servidor responder"

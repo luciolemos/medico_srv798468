@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Core\SeoMetadata;
 use PHPMailer\PHPMailer\Exception as MailException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -45,16 +46,23 @@ final class HomeController
             $response = $response->withHeader('X-Robots-Tag', 'noindex, nofollow');
         }
 
+        $landingContent = $this->landingContent();
+        $seo = new SeoMetadata($this->config, $landingContent);
+        $seoMeta = $seo->meta();
+
         return $this->twig->render($response, 'pages/home.twig', [
             'app_name' => $this->config['app_name'] ?? 'Clínica Médica',
             'app_mark' => $this->config['app_mark'] ?? 'M',
             'page_title' => $this->config['page_title'] ?? null,
+            'landing_content' => $landingContent,
+            'seo_meta' => $seoMeta,
+            'structured_data_json' => $seo->structuredDataJson($seoMeta),
             'palette' => $palette,
             'show_palette_selector' => (bool) ($this->config['show_palette_selector'] ?? false),
             'recaptcha_enabled' => $this->isRecaptchaFrontendEnabled(),
             'recaptcha_site_key' => (string) ($this->config['recaptcha_site_key'] ?? ''),
             'recaptcha_action' => $this->recaptchaAction(),
-            'canonical_url' => $this->canonicalHomeUrl(),
+            'canonical_url' => $seoMeta['canonical_url'],
             'should_noindex' => $hasSeoVariantQuery,
             'csrf_token' => $this->issueContactCsrfToken(),
             'allowed_palettes' => self::ALLOWED_PALETTES,
@@ -86,7 +94,7 @@ final class HomeController
         if ($this->isBotSubmission($post)) {
             $this->setFormFlash([
                 'type' => 'warning',
-                'message' => 'Nao foi possivel processar o envio. Revise os campos e tente novamente.',
+                'message' => 'Não foi possível processar o envio. Revise os campos e tente novamente.',
             ]);
             return $this->redirectToForm($response);
         }
@@ -102,7 +110,7 @@ final class HomeController
         if ($this->hasHitContactRateLimit()) {
             $this->setFormFlash([
                 'type' => 'warning',
-                'message' => 'Recebemos muitas tentativas seguidas deste origem. Aguarde alguns minutos e tente novamente.',
+                'message' => 'Recebemos muitas tentativas seguidas desta origem. Aguarde alguns minutos e tente novamente.',
             ], $data);
             return $this->redirectToForm($response);
         }
@@ -150,7 +158,7 @@ final class HomeController
         }
 
         $submittedAt = date('d/m/Y H:i:s');
-        $subject = 'Clínica Médica | Nova solicitação de agendamento - Protocolo ' . $requestId;
+        $subject = $this->brandName() . ' | Nova solicitação de agendamento - Protocolo ' . $requestId;
         $textBody = $this->buildLeadTextBody($eventId, $requestId, $submittedAt, $data);
         $htmlBody = $this->buildLeadHtmlBody($eventId, $requestId, $submittedAt, $data);
 
@@ -279,7 +287,7 @@ final class HomeController
         try {
             $token = bin2hex(random_bytes(32));
         } catch (\Throwable $e) {
-            $token = hash('sha256', (string) microtime(true));
+            return '';
         }
 
         $_SESSION[self::CSRF_SESSION_KEY] = $token;
@@ -602,9 +610,10 @@ final class HomeController
         return array_key_exists('palette', $queryParams);
     }
 
-    private function canonicalHomeUrl(): string
+    private function landingContent(): array
     {
-        return rtrim($this->resolveOrigin(), '/') . '/';
+        $content = $this->config['landing_content'] ?? [];
+        return is_array($content) ? $content : [];
     }
 
     private function useSmtpDriver(): bool
@@ -780,7 +789,8 @@ HTML;
 
     private function resolveOrigin(): string
     {
-        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $forwardedProto = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
+        $scheme = $forwardedProto === 'https' || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         $base = rtrim((string) ($this->config['base_url'] ?? ''), '/');
         return $scheme . '://' . $host . ($base !== '' ? $base : '');
@@ -845,20 +855,52 @@ HTML;
 
     private function newTrackingEventId(): string
     {
+        $prefix = $this->eventPrefix();
         try {
-            return 'medico_' . date('YmdHis') . '_' . bin2hex(random_bytes(6));
+            return $prefix . '_' . date('YmdHis') . '_' . bin2hex(random_bytes(6));
         } catch (\Throwable $e) {
-            return 'medico_' . date('YmdHis') . '_' . substr(sha1((string) microtime(true)), 0, 12);
+            return $prefix . '_' . date('YmdHis') . '_' . substr(sha1((string) microtime(true)), 0, 12);
         }
     }
 
     private function newRequestId(): string
     {
+        $prefix = $this->requestPrefix();
         try {
-            return 'MED-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
+            return $prefix . '-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(2)));
         } catch (\Throwable $e) {
-            return 'MED-' . date('Ymd') . '-' . strtoupper(substr(sha1((string) microtime(true)), 0, 4));
+            return $prefix . '-' . date('Ymd') . '-' . strtoupper(substr(sha1((string) microtime(true)), 0, 4));
         }
+    }
+
+    private function brandName(): string
+    {
+        $name = trim((string) ($this->config['app_name'] ?? ''));
+        return $name !== '' ? $name : 'Clínica Médica';
+    }
+
+    private function eventPrefix(): string
+    {
+        $slug = strtolower(trim((string) ($this->config['app_slug'] ?? '')));
+        if ($slug === '') {
+            $slug = trim((string) ($this->config['base_url'] ?? ''), '/');
+        }
+
+        $slug = preg_replace('/[^a-z0-9]+/', '_', strtolower($slug)) ?? '';
+        $slug = trim($slug, '_');
+        return $slug !== '' ? $slug : 'landing';
+    }
+
+    private function requestPrefix(): string
+    {
+        $configured = strtoupper(trim((string) ($this->config['request_prefix'] ?? '')));
+        $configured = preg_replace('/[^A-Z0-9]/', '', $configured) ?? '';
+        if ($configured !== '') {
+            return substr($configured, 0, 12);
+        }
+
+        $slug = strtoupper(str_replace('_', '', $this->eventPrefix()));
+        return substr($slug !== '' ? $slug : 'LANDING', 0, 6);
     }
 
     private function persistLeadEvent(string $eventId, string $requestId, string $result, string $reason, array $data): void

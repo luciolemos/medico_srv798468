@@ -1,19 +1,40 @@
 {% extends 'base.twig' %}
 
-{% block title %}{{ page_title ?? 'Clínica Médica | Atendimento médico com hora marcada' }}{% endblock %}
-{% block meta_description %}Clínica médica com consultas, check-ups preventivos e acompanhamento de saúde com atendimento humanizado.{% endblock %}
+{% set content = landing_content|default({}) %}
+{% set seo = content.seo|default({}) %}
+{% set hero = content.hero|default({}) %}
+{% set hero_image = hero.image|default({}) %}
+{% set hero_sources = hero_image.sources|default([]) %}
+{% set hero_image_src = hero_image.src|default('assets/img/img_default_640.webp') %}
+{% set hero_image_sizes = hero_image.sizes|default('(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px') %}
+
+{% block title %}{{ page_title|default(seo.title|default(app_name|default('Landing de saúde'))) }}{% endblock %}
+{% block meta_description %}{{ seo.description|default('Atendimento com hora marcada, equipe organizada e retorno claro.') }}{% endblock %}
 {% block head_extra %}
 <link
   rel="preload"
   as="image"
-  href="{{ base_url }}/assets/img/img_default_640.webp"
-  imagesrcset="{{ base_url }}/assets/img/img_default_640.webp 640w, {{ base_url }}/assets/img/img_default_960.webp 960w, {{ base_url }}/assets/img/img_default.webp 1896w"
-  imagesizes="(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px"
+  href="{{ base_url }}/{{ hero_image_src }}"
+  imagesrcset="{% for source in hero_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
+  imagesizes="{{ hero_image_sizes }}"
   fetchpriority="high"
 >
 {% endblock %}
 
 {% block content %}
+
+{% set moments = content.moments|default({}) %}
+{% set services = content.services.items|default([]) %}
+{% set services_section = content.services|default({}) %}
+{% set how = content.how|default({}) %}
+{% set structure = content.structure|default({}) %}
+{% set cta = content.cta|default({}) %}
+{% set form = content.form|default({}) %}
+{% set form_fields = form.fields|default({}) %}
+{% set form_errors_copy = form.errors|default({}) %}
+{% set form_buttons = form.buttons|default({}) %}
+{% set faq = content.faq|default({}) %}
+{% set floating_whatsapp = content.floating_whatsapp|default({}) %}
 
 <div class="bg-blobs" aria-hidden="true">
   <span class="blob blob-1"></span>
@@ -29,59 +50,63 @@
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-lg-6">
         <div class="hero-badge mb-3">
-          <i class="bi bi-heart-pulse"></i>
-          <span>Clínica médica com atendimento humanizado</span>
+          <i class="bi bi-{{ hero.badge_icon|default('heart-pulse') }}"></i>
+          <span>{{ hero.badge|default(app_badge|default('Atendimento humanizado')) }}</span>
         </div>
 
         <h1 class="display-5 fw-bold lh-sm mb-3 hero-title-motion">
-          <span class="hero-title-part hero-title-part-1">Cuidado médico</span>
-          <span class="text-gradient hero-title-part hero-title-part-2 hero-title-highlight">próximo e seguro</span>
-          <span class="hero-title-part hero-title-part-3">para acompanhar sua saúde em cada etapa.</span>
+          <span class="hero-title-part hero-title-part-1">{{ hero.title_parts[0]|default(app_name|default('Atendimento')) }}</span>
+          <span class="text-gradient hero-title-part hero-title-part-2 hero-title-highlight">{{ hero.title_parts[1]|default('próximo e organizado') }}</span>
+          <span class="hero-title-part hero-title-part-3">{{ hero.title_parts[2]|default('para cuidar de cada solicitação com clareza.') }}</span>
         </h1>
 
         <p class="lead text-secondary-emphasis mb-4">
-          Consultas clínicas, check-ups preventivos e acompanhamento contínuo com escuta atenta, agenda organizada e orientação clara para o próximo passo do cuidado.
+          {{ hero.lead|default('Atendimento com escuta atenta, agenda organizada e orientação clara para o próximo passo.') }}
         </p>
 
         <div class="d-flex flex-column flex-sm-row gap-2 gap-sm-3">
-          <a class="btn btn-primary btn-lg px-4 cta-track" href="#form-orcamento" data-cta-id="hero_primary">
-            Agendar consulta <i class="bi bi-arrow-right-short"></i>
+          {% set primary_cta = hero.primary_cta|default({}) %}
+          {% set secondary_cta = hero.secondary_cta|default({}) %}
+          <a class="btn btn-primary btn-lg px-4 cta-track" href="{{ primary_cta.href|default('#form-orcamento') }}" data-cta-id="hero_primary">
+            {{ primary_cta.label|default('Agendar consulta') }} <i class="bi bi-{{ primary_cta.icon|default('arrow-right-short') }}"></i>
           </a>
-          <a class="btn btn-outline-light btn-lg px-4 cta-track" href="#features" data-cta-id="hero_secondary">
-            Ver atendimentos <i class="bi bi-clipboard2-pulse ms-1"></i>
+          <a class="btn btn-outline-light btn-lg px-4 cta-track" href="{{ secondary_cta.href|default('#features') }}" data-cta-id="hero_secondary">
+            {{ secondary_cta.label|default('Ver atendimentos') }} <i class="bi bi-{{ secondary_cta.icon|default('clipboard2-pulse') }} ms-1"></i>
           </a>
         </div>
 
         <div class="d-flex flex-wrap gap-3 mt-4 small text-secondary-emphasis">
+          {% for item in hero.trust_items|default([]) %}
           <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-shield-check"></i><span>Prontuário seguro</span>
+            <i class="bi bi-{{ item.icon }}"></i><span>{{ item.label }}</span>
           </div>
-          <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-calendar2-check"></i><span>Horário agendado</span>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <i class="bi bi-person-heart"></i><span>Escuta acolhedora</span>
-          </div>
+          {% endfor %}
         </div>
 
+        {% set proof = hero.proof|default({}) %}
+        {% set proof_avatar = proof.avatar|default({}) %}
+        {% set proof_avatar_sources = proof_avatar.sources|default([]) %}
         <div class="hero-proof glass mt-3">
+          {% if proof_avatar.src|default('') %}
           <div class="proof-avatars" aria-hidden="true">
             <img
-              src="{{ base_url }}/assets/img/avatars/face2_96.webp"
-              srcset="{{ base_url }}/assets/img/avatars/face2_96.webp 96w, {{ base_url }}/assets/img/avatars/face2_160.webp 160w"
-              sizes="56px"
+              src="{{ base_url }}/{{ proof_avatar.src }}"
+              srcset="{% for source in proof_avatar_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
+              sizes="{{ proof_avatar.sizes|default('56px') }}"
               alt=""
-              width="56"
-              height="56"
+              width="{{ proof_avatar.width|default(56) }}"
+              height="{{ proof_avatar.height|default(56) }}"
               loading="lazy"
               decoding="async"
               fetchpriority="low"
             >
           </div>
+          {% endif %}
           <div class="proof-copy">
-            <strong>Atendimento com continuidade</strong>
-            <span>Da primeira consulta ao retorno, a equipe orienta exames, encaminhamentos e acompanhamento.</span>
-            <span>Canal direto para agendamento e confirmação.</span>
+            <strong>{{ proof.title|default('Atendimento com continuidade') }}</strong>
+            {% for line in proof.lines|default([]) %}
+            <span>{{ line }}</span>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -91,15 +116,15 @@
           <picture>
             <source
               type="image/webp"
-              srcset="{{ base_url }}/assets/img/img_default_640.webp 640w, {{ base_url }}/assets/img/img_default_960.webp 960w, {{ base_url }}/assets/img/img_default.webp 1896w"
-              sizes="(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px"
+              srcset="{% for source in hero_sources %}{{ base_url }}/{{ source.path }} {{ source.width }}w{{ loop.last ? '' : ', ' }}{% endfor %}"
+              sizes="{{ hero_image_sizes }}"
             >
             <img
-              src="{{ base_url }}/assets/img/img_default_640.webp"
-              alt="Médica em consulta com paciente no consultório"
+              src="{{ base_url }}/{{ hero_image_src }}"
+              alt="{{ hero_image.alt|default('Atendimento em consultório') }}"
               class="img-fluid"
-              width="640"
-              height="360"
+              width="{{ hero_image.width|default(640) }}"
+              height="{{ hero_image.height|default(360) }}"
               loading="eager"
               decoding="sync"
               fetchpriority="high"
@@ -108,18 +133,12 @@
         </div>
 
         <div class="hero-metrics mt-3">
+          {% for metric in hero.metrics|default([]) %}
           <div class="metric glass">
-            <div class="metric-kpi">Seg-Sex</div>
-            <div class="metric-label">Agenda clínica</div>
+            <div class="metric-kpi">{{ metric.kpi }}</div>
+            <div class="metric-label">{{ metric.label }}</div>
           </div>
-          <div class="metric glass">
-            <div class="metric-kpi">24h</div>
-            <div class="metric-label">Confirmação</div>
-          </div>
-          <div class="metric glass">
-            <div class="metric-kpi">Retorno</div>
-            <div class="metric-label">Acompanhado</div>
-          </div>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -129,20 +148,17 @@
 <section class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Atendimento para diferentes momentos da sua saúde</h2>
+      <h2 class="fw-bold">{{ moments.title|default('Atendimento para diferentes necessidades') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        Uma clínica organizada para prevenção, diagnóstico inicial, acompanhamento e orientação médica responsável.
+        {{ moments.text|default('Uma operação organizada para receber, orientar e acompanhar cada solicitação com clareza.') }}
       </p>
     </div>
     <div class="row g-3 align-items-center justify-content-center">
       <div class="col-12">
         <div class="d-flex flex-wrap gap-2 justify-content-center">
-          <span class="pill"><i class="bi bi-heart-pulse"></i> Clínica geral</span>
-          <span class="pill"><i class="bi bi-clipboard2-check"></i> Check-up preventivo</span>
-          <span class="pill"><i class="bi bi-activity"></i> Acompanhamento contínuo</span>
-          <span class="pill"><i class="bi bi-capsule"></i> Orientação terapêutica</span>
-          <span class="pill"><i class="bi bi-file-medical"></i> Exames e encaminhamentos</span>
-          <span class="pill"><i class="bi bi-calendar2-check"></i> Consulta com hora marcada</span>
+          {% for pill in moments.pills|default([]) %}
+          <span class="pill"><i class="bi bi-{{ pill.icon }}"></i> {{ pill.label }}</span>
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -152,20 +168,11 @@
 <section id="features" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Serviços da clínica</h2>
+      <h2 class="fw-bold">{{ services_section.title|default('Serviços') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        Atendimento médico para queixas do dia a dia, prevenção e seguimento de condições que precisam de cuidado regular.
+        {{ services_section.text|default('Frentes de atendimento configuráveis conforme o nicho da landing.') }}
       </p>
     </div>
-
-    {% set services = services ?? [
-      {'icon':'heart-pulse','title':'Consulta clínica','text':'Avaliação de sintomas, histórico de saúde, exame físico e orientação do plano de cuidado.'},
-      {'icon':'clipboard2-pulse','title':'Check-up preventivo','text':'Revisão de saúde, fatores de risco, solicitação de exames e leitura dos resultados em consulta.'},
-      {'icon':'activity','title':'Acompanhamento contínuo','text':'Seguimento de pressão alta, diabetes, alterações metabólicas e outras condições crônicas.'},
-      {'icon':'person-heart','title':'Saúde da família','text':'Cuidado para adultos e idosos com comunicação clara para pacientes e familiares.'},
-      {'icon':'capsule','title':'Revisão de medicações','text':'Conferência de uso, horários, interações relatadas e adesão ao tratamento prescrito.'},
-      {'icon':'hospital','title':'Encaminhamentos','text':'Orientação para especialistas, exames complementares e retorno com os resultados.'},
-    ] %}
 
     <div class="row g-3 g-lg-4">
       {% for service in services %}
@@ -184,35 +191,31 @@
 <section id="how" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Como funciona o atendimento</h2>
+      <h2 class="fw-bold">{{ how.title|default('Como funciona o atendimento') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        Um fluxo simples para reduzir espera, organizar informações e deixar claro o próximo passo.
+        {{ how.text|default('Um fluxo simples para reduzir espera, organizar informações e deixar claro o próximo passo.') }}
       </p>
     </div>
 
     <div class="row align-items-center g-4 g-lg-5">
       <div class="col-lg-6">
         <ol class="steps">
-          <li><span class="step-num">1</span> Você solicita o agendamento pelo formulário ou WhatsApp</li>
-          <li><span class="step-num">2</span> A equipe confirma horário, dados básicos e motivo da consulta</li>
-          <li><span class="step-num">3</span> A consulta é realizada com escuta, exame e orientação médica</li>
-          <li><span class="step-num">4</span> Exames, receitas e encaminhamentos são organizados quando necessários</li>
-          <li><span class="step-num">5</span> O retorno acompanha resultados e evolução do cuidado</li>
+          {% for step in how.steps|default([]) %}
+          <li><span class="step-num">{{ loop.index }}</span> {{ step }}</li>
+          {% endfor %}
         </ol>
       </div>
 
       <div class="col-lg-6">
         <div class="quote-card hover-lift glass card-variant-docs p-4">
           <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="fw-semibold">Diferenciais no atendimento</div>
-            <span class="badge text-bg-success-subtle border border-success-subtle">Clínica</span>
+            <div class="fw-semibold">{{ how.details_title|default('Diferenciais no atendimento') }}</div>
+            <span class="badge text-bg-success-subtle border border-success-subtle">{{ how.details_badge|default('Atendimento') }}</span>
           </div>
           <ul class="checklist mb-0">
-            <li><i class="bi bi-check2-circle"></i> Agenda com confirmação prévia</li>
-            <li><i class="bi bi-check2-circle"></i> Orientação clara antes e depois da consulta</li>
-            <li><i class="bi bi-check2-circle"></i> Ambiente reservado e acolhedor</li>
-            <li><i class="bi bi-check2-circle"></i> Histórico clínico organizado com segurança</li>
-            <li><i class="bi bi-check2-circle"></i> Encaminhamento responsável quando necessário</li>
+            {% for detail in how.details|default([]) %}
+            <li><i class="bi bi-check2-circle"></i> {{ detail }}</li>
+            {% endfor %}
           </ul>
         </div>
       </div>
@@ -223,20 +226,14 @@
 <section id="estrutura" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold mb-2">Estrutura pensada para o paciente</h2>
+      <h2 class="fw-bold mb-2">{{ structure.title|default('Estrutura pensada para o paciente') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        A experiência de atendimento combina acolhimento, organização e segurança das informações.
+        {{ structure.text|default('A experiência de atendimento combina acolhimento, organização e segurança das informações.') }}
       </p>
     </div>
 
-    {% set structure_cards = [
-      {'icon': 'door-open', 'title': 'Recepção organizada', 'text': 'Chegada orientada, confirmação de dados e suporte para dúvidas antes da consulta.'},
-      {'icon': 'shield-lock', 'title': 'Privacidade', 'text': 'Dados de contato e informações clínicas tratados com cuidado e acesso restrito.'},
-      {'icon': 'clipboard2-check', 'title': 'Plano de cuidado', 'text': 'Registro das orientações, pedidos de exame e próximos passos para acompanhamento.'},
-    ] %}
-
     <div class="row g-3 g-lg-4">
-      {% for item in structure_cards %}
+      {% for item in structure.cards|default([]) %}
       <div class="col-md-6 col-lg-4">
         <div class="quote-card hover-lift glass card-variant-docs p-4 h-100">
           <div class="d-flex align-items-center gap-2">
@@ -253,24 +250,24 @@
 <section id="cta" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Precisa marcar uma consulta?</h2>
+      <h2 class="fw-bold">{{ cta.title|default('Precisa marcar uma consulta?') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        Envie seus dados e a equipe retorna para confirmar o melhor horário disponível.
+        {{ cta.text|default('Envie seus dados e a equipe retorna para confirmar o melhor horário disponível.') }}
       </p>
     </div>
 
     <div class="cta-box glass cta-box-no-bg p-4 p-lg-5 text-center">
       <div class="d-flex flex-column flex-sm-row justify-content-center gap-2 gap-sm-3">
         <a class="btn btn-primary btn-lg px-4 cta-track" href="#form-orcamento" data-cta-id="final_primary">
-          Solicitar agendamento <i class="bi bi-calendar2-check ms-1"></i>
+          {{ cta.primary_label|default('Solicitar agendamento') }} <i class="bi bi-calendar2-check ms-1"></i>
         </a>
         <a class="btn btn-outline-light btn-lg px-4 cta-track" href="{{ whatsapp_url }}" target="_blank" rel="noopener" data-cta-id="final_whatsapp">
-          Falar no WhatsApp <i class="bi bi-whatsapp ms-1"></i>
+          {{ cta.secondary_label|default('Falar no WhatsApp') }} <i class="bi bi-whatsapp ms-1"></i>
         </a>
       </div>
 
       <div class="small text-secondary-emphasis mt-3">
-        Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.
+        {{ cta.note|default('Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.') }}
       </div>
     </div>
   </div>
@@ -279,9 +276,9 @@
 <section id="form-orcamento" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Solicite seu agendamento</h2>
+      <h2 class="fw-bold">{{ form.title|default('Solicite seu agendamento') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        Informe seus contatos e o motivo da consulta para receber retorno da equipe.
+        {{ form.text|default('Informe seus contatos e o motivo da consulta para receber retorno da equipe.') }}
       </p>
     </div>
 
@@ -320,8 +317,8 @@
             <div class="form-step-progress-bar" id="leadFormProgressBar"></div>
           </div>
           <div class="form-step-labels">
-            <span class="form-step-label active" data-form-step-label="1">1. Dados</span>
-            <span class="form-step-label" data-form-step-label="2">2. Consulta</span>
+            <span class="form-step-label active" data-form-step-label="1">{{ form.steps[0]|default('1. Dados') }}</span>
+            <span class="form-step-label" data-form-step-label="2">{{ form.steps[1]|default('2. Consulta') }}</span>
           </div>
           <div class="visually-hidden" id="leadFormStatus" aria-live="polite"></div>
         </div>
@@ -329,24 +326,24 @@
         <div class="col-12 form-step" data-form-step="1">
           <div class="row g-3">
             <div class="col-12 col-md-6" data-step-field="1">
-              <label class="form-label text-secondary-emphasis" for="cta-nome">Nome completo</label>
+              <label class="form-label text-secondary-emphasis" for="cta-nome">{{ form_fields.name_label|default('Nome completo') }}</label>
               <input class="form-control form-control-lg{{ form_errors.nome is defined ? ' is-invalid' : '' }}" type="text" id="cta-nome" name="nome" value="{{ form_data.nome|e }}" autocomplete="name" required>
               {% if form_errors.nome is defined %}
-                <div class="invalid-feedback d-block">Informe seu nome.</div>
+                <div class="invalid-feedback d-block">{{ form_errors_copy.name|default('Informe seu nome.') }}</div>
               {% endif %}
             </div>
             <div class="col-12 col-md-6" data-step-field="1">
-              <label class="form-label text-secondary-emphasis" for="cta-telefone">Telefone / WhatsApp</label>
-              <input class="form-control form-control-lg{{ form_errors.telefone is defined ? ' is-invalid' : '' }}" type="tel" id="cta-telefone" name="telefone" value="{{ form_data.telefone|e }}" autocomplete="tel" inputmode="tel" pattern="[\d\s()+-]{10,20}" placeholder="(84) 99999-9999" required>
+              <label class="form-label text-secondary-emphasis" for="cta-telefone">{{ form_fields.phone_label|default('Telefone / WhatsApp') }}</label>
+              <input class="form-control form-control-lg{{ form_errors.telefone is defined ? ' is-invalid' : '' }}" type="tel" id="cta-telefone" name="telefone" value="{{ form_data.telefone|e }}" autocomplete="tel" inputmode="tel" pattern="[\d\s()+-]{10,20}" placeholder="{{ form_fields.phone_placeholder|default('(84) 99999-9999') }}" required>
               {% if form_errors.telefone is defined %}
-                <div class="invalid-feedback d-block">Informe um telefone válido para contato.</div>
+                <div class="invalid-feedback d-block">{{ form_errors_copy.phone|default('Informe um telefone válido para contato.') }}</div>
               {% endif %}
             </div>
             <div class="col-12 col-md-6" data-step-field="1">
-              <label class="form-label text-secondary-emphasis" for="cta-email">Email</label>
+              <label class="form-label text-secondary-emphasis" for="cta-email">{{ form_fields.email_label|default('Email') }}</label>
               <input class="form-control form-control-lg{{ form_errors.email is defined ? ' is-invalid' : '' }}" type="email" id="cta-email" name="email" value="{{ form_data.email|e }}" autocomplete="email" required>
               {% if form_errors.email is defined %}
-                <div class="invalid-feedback d-block">Informe um email válido para retorno.</div>
+                <div class="invalid-feedback d-block">{{ form_errors_copy.email|default('Informe um email válido para retorno.') }}</div>
               {% endif %}
             </div>
           </div>
@@ -355,18 +352,18 @@
         <div class="col-12 form-step d-none" data-form-step="2">
           <div class="row g-3">
             <div class="col-12" data-step-field="2">
-              <label class="form-label text-secondary-emphasis" for="cta-mensagem">Motivo da consulta</label>
-              <textarea class="form-control form-control-lg{{ form_errors.mensagem is defined ? ' is-invalid' : '' }}" id="cta-mensagem" name="mensagem" rows="3" minlength="10" placeholder="Ex.: Gostaria de agendar uma consulta clínica na próxima semana." required>{{ form_data.mensagem|e }}</textarea>
+              <label class="form-label text-secondary-emphasis" for="cta-mensagem">{{ form_fields.message_label|default('Motivo da consulta') }}</label>
+              <textarea class="form-control form-control-lg{{ form_errors.mensagem is defined ? ' is-invalid' : '' }}" id="cta-mensagem" name="mensagem" rows="3" minlength="10" placeholder="{{ form_fields.message_placeholder|default('Ex.: Gostaria de agendar um horário na próxima semana.') }}" required>{{ form_data.mensagem|e }}</textarea>
               {% if form_errors.mensagem is defined %}
-                <div class="invalid-feedback d-block">Descreva brevemente sua necessidade.</div>
+                <div class="invalid-feedback d-block">{{ form_errors_copy.message|default('Descreva brevemente sua necessidade.') }}</div>
               {% endif %}
             </div>
             <div class="col-12" data-step-field="2">
               <details class="optional-fields">
-                <summary>Adicionar convênio ou observações (opcional)</summary>
+                <summary>{{ form_fields.optional_summary|default('Adicionar convênio ou observações (opcional)') }}</summary>
                 <div class="row g-3 mt-1">
                   <div class="col-12">
-                    <label class="form-label text-secondary-emphasis" for="cta-empresa">Convênio / observações</label>
+                    <label class="form-label text-secondary-emphasis" for="cta-empresa">{{ form_fields.optional_label|default('Convênio / observações') }}</label>
                     <input class="form-control form-control-lg" type="text" id="cta-empresa" name="empresa" value="{{ form_data.empresa|e }}">
                   </div>
                 </div>
@@ -376,14 +373,23 @@
         </div>
 
         <div class="col-12 d-flex flex-column flex-sm-row justify-content-between gap-2">
-          <button class="btn btn-outline-light btn-lg px-4 d-none" type="button" id="leadFormPrev">Voltar</button>
+          <button class="btn btn-outline-light btn-lg px-4 d-none" type="button" id="leadFormPrev">{{ form_buttons.previous|default('Voltar') }}</button>
           <div class="ms-sm-auto d-flex gap-2">
-            <button class="btn btn-outline-light btn-lg px-4" type="button" id="leadFormNext">Próximo</button>
+            <button class="btn btn-outline-light btn-lg px-4" type="button" id="leadFormNext">{{ form_buttons.next|default('Próximo') }}</button>
             <button class="btn btn-primary btn-lg px-4 btn-submit-email cta-track d-none" type="submit" id="leadFormSubmit" data-cta-id="form_submit">
-              Enviar solicitação <i class="bi bi-envelope ms-1"></i>
+              {{ form_buttons.submit|default('Enviar solicitação') }} <i class="bi bi-envelope ms-1"></i>
             </button>
           </div>
         </div>
+        {% if recaptcha_enabled ?? false %}
+        <p class="recaptcha-disclosure mb-0">
+          Este formulário é protegido pelo reCAPTCHA e está sujeito à
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>
+          e aos
+          <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">Termos de Serviço</a>
+          do Google.
+        </p>
+        {% endif %}
       </form>
     </div>
   </div>
@@ -392,80 +398,30 @@
 <section id="faq" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
-      <h2 class="fw-bold">Dúvidas frequentes</h2>
+      <h2 class="fw-bold">{{ faq.title|default('Dúvidas frequentes') }}</h2>
       <p class="text-secondary-emphasis mb-0">
-        Informações essenciais antes de solicitar seu agendamento.
+        {{ faq.text|default('Informações essenciais antes de solicitar seu agendamento.') }}
       </p>
     </div>
 
     <div class="row justify-content-center">
       <div class="col-12">
         <div class="accordion accordion-flush glass px-3" id="faqAcc">
+          {% for item in faq.items|default([]) %}
+          {% set faq_id = 'q' ~ loop.index %}
           <div class="accordion-item bg-transparent">
             <h3 class="accordion-header">
-              <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q1">
-                Quais atendimentos a clínica realiza?
+              <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#{{ faq_id }}">
+                {{ item.question }}
               </button>
             </h3>
-            <div id="q1" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
+            <div id="{{ faq_id }}" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
               <div class="accordion-body text-secondary-emphasis">
-                A clínica realiza consultas médicas, check-ups preventivos, revisão de exames, acompanhamento de condições crônicas e encaminhamentos quando necessário.
+                {{ item.answer }}
               </div>
             </div>
           </div>
-
-          <div class="accordion-item bg-transparent">
-            <h3 class="accordion-header">
-              <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q2">
-                Como confirmo meu horário?
-              </button>
-            </h3>
-            <div id="q2" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-              <div class="accordion-body text-secondary-emphasis">
-                Após o envio do formulário, a equipe entra em contato por WhatsApp ou email para confirmar disponibilidade, horário e orientações de chegada.
-              </div>
-            </div>
-          </div>
-
-          <div class="accordion-item bg-transparent">
-            <h3 class="accordion-header">
-              <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q3">
-                Devo levar exames anteriores?
-              </button>
-            </h3>
-            <div id="q3" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-              <div class="accordion-body text-secondary-emphasis">
-                Sim, quando possível. Exames, receitas em uso e relatórios anteriores ajudam o médico a entender seu histórico com mais precisão.
-              </div>
-            </div>
-          </div>
-
-          <div class="accordion-item bg-transparent">
-            <h3 class="accordion-header">
-              <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q4">
-                Atende convênio?
-              </button>
-            </h3>
-            <div id="q4" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-              <div class="accordion-body text-secondary-emphasis">
-                Informe seu convênio no campo de observações. A equipe confirma cobertura, disponibilidade e condições de atendimento no retorno.
-              </div>
-            </div>
-          </div>
-
-          <div class="accordion-item bg-transparent">
-            <h3 class="accordion-header">
-              <button class="accordion-button collapsed bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#q5">
-                Este site substitui uma consulta médica?
-              </button>
-            </h3>
-            <div id="q5" class="accordion-collapse collapse" data-bs-parent="#faqAcc">
-              <div class="accordion-body text-secondary-emphasis">
-                Não. O site facilita contato e agendamento. Orientações, diagnóstico e tratamento dependem de avaliação médica adequada.
-              </div>
-            </div>
-          </div>
-
+          {% endfor %}
         </div>
       </div>
     </div>
@@ -503,10 +459,10 @@
   href="{{ whatsapp_url }}"
   target="_blank"
   rel="noopener"
-  aria-label="Falar no WhatsApp"
+  aria-label="{{ floating_whatsapp.aria_label|default('Falar no WhatsApp') }}"
 >
   <i class="bi bi-whatsapp"></i>
-  <span>WhatsApp</span>
+  <span>{{ floating_whatsapp.label|default('WhatsApp') }}</span>
 </a>
 
 {% endblock %}
