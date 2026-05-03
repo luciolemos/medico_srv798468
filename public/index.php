@@ -24,7 +24,16 @@ if (!is_file($autoload)) {
 
 require $autoload;
 
-$base = $_ENV['APP_BASE'] ?? '';
+$base = trim((string) ($_ENV['APP_BASE'] ?? ''));
+if ($base === '') {
+    $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+    $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
+    if ($scriptDir !== '' && $scriptDir !== '.' && $scriptDir !== '/') {
+        $base = $scriptDir;
+        $_ENV['APP_BASE'] = $base;
+        putenv('APP_BASE=' . $base);
+    }
+}
 $appEnv = strtolower((string) ($_ENV['APP_ENV'] ?? 'production'));
 $isDev = in_array($appEnv, ['dev', 'development', 'local'], true);
 $twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
