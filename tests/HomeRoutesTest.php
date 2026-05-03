@@ -128,6 +128,7 @@ final class HomeRoutesTest extends TestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('https://www.google.com/recaptcha/api.js?render=site-key-123', $html);
+        self::assertStringContainsString('class="bg-body text-body antialiased has-recaptcha"', $html);
         self::assertStringContainsString('name="recaptcha_token"', $html);
         self::assertStringContainsString('data-recaptcha-site-key="site-key-123"', $html);
         self::assertStringContainsString('data-recaptcha-action="contact_submit"', $html);

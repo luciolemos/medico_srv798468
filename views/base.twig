@@ -71,7 +71,7 @@
 </head>
 
 
-<body class="bg-body text-body antialiased">
+<body class="bg-body text-body antialiased{{ (recaptcha_enabled ?? false) ? ' has-recaptcha' : '' }}">
 
 <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
 
