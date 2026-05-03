@@ -67,6 +67,15 @@ $recaptchaEnabled = filter_var($_ENV['RECAPTCHA_ENABLED'] ?? false, FILTER_VALID
 $recaptchaSiteKey = trim((string) ($_ENV['RECAPTCHA_SITE_KEY'] ?? ''));
 $recaptchaAction = trim((string) ($_ENV['RECAPTCHA_ACTION'] ?? 'contact_submit'));
 $twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
+if ($twigCache !== false) {
+    if (!is_dir($twigCache)) {
+        @mkdir($twigCache, 0775, true);
+    }
+
+    if (!is_dir($twigCache) || !is_writable($twigCache)) {
+        $twigCache = false;
+    }
+}
 $assetVersion = trim((string) ($_ENV['ASSET_VERSION'] ?? ''));
 if ($assetVersion === '') {
     $assetVersion = (string) max(
@@ -81,7 +90,9 @@ if ($assetVersion === '') {
 
 $twig = Twig::create(__DIR__ . '/../views', [
     'cache' => $twigCache,
-    'auto_reload' => $isDev,
+    // Hostinger deploys can keep compiled Twig files between releases; always
+    // check freshness so updated templates are rendered without manual cache clears.
+    'auto_reload' => true,
 ]);
 $twig->getEnvironment()->addGlobal('base_url', $base);
 $twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
