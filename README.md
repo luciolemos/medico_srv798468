@@ -88,6 +88,8 @@ Para protótipos com mais de uma variação no mesmo repositório, crie outro ar
 
 A seção `seo` em `config/content/landing.php` controla título, descrição, Open Graph, Twitter Card e JSON-LD. Para novos nichos, ajuste principalmente `seo.schema.type`, por exemplo `MedicalClinic`, `Dentist` ou `VeterinaryCare`, além de imagem social, área atendida e serviços.
 
+Use `typography.profile` para diferenciar a personalidade visual de cada landing sem alterar o layout. Perfis disponíveis: `clinical` para clínica médica, `family` para pediatria/família, `premium` para estética ou odontologia de alto padrão, `warm` para veterinária ou atendimento acolhedor e `technical` para páginas mais objetivas. O perfil troca famílias tipográficas, pesos e ritmo dos títulos via CSS variables.
+
 As imagens principais seguem nomes padronizados: `public/assets/img/hero/{slug}-640.webp`, `{slug}-960.webp`, `{slug}-1896.webp`, `{slug}-mobile-640.webp` e `public/assets/img/social/{slug}-og.jpg`. O corte mobile é vertical para preservar o rosto/atendimento em telas estreitas. O gerador renomeia os placeholders para o slug novo; depois substitua esses arquivos por imagens finais do nicho.
 
 Após alterar templates em produção, limpe o cache Twig em `storage/cache/twig` ou rode o script de pós-update.

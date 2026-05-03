@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-br" data-theme="dark">
+{% set typography = landing_content.typography|default({}) %}
+{% set typography_profile = typography.profile|default('clinical') %}
+<html lang="pt-br" data-theme="dark" data-typography="{{ typography_profile|e('html_attr') }}">
 <head>
   {% set meta = seo_meta|default({}) %}
   {% set meta_image = meta.image|default({}) %}
