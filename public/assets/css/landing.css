@@ -530,6 +530,11 @@ button:active {
   border-top: 1px solid var(--stroke-soft);
 }
 
+.footer-credit {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
 .section-divider {
   border: 0;
   height: 1px;

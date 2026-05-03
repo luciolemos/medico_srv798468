@@ -32,6 +32,14 @@
           {{ footer_content.emergency_note|default('Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.') }}
         </div>
       </div>
+
+      {% if footer_content.credit|default('') %}
+        <div class="col-12 col-md-5">
+          <div class="footer-credit small text-md-end">
+            {{ footer_content.credit }}
+          </div>
+        </div>
+      {% endif %}
     </div>
   </div>
 </footer>
