@@ -36,6 +36,16 @@ return [
             'para acompanhar cada fase da infância.',
         ],
         'lead' => 'Consultas pediátricas, puericultura e acompanhamento do desenvolvimento com orientação clara para responsáveis, rotina organizada e acolhimento desde o primeiro contato.',
+        'primary_cta' => [
+            'label' => 'Agendar consulta',
+            'href' => '#form-orcamento',
+            'icon' => 'arrow-right-short',
+        ],
+        'secondary_cta' => [
+            'label' => 'Ver cuidados',
+            'href' => '#features',
+            'icon' => 'clipboard2-heart',
+        ],
         'trust_items' => [
             ['icon' => 'shield-check', 'label' => 'Ambiente seguro'],
             ['icon' => 'calendar2-check', 'label' => 'Consulta agendada'],
@@ -130,22 +140,44 @@ return [
     ],
     'cta' => [
         'title' => 'Precisa marcar consulta para uma criança?',
-        'text' => 'Envie os dados do responsável e a equipe retorna para confirmar o melhor horário disponível.',
+        'text' => 'Preencha com os dados do responsável e a principal necessidade da criança. A equipe retorna para alinhar horário, idade e orientações iniciais.',
         'primary_label' => 'Solicitar agendamento',
         'secondary_label' => 'Falar no WhatsApp',
+        'helper_points' => [
+            ['icon' => 'clock-history', 'label' => 'Retorno para alinhar idade e horário'],
+            ['icon' => 'shield-lock', 'label' => 'Contato simples para a família'],
+            ['icon' => 'clipboard2-check', 'label' => 'Orientação inicial antes da consulta'],
+        ],
         'note' => 'Em caso de urgência pediátrica, procure o pronto atendimento mais próximo.',
     ],
     'form' => [
         'title' => 'Solicite o agendamento pediátrico',
-        'text' => 'Informe os dados do responsável, contato e motivo da consulta para a equipe retornar.',
+        'text' => 'Você pode informar só o essencial agora: dados do responsável, contato e o motivo principal da consulta infantil.',
+        'helper_points' => [
+            [
+                'icon' => 'chat-square-text',
+                'title' => 'Primeiro contato descomplicado',
+                'text' => 'Basta enviar os dados do responsável e a necessidade principal da criança.',
+            ],
+            [
+                'icon' => 'calendar2-check',
+                'title' => 'Agendamento mais orientado',
+                'text' => 'A equipe confirma idade, motivo da consulta e o melhor encaixe de horário.',
+            ],
+            [
+                'icon' => 'shield-lock',
+                'title' => 'Menos exposição',
+                'text' => 'Evite relatar detalhes clínicos extensos no formulário. O básico já é suficiente para começar.',
+            ],
+        ],
         'fields' => [
             'name_label' => 'Nome do responsável',
             'phone_label' => 'Telefone / WhatsApp',
             'email_label' => 'Email',
             'message_label' => 'Motivo da consulta',
             'message_placeholder' => 'Ex.: Gostaria de agendar consulta para meu filho de 4 anos.',
-            'optional_summary' => 'Adicionar idade da criança, convênio ou observações (opcional)',
-            'optional_label' => 'Idade / convênio / observações',
+            'optional_summary' => 'Adicionar idade da criança, convênio ou observações práticas (opcional)',
+            'optional_label' => 'Idade / convênio / observações práticas',
         ],
         'errors' => [
             'name' => 'Informe o nome do responsável.',
@@ -153,7 +185,7 @@ return [
             'email' => 'Informe um email válido.',
             'message' => 'Descreva brevemente a necessidade da criança.',
         ],
-        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento pediátrico. Evite inserir informações clínicas sensíveis além do necessário para contato inicial.',
+        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento pediátrico. Informe apenas o necessário no primeiro contato e deixe detalhes clínicos para a consulta.',
     ],
     'faq' => [
         'title' => 'Dúvidas frequentes sobre pediatria',

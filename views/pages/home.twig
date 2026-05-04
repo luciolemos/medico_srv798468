@@ -48,6 +48,8 @@
 {% set form_fields = form.fields|default({}) %}
 {% set form_errors_copy = form.errors|default({}) %}
 {% set form_buttons = form.buttons|default({}) %}
+{% set cta_helper_points = cta.helper_points|default([]) %}
+{% set form_helper_points = form.helper_points|default([]) %}
 {% set faq = content.faq|default({}) %}
 {% set floating_whatsapp = content.floating_whatsapp|default({}) %}
 
@@ -145,12 +147,12 @@
             <img
               src="{{ base_url }}/{{ hero_image_src }}"
               alt="{{ hero_image.alt|default('Atendimento em consultório') }}"
-              class="img-fluid"
+                class="img-fluid"
+                fetchpriority="high"
+                loading="eager"
+                decoding="async"
               width="{{ hero_image.width|default(640) }}"
               height="{{ hero_image.height|default(360) }}"
-              loading="eager"
-              decoding="sync"
-              fetchpriority="high"
             >
           </picture>
         </div>
@@ -289,6 +291,17 @@
         </a>
       </div>
 
+      {% if cta_helper_points %}
+      <div class="d-flex flex-wrap justify-content-center gap-2 gap-lg-3 mt-3">
+        {% for item in cta_helper_points %}
+        <span class="pill">
+          <i class="bi bi-{{ item.icon|default('check2-circle') }}"></i>
+          {{ item.label|default(item) }}
+        </span>
+        {% endfor %}
+      </div>
+      {% endif %}
+
       <div class="small text-secondary-emphasis mt-3">
         {{ cta.note|default('Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.') }}
       </div>
@@ -317,6 +330,26 @@
         >
           {{ form_status.message }}
         </div>
+      {% endif %}
+
+      {% if form_helper_points %}
+      <div class="row g-2 mb-3">
+        {% for item in form_helper_points %}
+        <div class="col-12 col-lg-4">
+          <div class="glass card-variant-proof p-3 h-100">
+            <div class="d-flex align-items-start gap-2">
+              <div class="feature-icon flex-shrink-0">
+                <i class="bi bi-{{ item.icon|default('check2-circle') }}"></i>
+              </div>
+              <div>
+                <div class="fw-semibold">{{ item.title|default('Orientação') }}</div>
+                <div class="text-secondary-emphasis small mt-1">{{ item.text|default('') }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
       {% endif %}
 
       <form class="row g-3 js-lead-form" action="{{ base_url }}/contato" method="post">
