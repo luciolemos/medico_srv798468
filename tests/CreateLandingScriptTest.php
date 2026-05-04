@@ -20,6 +20,23 @@ final class CreateLandingScriptTest extends TestCase
         $this->removeDirectory($this->rootPath);
     }
 
+    public function testCreateLandingListsPresetSlugs(): void
+    {
+        $script = dirname(__DIR__) . '/scripts/create-landing.sh';
+        $command = 'bash ' . escapeshellarg($script) . ' --list-presets';
+
+        exec($command, $output, $exitCode);
+        $text = implode("\n", $output);
+
+        self::assertSame(0, $exitCode, $text);
+        self::assertStringContainsString('slug', $text);
+        self::assertStringContainsString('pediatria', $text);
+        self::assertStringContainsString('odontologia', $text);
+        self::assertStringContainsString('veterinaria', $text);
+        self::assertStringContainsString('premium', $text);
+        self::assertStringContainsString('VeterinaryCare', $text);
+    }
+
     public function testCreateLandingUsesSlugContentAndPrunesOtherNiches(): void
     {
         $projectRoot = dirname(__DIR__);

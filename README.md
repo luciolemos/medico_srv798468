@@ -52,6 +52,7 @@ Abra `http://127.0.0.1:8000/`.
 Também há um gerador para criar uma cópia limpa do protótipo:
 
 ```bash
+bash scripts/create-landing.sh --list-presets
 bash scripts/create-landing.sh pediatria --name "Clínica Pediátrica" --mark P --palette emerald --request-prefix PED
 ```
 

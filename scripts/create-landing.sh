@@ -16,11 +16,13 @@ APP_MARK=""
 APP_PALETTE=""
 REQUEST_PREFIX=""
 DRY_RUN=0
+LIST_PRESETS=0
 
 usage() {
   cat <<'USAGE'
 Usage:
   bash scripts/create-landing.sh SLUG [options]
+  bash scripts/create-landing.sh --list-presets
 
 Options:
   --target DIR             Diretório de destino. Default: /var/www/SLUG
@@ -29,6 +31,7 @@ Options:
   --mark TEXT              Marca curta no nav/favicon textual. Default: primeira letra do nome
   --palette VALUE          Paleta inicial: blue, red, emerald, amber ou violet. Default: preset do nicho ou blue
   --request-prefix VALUE   Prefixo de protocolo, por exemplo PED, VET, ODO. Default: preset do nicho ou slug em maiúsculas
+  --list-presets           Lista os presets cadastrados e o conteúdo ativo esperado
   --dry-run                Mostra o que seria feito sem copiar arquivos
   --help                   Mostra esta ajuda
 
@@ -92,6 +95,42 @@ preset_slugs() {
         }
     }
   ' "$SOURCE_ROOT/config/presets/niches.php"
+}
+
+list_presets() {
+  php -r '
+    $root = $argv[1];
+    $file = $root . "/config/presets/niches.php";
+    if (!is_file($file)) {
+        fwrite(STDERR, "[error] presets não encontrados: {$file}\n");
+        exit(1);
+    }
+
+    $presets = require $file;
+    if (!is_array($presets)) {
+        fwrite(STDERR, "[error] presets devem retornar array\n");
+        exit(1);
+    }
+
+    printf("%-14s %-26s %-8s %-10s %-24s %-8s %-12s\n", "slug", "nome", "paleta", "tipo", "schema", "prefixo", "conteúdo");
+    foreach ($presets as $slug => $preset) {
+        if (!is_string($slug) || !is_array($preset)) {
+            continue;
+        }
+
+        $content = is_file($root . "/config/content/" . $slug . ".php") ? $slug : "landing";
+        printf(
+            "%-14s %-26s %-8s %-10s %-24s %-8s %-12s\n",
+            $slug,
+            (string) ($preset["name"] ?? ""),
+            (string) ($preset["palette"] ?? ""),
+            (string) ($preset["typography"] ?? ""),
+            (string) ($preset["schema_type"] ?? ""),
+            (string) ($preset["request_prefix"] ?? ""),
+            $content
+        );
+    }
+  ' "$SOURCE_ROOT"
 }
 
 set_env_value() {
@@ -232,6 +271,10 @@ while [[ $# -gt 0 ]]; do
       REQUEST_PREFIX="${2:-}"
       shift 2
       ;;
+    --list-presets)
+      LIST_PRESETS=1
+      shift
+      ;;
     --dry-run)
       DRY_RUN=1
       shift
@@ -256,6 +299,11 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+
+if [[ "$LIST_PRESETS" -eq 1 ]]; then
+  list_presets
+  exit 0
+fi
 
 if [[ -z "$SLUG" ]]; then
   echo "[error] informe o SLUG" >&2
