@@ -36,6 +36,16 @@ return [
             'para acompanhar saúde, prevenção e rotina.',
         ],
         'lead' => 'Consultas veterinárias, vacinação, check-ups e acompanhamento com escuta atenta, agenda organizada e orientação clara para tutores.',
+        'primary_cta' => [
+            'label' => 'Agendar consulta',
+            'href' => '#form-orcamento',
+            'icon' => 'arrow-right-short',
+        ],
+        'secondary_cta' => [
+            'label' => 'Ver cuidados',
+            'href' => '#features',
+            'icon' => 'clipboard2-heart',
+        ],
         'trust_items' => [
             ['icon' => 'shield-check', 'label' => 'Ambiente seguro'],
             ['icon' => 'calendar-heart', 'label' => 'Consulta agendada'],
@@ -130,22 +140,44 @@ return [
     ],
     'cta' => [
         'title' => 'Precisa marcar uma consulta veterinária?',
-        'text' => 'Envie seus dados e a equipe retorna para confirmar o melhor horário disponível.',
+        'text' => 'Preencha com seus dados, o nome do pet e a principal necessidade. A equipe retorna para alinhar disponibilidade e orientação inicial.',
         'primary_label' => 'Solicitar agendamento',
         'secondary_label' => 'Falar no WhatsApp',
+        'helper_points' => [
+            ['icon' => 'clock-history', 'label' => 'Retorno para alinhar horário e espécie'],
+            ['icon' => 'shield-lock', 'label' => 'Contato simples para tutor e pet'],
+            ['icon' => 'clipboard2-check', 'label' => 'Orientação inicial antes da consulta'],
+        ],
         'note' => 'Em caso de urgência veterinária, procure atendimento emergencial.',
     ],
     'form' => [
         'title' => 'Solicite o agendamento veterinário',
-        'text' => 'Informe os dados do tutor, contato e motivo da consulta para a equipe retornar.',
+        'text' => 'Você pode informar só o essencial agora: dados do tutor, contato e motivo principal da consulta do pet.',
+        'helper_points' => [
+            [
+                'icon' => 'chat-square-text',
+                'title' => 'Primeiro contato direto',
+                'text' => 'Basta indicar tutor, contato e necessidade principal para a equipe organizar o retorno.',
+            ],
+            [
+                'icon' => 'calendar2-check',
+                'title' => 'Agendamento com contexto',
+                'text' => 'A equipe confirma espécie, faixa etária e o melhor horário antes da consulta.',
+            ],
+            [
+                'icon' => 'shield-lock',
+                'title' => 'Menos atrito no envio',
+                'text' => 'Evite detalhar o caso inteiro no formulário. O básico já ajuda a direcionar o atendimento.',
+            ],
+        ],
         'fields' => [
             'name_label' => 'Nome do tutor',
             'phone_label' => 'Telefone / WhatsApp',
             'email_label' => 'Email',
             'message_label' => 'Motivo da consulta',
             'message_placeholder' => 'Ex.: Gostaria de agendar consulta para vacinação e check-up.',
-            'optional_summary' => 'Adicionar nome, idade, espécie ou observações (opcional)',
-            'optional_label' => 'Nome / idade / espécie / observações',
+            'optional_summary' => 'Adicionar nome do pet, idade, espécie ou observações práticas (opcional)',
+            'optional_label' => 'Pet / idade / espécie / observações práticas',
         ],
         'errors' => [
             'name' => 'Informe o nome do tutor.',
@@ -153,7 +185,7 @@ return [
             'email' => 'Informe um email válido.',
             'message' => 'Descreva brevemente a necessidade do atendimento.',
         ],
-        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento veterinário. Evite inserir informações clínicas sensíveis além do necessário para contato inicial.',
+        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento veterinário. Informe apenas o necessário no primeiro contato e detalhe o caso completo no atendimento.',
     ],
     'faq' => [
         'title' => 'Dúvidas frequentes sobre atendimento veterinário',

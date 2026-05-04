@@ -19,6 +19,23 @@
   --button-letter-spacing: 0;
   --heading-weight: 800;
   --button-weight: 700;
+  --grid-opacity: 0.07;
+  --body-accent-mask: radial-gradient(circle at center, black 35%, transparent 100%);
+  --body-overlay: none;
+  --nav-glass-bg: rgba(18, 38, 72, 0.76);
+  --nav-control-bg: rgba(24, 46, 84, 0.64);
+  --hero-badge-bg: rgba(7, 20, 40, 0.58);
+  --pill-bg: rgba(8, 20, 40, 0.66);
+  --steps-bg: rgba(7, 19, 39, 0.66);
+  --glass-bg-start: rgba(20, 42, 80, 0.78);
+  --glass-bg-end: rgba(16, 35, 68, 0.86);
+  --footer-bg-start: rgba(17, 36, 68, 0.86);
+  --footer-bg-end: rgba(13, 29, 56, 0.93);
+  --section-divider-mid: rgba(109, 203, 255, 0.35);
+  --hero-image-radius: 18px;
+  --hero-image-border: 1px solid var(--stroke-soft);
+  --hero-image-filter: none;
+  --hero-image-object-position: center center;
 
   --r1: 18px;
   --r2: 12px;
@@ -54,6 +71,58 @@ html[data-typography="warm"] {
   --font-heading: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   --heading-weight: 800;
   --button-weight: 700;
+}
+
+html[data-niche="estetica"] {
+  --font-body: "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-heading: "Georgia", "Times New Roman", serif;
+  --font-ui: "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --heading-weight: 700;
+  --heading-letter-spacing: -0.02em;
+  --button-letter-spacing: 0.04em;
+  --grid-opacity: 0.03;
+  --body-accent-mask: radial-gradient(circle at 22% 18%, black 18%, transparent 56%), radial-gradient(circle at 82% 76%, black 14%, transparent 52%);
+  --body-overlay:
+    radial-gradient(circle at 18% 16%, rgba(255, 236, 242, 0.15), transparent 26%),
+    radial-gradient(circle at 82% 24%, rgba(245, 212, 255, 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(22, 14, 34, 0.1), transparent 38%);
+  --nav-glass-bg: rgba(31, 22, 45, 0.7);
+  --nav-control-bg: rgba(39, 28, 54, 0.66);
+  --hero-badge-bg: rgba(33, 22, 50, 0.62);
+  --pill-bg: rgba(34, 22, 50, 0.68);
+  --steps-bg: rgba(34, 22, 49, 0.72);
+  --glass-bg-start: rgba(38, 26, 56, 0.78);
+  --glass-bg-end: rgba(28, 18, 43, 0.88);
+  --footer-bg-start: rgba(28, 18, 43, 0.88);
+  --footer-bg-end: rgba(22, 14, 34, 0.95);
+  --section-divider-mid: rgba(216, 176, 255, 0.32);
+  --hero-image-radius: 26px;
+  --hero-image-filter: saturate(1.04) contrast(1.02);
+}
+
+html[data-niche="psicologia"] {
+  --font-body: "Lato", "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-heading: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --heading-weight: 800;
+  --heading-letter-spacing: -0.01em;
+  --grid-opacity: 0.035;
+  --body-accent-mask: radial-gradient(circle at 18% 22%, black 18%, transparent 52%), radial-gradient(circle at 78% 84%, black 16%, transparent 54%);
+  --body-overlay:
+    radial-gradient(circle at 16% 18%, rgba(255, 228, 171, 0.12), transparent 26%),
+    radial-gradient(circle at 82% 28%, rgba(230, 173, 88, 0.1), transparent 24%),
+    linear-gradient(180deg, rgba(38, 26, 11, 0.12), transparent 42%);
+  --nav-glass-bg: rgba(42, 31, 20, 0.72);
+  --nav-control-bg: rgba(52, 39, 25, 0.66);
+  --hero-badge-bg: rgba(46, 34, 20, 0.62);
+  --pill-bg: rgba(46, 34, 20, 0.68);
+  --steps-bg: rgba(45, 34, 20, 0.72);
+  --glass-bg-start: rgba(50, 37, 22, 0.76);
+  --glass-bg-end: rgba(36, 26, 15, 0.88);
+  --footer-bg-start: rgba(40, 29, 18, 0.88);
+  --footer-bg-end: rgba(31, 23, 14, 0.95);
+  --section-divider-mid: rgba(255, 204, 118, 0.3);
+  --hero-image-radius: 22px;
+  --hero-image-filter: saturate(0.98) contrast(1.01) brightness(0.99);
 }
 
 html[data-typography="technical"] {
@@ -106,10 +175,10 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(var(--gradA), 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--gradA), 0.07) 1px, transparent 1px);
+    linear-gradient(rgba(var(--gradA), var(--grid-opacity)) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--gradA), var(--grid-opacity)) 1px, transparent 1px);
   background-size: 34px 34px;
-  mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
+  mask-image: var(--body-accent-mask);
   z-index: -2;
   opacity: 0;
   transition: opacity 0.28s ease;
@@ -120,7 +189,7 @@ body::after {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background: none;
+  background: var(--body-overlay);
   opacity: 0;
   z-index: -1;
   transition: none;
@@ -524,7 +593,7 @@ button:active {
 }
 
 .nav-glass {
-  background: rgba(18, 38, 72, 0.76);
+  background: var(--nav-glass-bg);
   border-bottom: 1px solid var(--stroke-soft);
   backdrop-filter: blur(16px) saturate(130%);
 }
@@ -549,7 +618,7 @@ button:active {
 .navbar .theme-toggle-icon {
   border-radius: 0.86rem;
   border: 1px solid var(--stroke-soft);
-  background: rgba(24, 46, 84, 0.64);
+  background: var(--nav-control-bg);
   backdrop-filter: blur(10px);
 }
 
@@ -565,7 +634,7 @@ button:active {
 }
 
 .footer {
-  background: linear-gradient(180deg, rgba(17, 36, 68, 0.86), rgba(13, 29, 56, 0.93));
+  background: linear-gradient(180deg, var(--footer-bg-start), var(--footer-bg-end));
   border-top: 1px solid var(--stroke-soft);
 }
 
@@ -633,7 +702,7 @@ button:active {
   border: 0;
   height: 1px;
   margin: 0;
-  background: linear-gradient(90deg, transparent, rgba(109, 203, 255, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, var(--section-divider-mid), transparent);
 }
 
 .navbar-logo {
@@ -698,7 +767,7 @@ button:active {
   padding: 0.46rem 0.84rem;
   border-radius: 999px;
   border: 1px solid var(--stroke);
-  background: rgba(7, 20, 40, 0.58);
+  background: var(--hero-badge-bg);
 }
 
 .hero-title-motion .hero-title-part {
@@ -772,7 +841,7 @@ button:active {
 }
 
 .glass {
-  background: linear-gradient(180deg, rgba(20, 42, 80, 0.78), rgba(16, 35, 68, 0.86));
+  background: linear-gradient(180deg, var(--glass-bg-start), var(--glass-bg-end));
   border: 1px solid var(--stroke-soft);
   border-radius: var(--r1);
   box-shadow: 0 12px 28px rgba(2, 10, 26, 0.3);
@@ -809,10 +878,12 @@ html.fx-ready .glass {
 }
 
 .hero-media img {
-  border-radius: var(--r1);
-  border: 1px solid var(--stroke-soft);
+  border-radius: var(--hero-image-radius);
+  border: var(--hero-image-border);
   box-shadow: 0 12px 28px rgba(0, 8, 20, 0.34);
   animation: hero-card-float 4.8s ease-in-out infinite;
+  object-position: var(--hero-image-object-position);
+  filter: var(--hero-image-filter);
 }
 
 html.fx-ready .hero-media img {
@@ -843,7 +914,7 @@ html.fx-ready .hero-media img {
   gap: 0.5rem;
   padding: 0.45rem 0.74rem;
   border-radius: 999px;
-  background: rgba(8, 20, 40, 0.66);
+  background: var(--pill-bg);
   border: 1px solid var(--stroke-soft);
   color: var(--text);
   font-size: 0.88rem;
@@ -903,7 +974,7 @@ html.fx-ready .hero-media img {
   padding: 0.75rem 0.86rem;
   border-radius: 14px;
   border: 1px solid var(--stroke-soft);
-  background: rgba(7, 19, 39, 0.66);
+  background: var(--steps-bg);
 }
 
 .step-num {
@@ -1590,8 +1661,44 @@ html[data-theme="light"] body {
   --light-muted-tablet-rgb: 17, 56, 91;
   --light-check-rgb: 27, 138, 91;
   --light-success-strong-rgb: 9, 72, 44;
+  --nav-glass-bg: rgba(255, 255, 255, 0.84);
+  --nav-control-bg: rgba(var(--light-surface-rgb), 0.88);
+  --hero-badge-bg: rgba(var(--light-surface-rgb), 0.9);
+  --pill-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(var(--light-surface-rgb), 0.98));
+  --steps-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(var(--light-surface-rgb), 0.98));
+  --glass-bg-start: rgba(255, 255, 255, 0.9);
+  --glass-bg-end: rgba(var(--light-surface-rgb), 0.96);
+  --footer-bg-start: rgba(var(--light-surface-rgb), 0.92);
+  --footer-bg-end: rgba(var(--light-surface-strong-rgb), 0.98);
+  --section-divider-mid: rgba(var(--light-accent-rgb), 0.38);
 
   background-color: var(--bg0);
+}
+
+html[data-theme="light"][data-niche="estetica"] body {
+  --light-bg0: #fdf8fc;
+  --light-bg1: #f8f0f7;
+  --light-bg2: #f1e5f0;
+  --light-accent-rgb: 123, 74, 168;
+  --light-accent-strong-rgb: 63, 34, 90;
+  --light-surface-rgb: 249, 241, 250;
+  --light-surface-strong-rgb: 243, 232, 246;
+  --light-muted-rgb: 88, 56, 112;
+  --light-muted-mobile-rgb: 84, 53, 107;
+  --light-muted-tablet-rgb: 80, 50, 102;
+}
+
+html[data-theme="light"][data-niche="psicologia"] body {
+  --light-bg0: #fcf8f1;
+  --light-bg1: #f7efe2;
+  --light-bg2: #f1e4d1;
+  --light-accent-rgb: 146, 96, 38;
+  --light-accent-strong-rgb: 83, 54, 21;
+  --light-surface-rgb: 252, 245, 233;
+  --light-surface-strong-rgb: 246, 234, 214;
+  --light-muted-rgb: 105, 71, 31;
+  --light-muted-mobile-rgb: 101, 67, 29;
+  --light-muted-tablet-rgb: 97, 64, 27;
 }
 
 html[data-theme="light"] body::before {

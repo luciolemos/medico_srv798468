@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% set typography = landing_content.typography|default({}) %}
 {% set typography_profile = typography.profile|default('clinical') %}
-<html lang="pt-br" data-theme="dark" data-typography="{{ typography_profile|e('html_attr') }}">
+<html lang="pt-br" data-theme="dark" data-typography="{{ typography_profile|e('html_attr') }}" data-niche="{{ app_slug|default('landing')|e('html_attr') }}">
 <head>
   {% set meta = seo_meta|default({}) %}
   {% set meta_image = meta.image|default({}) %}

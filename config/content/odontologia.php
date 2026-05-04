@@ -36,6 +36,16 @@ return [
             'para preservar saúde, função e estética do sorriso.',
         ],
         'lead' => 'Avaliação odontológica, prevenção, estética dental e acompanhamento com orientação clara, agenda organizada e condutas indicadas de forma responsável.',
+        'primary_cta' => [
+            'label' => 'Agendar avaliação',
+            'href' => '#form-orcamento',
+            'icon' => 'arrow-right-short',
+        ],
+        'secondary_cta' => [
+            'label' => 'Ver tratamentos',
+            'href' => '#features',
+            'icon' => 'clipboard2-pulse',
+        ],
         'trust_items' => [
             ['icon' => 'shield-check', 'label' => 'Biossegurança'],
             ['icon' => 'calendar2-check', 'label' => 'Horário marcado'],
@@ -130,22 +140,44 @@ return [
     ],
     'cta' => [
         'title' => 'Quer agendar uma avaliação odontológica?',
-        'text' => 'Envie seus dados e a equipe retorna para confirmar o melhor horário disponível.',
+        'text' => 'Preencha com seus contatos e a principal necessidade odontológica. A equipe retorna para alinhar disponibilidade, horário e orientação inicial.',
         'primary_label' => 'Solicitar agendamento',
         'secondary_label' => 'Falar no WhatsApp',
+        'helper_points' => [
+            ['icon' => 'clock-history', 'label' => 'Retorno para alinhar horário e prioridade'],
+            ['icon' => 'shield-lock', 'label' => 'Contato simples e sem exposição desnecessária'],
+            ['icon' => 'clipboard2-check', 'label' => 'Avaliação antes do plano definitivo'],
+        ],
         'note' => 'Em caso de urgência intensa, trauma ou sangramento importante, procure atendimento odontológico de urgência.',
     ],
     'form' => [
         'title' => 'Solicite seu agendamento odontológico',
-        'text' => 'Informe seus contatos e o motivo da consulta para receber retorno da equipe.',
+        'text' => 'Você não precisa explicar tudo agora. Informe seus contatos e o motivo principal da consulta para que a equipe organize o primeiro retorno.',
+        'helper_points' => [
+            [
+                'icon' => 'chat-square-text',
+                'title' => 'Primeiro contato objetivo',
+                'text' => 'Basta indicar sua principal necessidade para a equipe iniciar o agendamento com clareza.',
+            ],
+            [
+                'icon' => 'calendar2-check',
+                'title' => 'Triagem antes da consulta',
+                'text' => 'O retorno serve para alinhar horário, prioridade e orientar o que levar no dia.',
+            ],
+            [
+                'icon' => 'shield-lock',
+                'title' => 'Menos atrito no envio',
+                'text' => 'Evite detalhes clínicos extensos agora. O essencial já ajuda a organizar o atendimento.',
+            ],
+        ],
         'fields' => [
             'name_label' => 'Nome completo',
             'phone_label' => 'Telefone / WhatsApp',
             'email_label' => 'Email',
             'message_label' => 'Motivo da consulta',
             'message_placeholder' => 'Ex.: Gostaria de agendar avaliação para limpeza e estética dental.',
-            'optional_summary' => 'Adicionar convênio, preferência de horário ou observações (opcional)',
-            'optional_label' => 'Convênio / horário / observações',
+            'optional_summary' => 'Adicionar convênio, preferência de horário ou observações práticas (opcional)',
+            'optional_label' => 'Convênio / horário / observações práticas',
         ],
         'errors' => [
             'name' => 'Informe seu nome.',
@@ -153,7 +185,7 @@ return [
             'email' => 'Informe um email válido.',
             'message' => 'Descreva brevemente sua necessidade odontológica.',
         ],
-        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento odontológico. Evite inserir informações clínicas sensíveis além do necessário para contato inicial.',
+        'privacy_note' => 'Ao enviar, você autoriza o uso dos dados informados para retorno sobre o agendamento odontológico. Use este espaço apenas para o necessário no primeiro contato e deixe detalhes clínicos para a avaliação.',
     ],
     'faq' => [
         'title' => 'Dúvidas frequentes sobre odontologia',
