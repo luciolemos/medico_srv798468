@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class LandingContentValidatorScriptTest extends TestCase
@@ -34,6 +35,33 @@ final class LandingContentValidatorScriptTest extends TestCase
         self::assertSame(0, $exitCode, implode("\n", $output));
         self::assertStringContainsString('typography.profile=clinical', implode("\n", $output));
         self::assertStringContainsString('failures: 0', implode("\n", $output));
+    }
+
+    #[DataProvider('mergedNicheContentProvider')]
+    public function testValidatorAcceptsMergedNicheContent(string $contentName, string $expectedProfile): void
+    {
+        $script = dirname(__DIR__) . '/scripts/validate-landing-content.php';
+        $command = escapeshellarg(PHP_BINARY)
+            . ' ' . escapeshellarg($script)
+            . ' --project-root ' . escapeshellarg(dirname(__DIR__))
+            . ' --content ' . escapeshellarg($contentName)
+            . ' --slug ' . escapeshellarg($contentName);
+
+        exec($command, $output, $exitCode);
+
+        self::assertSame(0, $exitCode, implode("\n", $output));
+        self::assertStringContainsString('mesclado com config/content/landing.php', implode("\n", $output));
+        self::assertStringContainsString('typography.profile=' . $expectedProfile, implode("\n", $output));
+        self::assertStringContainsString('failures: 0', implode("\n", $output));
+    }
+
+    public static function mergedNicheContentProvider(): array
+    {
+        return [
+            'pediatria' => ['pediatria', 'family'],
+            'odontologia' => ['odontologia', 'premium'],
+            'veterinaria' => ['veterinaria', 'warm'],
+        ];
     }
 
     public function testValidatorFailsWhenRequiredAssetsAreMissing(): void

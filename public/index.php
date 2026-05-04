@@ -2,6 +2,12 @@
 
 declare(strict_types=1);
 
+use App\Contact\AsyncMailer;
+use App\Contact\ApcuRateLimiter;
+use App\Contact\ContactMailer;
+use App\Contact\ContactRateLimiter;
+use App\Contact\LeadLogger;
+use App\Contact\RecaptchaVerifier;
 use App\Controllers\HomeController;
 use App\Core\Env;
 use App\Core\LandingContent;
@@ -88,11 +94,17 @@ if ($assetVersion === '') {
     );
 }
 
+try {
+    $cspNonce = base64_encode(random_bytes(16));
+} catch (\Throwable) {
+    $cspNonce = bin2hex(uniqid('', true));
+}
+
 $twig = Twig::create(__DIR__ . '/../views', [
-    'cache' => $twigCache,
-    // Hostinger deploys can keep compiled Twig files between releases; always
-    // check freshness so updated templates are rendered without manual cache clears.
-    'auto_reload' => true,
+    'cache'       => $twigCache,
+    // In production the cache is versioned per deploy; auto_reload is only
+    // needed in local dev to avoid manual cache clears after template edits.
+    'auto_reload' => $isDev,
 ]);
 $twig->getEnvironment()->addGlobal('base_url', $base);
 $twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
@@ -111,50 +123,75 @@ $twig->getEnvironment()->addGlobal('x_url', $_ENV['X_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('facebook_url', $_ENV['FACEBOOK_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('instagram_url', $_ENV['INSTAGRAM_URL'] ?? '#');
 $twig->getEnvironment()->addGlobal('whatsapp_url', $_ENV['WHATSAPP_URL'] ?? '#');
+$twig->getEnvironment()->addGlobal('csp_nonce', $cspNonce);
+
+$recaptchaVerifier = new RecaptchaVerifier([
+    'recaptcha_enabled'          => $recaptchaEnabled,
+    'recaptcha_site_key'         => $recaptchaSiteKey,
+    'recaptcha_secret_key'       => trim((string) ($_ENV['RECAPTCHA_SECRET_KEY'] ?? '')),
+    'recaptcha_min_score'        => (float) ($_ENV['RECAPTCHA_MIN_SCORE'] ?? 0.5),
+    'recaptcha_allowed_hostname' => trim((string) ($_ENV['RECAPTCHA_ALLOWED_HOSTNAME'] ?? '')),
+    'recaptcha_action'           => $recaptchaAction !== '' ? $recaptchaAction : 'contact_submit',
+    'recaptcha_timeout'          => (int) ($_ENV['RECAPTCHA_TIMEOUT'] ?? 6),
+    'recaptcha_connect_timeout'  => (int) ($_ENV['RECAPTCHA_CONNECT_TIMEOUT'] ?? 3),
+]);
+
+$rateLimiterConfig = [
+    'rate_limit_max_attempts'   => (int) ($_ENV['RATE_LIMIT_MAX_ATTEMPTS'] ?? 5),
+    'rate_limit_window_seconds' => (int) ($_ENV['RATE_LIMIT_WINDOW_SECONDS'] ?? 600),
+];
+$rateLimiter = extension_loaded('apcu') && (bool) ini_get('apc.enabled')
+    ? new ApcuRateLimiter($rateLimiterConfig)
+    : new ContactRateLimiter($rateLimiterConfig);
+
+$mailerInner = new ContactMailer([
+    'app_name'        => $_ENV['APP_NAME'] ?? 'Clínica Médica',
+    'contact_from'    => $_ENV['CONTACT_FROM'] ?? null,
+    'mail_driver'     => $_ENV['MAIL_DRIVER'] ?? 'mail',
+    'smtp_host'       => $_ENV['SMTP_HOST'] ?? '',
+    'smtp_port'       => (int) ($_ENV['SMTP_PORT'] ?? 587),
+    'smtp_user'       => $_ENV['SMTP_USER'] ?? '',
+    'smtp_pass'       => $_ENV['SMTP_PASS'] ?? '',
+    'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? 'tls',
+    'smtp_auth'       => ($_ENV['SMTP_AUTH'] ?? 'true') !== 'false',
+    'smtp_timeout'    => (int) ($_ENV['SMTP_TIMEOUT'] ?? 15),
+]);
+$mailAsync = filter_var($_ENV['MAIL_ASYNC'] ?? false, FILTER_VALIDATE_BOOLEAN);
+$mailer = $mailAsync ? new AsyncMailer($mailerInner) : $mailerInner;
+
+$leadLogger = new LeadLogger([
+    'app_name'               => $_ENV['APP_NAME'] ?? 'Clínica Médica',
+    'app_slug'               => $_ENV['APP_SLUG'] ?? '',
+    'base_url'               => $base,
+    'lead_log_retention_days' => (int) ($_ENV['LEAD_LOG_RETENTION_DAYS'] ?? 30),
+    'lead_log_hash_salt'     => $_ENV['LEAD_LOG_HASH_SALT'] ?? '',
+    'lead_encrypt_key'       => $_ENV['LEAD_ENCRYPT_KEY'] ?? '',
+]);
 
 $controller = new HomeController($twig, [
-    'app_name' => $_ENV['APP_NAME'] ?? 'Clínica Médica',
-    'app_mark' => $_ENV['APP_MARK'] ?? 'M',
-    'app_slug' => $_ENV['APP_SLUG'] ?? '',
-    'request_prefix' => $_ENV['APP_REQUEST_PREFIX'] ?? '',
-    'page_title' => $_ENV['APP_PAGE_TITLE'] ?? null,
-    'canonical_url' => $_ENV['APP_CANONICAL_URL'] ?? '',
-    'landing_content' => $landingContent,
-    'palette' => $_ENV['APP_PALETTE'] ?? 'blue',
+    'app_name'             => $_ENV['APP_NAME'] ?? 'Clínica Médica',
+    'app_mark'             => $_ENV['APP_MARK'] ?? 'M',
+    'app_slug'             => $_ENV['APP_SLUG'] ?? '',
+    'request_prefix'       => $_ENV['APP_REQUEST_PREFIX'] ?? '',
+    'page_title'           => $_ENV['APP_PAGE_TITLE'] ?? null,
+    'canonical_url'        => $_ENV['APP_CANONICAL_URL'] ?? '',
+    'landing_content'      => $landingContent,
+    'palette'              => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
-    'base_url' => $base,
-    'recaptcha_enabled' => $recaptchaEnabled,
-    'recaptcha_site_key' => $recaptchaSiteKey,
-    'recaptcha_secret_key' => trim((string) ($_ENV['RECAPTCHA_SECRET_KEY'] ?? '')),
-    'recaptcha_min_score' => (float) ($_ENV['RECAPTCHA_MIN_SCORE'] ?? 0.5),
-    'recaptcha_allowed_hostname' => trim((string) ($_ENV['RECAPTCHA_ALLOWED_HOSTNAME'] ?? '')),
-    'recaptcha_action' => $recaptchaAction !== '' ? $recaptchaAction : 'contact_submit',
-    'contact_to' => $_ENV['CONTACT_TO'] ?? null,
-    'contact_from' => $_ENV['CONTACT_FROM'] ?? null,
-    'mail_driver' => $_ENV['MAIL_DRIVER'] ?? 'mail',
-    'smtp_host' => $_ENV['SMTP_HOST'] ?? '',
-    'smtp_port' => (int) ($_ENV['SMTP_PORT'] ?? 587),
-    'smtp_user' => $_ENV['SMTP_USER'] ?? '',
-    'smtp_pass' => $_ENV['SMTP_PASS'] ?? '',
-    'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? 'tls',
-    'smtp_auth' => ($_ENV['SMTP_AUTH'] ?? 'true') !== 'false',
-    'smtp_timeout' => (int) ($_ENV['SMTP_TIMEOUT'] ?? 15),
-    'rate_limit_max_attempts' => (int) ($_ENV['RATE_LIMIT_MAX_ATTEMPTS'] ?? 5),
-    'rate_limit_window_seconds' => (int) ($_ENV['RATE_LIMIT_WINDOW_SECONDS'] ?? 600),
-    'lead_log_retention_days' => (int) ($_ENV['LEAD_LOG_RETENTION_DAYS'] ?? 30),
-    'lead_log_hash_salt' => $_ENV['LEAD_LOG_HASH_SALT'] ?? '',
-    'x_url' => $_ENV['X_URL'] ?? '#',
-    'facebook_url' => $_ENV['FACEBOOK_URL'] ?? '#',
-    'instagram_url' => $_ENV['INSTAGRAM_URL'] ?? '#',
-    'whatsapp_url' => $_ENV['WHATSAPP_URL'] ?? '#',
-]);
+    'base_url'             => $base,
+    'contact_to'           => $_ENV['CONTACT_TO'] ?? null,
+    'x_url'                => $_ENV['X_URL'] ?? '#',
+    'facebook_url'         => $_ENV['FACEBOOK_URL'] ?? '#',
+    'instagram_url'        => $_ENV['INSTAGRAM_URL'] ?? '#',
+    'whatsapp_url'         => $_ENV['WHATSAPP_URL'] ?? '#',
+], $recaptchaVerifier, $rateLimiter, $mailer, $leadLogger);
 
 $app = AppFactory::create();
 $app->setBasePath($base);
 $app->add(TwigMiddleware::create($app, $twig));
 
 $app->addErrorMiddleware($isDev, $isDev, $isDev);
-$app->add(new SecurityHeadersMiddleware());
+$app->add(new SecurityHeadersMiddleware($cspNonce));
 
 $routes = require __DIR__ . '/../routes/web.php';
 $routes($app, $controller);

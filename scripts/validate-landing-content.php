@@ -87,16 +87,63 @@ if ($slug === '') {
 }
 $slug = $normalizeName($slug);
 
+$envContentName = $normalizeName((string) ($env['APP_CONTENT_FILE'] ?? ''));
+$envSlugName = $normalizeName((string) ($env['APP_SLUG'] ?? ''));
+$activeContentName = $envContentName;
+if ($activeContentName === '') {
+    $hasSlugContent = $envSlugName !== '' && is_file($projectRoot . '/config/content/' . $envSlugName . '.php');
+    $activeContentName = $hasSlugContent ? $envSlugName : 'landing';
+}
+$contentUsesProjectEnv = $contentName === $activeContentName;
+
 $contentPath = $projectRoot . '/config/content/' . $contentName . '.php';
 if (!is_file($contentPath)) {
     fwrite(STDERR, "[error] arquivo de conteúdo não encontrado: {$contentPath}\n");
     exit(2);
 }
 
-$content = require $contentPath;
-if (!is_array($content)) {
-    fwrite(STDERR, "[error] conteúdo deve retornar array: {$contentPath}\n");
+$readContentFile = static function (string $path): array {
+    $content = require $path;
+    if (!is_array($content)) {
+        fwrite(STDERR, "[error] conteúdo deve retornar array: {$path}\n");
+        exit(2);
+    }
+
+    return $content;
+};
+
+$mergeContent = static function (array $default, array $override) use (&$mergeContent): array {
+    foreach ($override as $key => $value) {
+        if (!is_string($key)) {
+            return $override;
+        }
+
+        $defaultValue = $default[$key] ?? null;
+        if (
+            is_array($defaultValue)
+            && is_array($value)
+            && !array_is_list($defaultValue)
+            && !array_is_list($value)
+        ) {
+            $default[$key] = $mergeContent($defaultValue, $value);
+            continue;
+        }
+
+        $default[$key] = $value;
+    }
+
+    return $default;
+};
+
+$defaultContentPath = $projectRoot . '/config/content/landing.php';
+if (!is_file($defaultContentPath)) {
+    fwrite(STDERR, "[error] conteúdo base não encontrado: {$defaultContentPath}\n");
     exit(2);
+}
+
+$content = $readContentFile($defaultContentPath);
+if ($contentName !== 'landing') {
+    $content = $mergeContent($content, $readContentFile($contentPath));
 }
 
 $presetsPath = $projectRoot . '/config/presets/niches.php';
@@ -214,7 +261,11 @@ $checkAsset = static function (string $path, string $label, ?int $expectedWidth 
     $line('ok', "{$label} existe: {$path} ({$actualWidth}x{$actualHeight})");
 };
 
-$line('ok', 'conteúdo carregado: config/content/' . $contentName . '.php');
+$loadedLabel = 'conteúdo carregado: config/content/' . $contentName . '.php';
+if ($contentName !== 'landing') {
+    $loadedLabel .= ' (mesclado com config/content/landing.php)';
+}
+$line('ok', $loadedLabel);
 
 $seoTitle = $requireString('seo.title');
 $requireString('seo.description');
@@ -232,7 +283,7 @@ if (!in_array($typographyProfile, $allowedTypography, true)) {
 }
 
 $palette = (string) ($env['APP_PALETTE'] ?? '');
-if ($palette !== '') {
+if ($palette !== '' && $contentUsesProjectEnv) {
     if (!in_array($palette, $allowedPalettes, true)) {
         $line('fail', "APP_PALETTE inválida no .env: {$palette}");
     } else {
@@ -252,7 +303,7 @@ if ($slug !== '' && isset($presets[$slug]) && is_array($presets[$slug])) {
         $line('warn', "preset {$slug} recomenda schema_type={$preset['schema_type']}, conteúdo usa {$schemaType}");
     }
 
-    if ($palette !== '' && ($preset['palette'] ?? '') !== '' && $preset['palette'] !== $palette) {
+    if ($contentUsesProjectEnv && $palette !== '' && ($preset['palette'] ?? '') !== '' && $preset['palette'] !== $palette) {
         $line('warn', "preset {$slug} recomenda palette={$preset['palette']}, .env usa {$palette}");
     }
 } elseif ($slug !== '') {

@@ -18,7 +18,14 @@ while IFS= read -r -d '' file; do
 done < <(find src public routes scripts -type f -name '*.php' -print0)
 
 echo "[step] Landing content validation"
-php scripts/validate-landing-content.php --project-root "$PROJECT_ROOT" --content landing
+while IFS= read -r -d '' file; do
+  content_name="$(basename "$file" .php)"
+  if [[ "$content_name" == "landing" ]]; then
+    php scripts/validate-landing-content.php --project-root "$PROJECT_ROOT" --content landing
+  else
+    php scripts/validate-landing-content.php --project-root "$PROJECT_ROOT" --content "$content_name" --slug "$content_name"
+  fi
+done < <(find config/content -maxdepth 1 -type f -name '*.php' -print0 | sort -z)
 
 echo "[step] Shell script lint"
 while IFS= read -r -d '' file; do

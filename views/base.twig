@@ -40,10 +40,10 @@
   {% if should_noindex ?? false %}
   <meta name="robots" content="noindex, nofollow">
   {% else %}
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   {% endif %}
   <meta name="theme-color" content="#0b0f19">
-  <script>
+  <script nonce="{{ csp_nonce ?? '' }}">
   (function () {
     const isValidTheme = (value) => value === "dark" || value === "light";
     const prefersLight = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches;
@@ -59,6 +59,8 @@
   </script>
 
   <link rel="icon" href="{{ base_url }}/assets/img/clinic-mark.svg">
+  <link rel="shortcut icon" href="{{ base_url }}/assets/img/clinic-mark.svg">
+  <link rel="apple-touch-icon" href="{{ base_url }}/assets/img/clinic-mark.svg">
 
   {# ==============================
      CSS — LIBS
@@ -123,7 +125,7 @@
    CONFIG GLOBAL JS
    ============================== #}
 
-<script>
+<script nonce="{{ csp_nonce ?? '' }}">
 window.APP = {
   baseUrl: "{{ base_url }}",
    env: "{{ app_env ?? 'prod' }}",

@@ -46,7 +46,7 @@ Abra `http://127.0.0.1:8000/`.
 1. Copie este projeto para o novo diretório, por exemplo `/var/www/pediatria`.
 2. Remova a identidade Git herdada se o destino for outro repositório.
 3. Ajuste `.env`: `APP_BASE`, nome público, links sociais, WhatsApp, SMTP e reCAPTCHA.
-4. Troque textos em `config/content/landing.php` e imagens em `public/assets/img/hero/` e `public/assets/img/social/`.
+4. Troque textos no arquivo ativo de `config/content/` e imagens em `public/assets/img/hero/` e `public/assets/img/social/`.
 5. Rode `composer test` e `bash scripts/run-tests.sh --url "http://127.0.0.1:8000/"`.
 
 Também há um gerador para criar uma cópia limpa do protótipo:
@@ -54,6 +54,8 @@ Também há um gerador para criar uma cópia limpa do protótipo:
 ```bash
 bash scripts/create-landing.sh pediatria --name "Clínica Pediátrica" --mark P --palette emerald --request-prefix PED
 ```
+
+Quando existir um arquivo de nicho com o mesmo slug, como `config/content/pediatria.php`, o gerador define `APP_CONTENT_FILE="pediatria"` automaticamente, mantém os assets específicos desse nicho e remove variações de nichos não usados na cópia final.
 
 ## Testes
 
@@ -68,6 +70,9 @@ Valide conteúdo, SEO e assets antes de publicar:
 
 ```bash
 php scripts/validate-landing-content.php
+php scripts/validate-landing-content.php --content pediatria --slug pediatria
+php scripts/validate-landing-content.php --content odontologia --slug odontologia
+php scripts/validate-landing-content.php --content veterinaria --slug veterinaria
 ```
 
 ## Privacidade e retenção
@@ -97,6 +102,8 @@ A seção `seo` em `config/content/landing.php` controla título, descrição, O
 Use `typography.profile` para diferenciar a personalidade visual de cada landing sem alterar o layout. Perfis disponíveis: `clinical` para clínica médica, `family` para pediatria/família, `premium` para estética ou odontologia de alto padrão, `warm` para veterinária ou atendimento acolhedor e `technical` para páginas mais objetivas. O perfil troca famílias tipográficas, pesos e ritmo dos títulos via CSS variables.
 
 Os presets recomendados para cada nicho ficam em `config/presets/niches.php`. O gerador `scripts/create-landing.sh` usa esses presets para sugerir nome, paleta, tipografia, schema SEO e prefixo de protocolo quando o slug é conhecido.
+
+Os primeiros conteúdos de nicho versionados são `config/content/pediatria.php`, `config/content/odontologia.php` e `config/content/veterinaria.php`. Eles herdam a estrutura base de `landing.php` e sobrescrevem textos, SEO, tipografia, serviços, FAQ e mensagens de formulário para cada área.
 
 As imagens principais seguem nomes padronizados: `public/assets/img/hero/{slug}-640.webp`, `{slug}-960.webp`, `{slug}-1896.webp`, `{slug}-mobile-640.webp` e `public/assets/img/social/{slug}-og.jpg`. O corte mobile é vertical para preservar o rosto/atendimento em telas estreitas. O gerador renomeia os placeholders para o slug novo; depois substitua esses arquivos por imagens finais do nicho.
 
