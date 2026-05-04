@@ -63,8 +63,8 @@ cd "$PROJECT_ROOT"
 
 chmod +x scripts/smoke-palette.sh scripts/smoke-contact.sh scripts/smoke-frontend.sh scripts/smoke-contact-success.sh
 
-echo "[step] Unit tests"
-php scripts/test-unit.php
+echo "[step] PHPUnit"
+composer test
 
 echo "[step] Smoke palette"
 bash scripts/smoke-palette.sh --url "$BASE_URL" --default "$DEFAULT_PALETTE"
