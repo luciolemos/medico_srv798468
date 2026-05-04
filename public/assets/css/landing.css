@@ -11,6 +11,14 @@
   --text: rgba(232, 245, 255, 0.97);
   --muted: rgba(162, 193, 220, 0.88);
   --floating-btn-bottom-offset: 1.1rem;
+  --font-body: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-heading: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: var(--font-body);
+  --body-letter-spacing: 0;
+  --heading-letter-spacing: 0;
+  --button-letter-spacing: 0;
+  --heading-weight: 800;
+  --button-weight: 700;
 
   --r1: 18px;
   --r2: 12px;
@@ -26,17 +34,46 @@
   --gradC: 43, 117, 255;
 }
 
+html[data-typography="family"] {
+  --font-body: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-heading: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --heading-weight: 800;
+  --button-weight: 800;
+}
+
+html[data-typography="premium"] {
+  --font-body: "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-heading: "Georgia", "Times New Roman", serif;
+  --font-ui: "Aptos", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --heading-weight: 700;
+  --button-weight: 700;
+}
+
+html[data-typography="warm"] {
+  --font-body: "Lato", "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-heading: "Trebuchet MS", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --heading-weight: 800;
+  --button-weight: 700;
+}
+
+html[data-typography="technical"] {
+  --font-body: "Roboto", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-heading: "Arial", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --heading-weight: 800;
+  --button-weight: 700;
+}
+
 html,
 body {
   height: 100%;
 }
 
 body {
-  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  font-family: var(--font-body);
   color: var(--text);
   overflow-x: hidden;
   padding-top: 96px;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--body-letter-spacing);
   background-color: var(--bg0);
 }
 
@@ -105,8 +142,9 @@ h5,
 h6,
 .display-5,
 .navbar-brand {
-  font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  letter-spacing: 0.02em;
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  letter-spacing: var(--heading-letter-spacing);
 }
 
 section[id] {
@@ -403,6 +441,7 @@ pre,
 }
 
 .btn {
+  font-family: var(--font-ui);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -410,8 +449,8 @@ pre,
   min-height: 44px;
   padding: 0.64rem 1rem;
   border-radius: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-weight: var(--button-weight);
+  letter-spacing: var(--button-letter-spacing);
 }
 
 .btn-primary {

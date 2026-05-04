@@ -1,0 +1,104 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Tests;
+
+use PHPUnit\Framework\TestCase;
+
+final class CreateLandingScriptTest extends TestCase
+{
+    private string $rootPath;
+
+    protected function setUp(): void
+    {
+        $this->rootPath = sys_get_temp_dir() . '/create-landing-' . bin2hex(random_bytes(4));
+    }
+
+    protected function tearDown(): void
+    {
+        $this->removeDirectory($this->rootPath);
+    }
+
+    public function testCreateLandingListsPresetSlugs(): void
+    {
+        $script = dirname(__DIR__) . '/scripts/create-landing.sh';
+        $command = 'bash ' . escapeshellarg($script) . ' --list-presets';
+
+        exec($command, $output, $exitCode);
+        $text = implode("\n", $output);
+
+        self::assertSame(0, $exitCode, $text);
+        self::assertStringContainsString('slug', $text);
+        self::assertStringContainsString('pediatria', $text);
+        self::assertStringContainsString('odontologia', $text);
+        self::assertStringContainsString('veterinaria', $text);
+        self::assertStringContainsString('premium', $text);
+        self::assertStringContainsString('VeterinaryCare', $text);
+    }
+
+    public function testCreateLandingUsesSlugContentAndPrunesOtherNiches(): void
+    {
+        $projectRoot = dirname(__DIR__);
+        $target = $this->rootPath . '/odontologia';
+        $script = $projectRoot . '/scripts/create-landing.sh';
+
+        $command = 'bash ' . escapeshellarg($script)
+            . ' odontologia --target ' . escapeshellarg($target);
+
+        exec($command, $output, $exitCode);
+
+        self::assertSame(0, $exitCode, implode("\n", $output));
+        self::assertFileExists($target . '/config/content/landing.php');
+        self::assertFileExists($target . '/config/content/odontologia.php');
+        self::assertFileDoesNotExist($target . '/config/content/pediatria.php');
+        self::assertFileDoesNotExist($target . '/config/content/veterinaria.php');
+        self::assertStringContainsString('APP_CONTENT_FILE="odontologia"', (string) file_get_contents($target . '/.env'));
+        self::assertStringContainsString('APP_SLUG="odontologia"', (string) file_get_contents($target . '/.env'));
+        self::assertFileExists($target . '/public/assets/img/hero/odontologia-640.webp');
+        self::assertFileExists($target . '/public/assets/img/hero/odontologia-mobile-640.webp');
+        self::assertFileExists($target . '/public/assets/img/social/odontologia-og.jpg');
+        self::assertFileDoesNotExist($target . '/public/assets/img/hero/medico-640.webp');
+        self::assertFileDoesNotExist($target . '/public/assets/img/hero/pediatria-640.webp');
+        self::assertFileDoesNotExist($target . '/public/assets/img/hero/veterinaria-640.webp');
+
+        $validateCommand = escapeshellarg(PHP_BINARY)
+            . ' ' . escapeshellarg($target . '/scripts/validate-landing-content.php')
+            . ' --project-root ' . escapeshellarg($target)
+            . ' --content odontologia'
+            . ' --slug odontologia'
+            . ' --strict';
+
+        exec($validateCommand, $validateOutput, $validateExitCode);
+
+        self::assertSame(0, $validateExitCode, implode("\n", $validateOutput));
+    }
+
+    private function removeDirectory(string $path): void
+    {
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $items = scandir($path);
+        if ($items === false) {
+            return;
+        }
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $fullPath = $path . '/' . $item;
+            if (is_dir($fullPath)) {
+                $this->removeDirectory($fullPath);
+                continue;
+            }
+
+            @unlink($fullPath);
+        }
+
+        @rmdir($path);
+    }
+}

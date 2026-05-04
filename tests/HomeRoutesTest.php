@@ -157,6 +157,7 @@ final class HomeRoutesTest extends TestCase
         $html = (string) $response->getBody();
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('data-typography="clinical"', $html);
         self::assertStringContainsString('Cuidado médico', $html);
         self::assertStringContainsString('Serviços da clínica', $html);
         self::assertStringContainsString('Desenvolvido por NatalCode - Soluções Digitais', $html);
@@ -184,6 +185,9 @@ final class HomeRoutesTest extends TestCase
                 'nav' => [
                     'badge' => 'Pediatria',
                     'cta' => 'Agendar',
+                ],
+                'typography' => [
+                    'profile' => 'family',
                 ],
                 'hero' => [
                     'badge' => 'Pediatria com escuta para a família',
@@ -215,6 +219,7 @@ final class HomeRoutesTest extends TestCase
         $structuredData = $this->extractStructuredData($html);
 
         self::assertSame(200, $response->getStatusCode());
+        self::assertStringContainsString('data-typography="family"', $html);
         self::assertStringContainsString('<title>Clínica Pediátrica | Consulta infantil</title>', $html);
         self::assertStringContainsString('Pediatria com agenda organizada', $html);
         self::assertStringContainsString('Pediatria com escuta para a família', $html);

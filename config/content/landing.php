@@ -29,6 +29,9 @@ return [
         'badge' => 'Clínica médica',
         'cta' => 'Agendar',
     ],
+    'typography' => [
+        'profile' => 'clinical',
+    ],
     'hero' => [
         'badge_icon' => 'heart-pulse',
         'badge' => 'Clínica médica com atendimento humanizado',
