@@ -73,7 +73,10 @@ php scripts/validate-landing-content.php
 php scripts/validate-landing-content.php --content pediatria --slug pediatria
 php scripts/validate-landing-content.php --content odontologia --slug odontologia
 php scripts/validate-landing-content.php --content veterinaria --slug veterinaria
+bash scripts/audit-generated-landings.sh
 ```
+
+`scripts/audit-generated-landings.sh` cria cópias temporárias para os presets, confere `.env`, conteúdo ativo, assets obrigatórios e ausência de arquivos herdados de outros nichos. O `quality-gate` roda essa auditoria automaticamente.
 
 ## Privacidade e retenção
 

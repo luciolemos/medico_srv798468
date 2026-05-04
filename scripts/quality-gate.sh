@@ -32,4 +32,7 @@ while IFS= read -r -d '' file; do
   bash -n "$file"
 done < <(find scripts -type f -name '*.sh' -print0)
 
+echo "[step] Generated landing audit"
+bash scripts/audit-generated-landings.sh
+
 echo "[ok  ] quality gate passou."
