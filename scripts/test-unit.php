@@ -3,6 +3,11 @@
 declare(strict_types=1);
 
 use App\Controllers\HomeController;
+use App\Contact\ContactMailer;
+use App\Contact\ContactRateLimiter;
+use App\Contact\LeadLogger;
+use App\Contact\RecaptchaVerifier;
+use App\Core\LandingContent;
 use Slim\Psr7\Factory\ServerRequestFactory;
 use Slim\Psr7\Response;
 use Slim\Views\Twig;
@@ -14,6 +19,11 @@ ob_start();
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
+
+$testStoragePath = sys_get_temp_dir() . '/medico-test-unit-' . getmypid();
+register_shutdown_function(static function () use ($testStoragePath): void {
+    removeDirectory($testStoragePath);
+});
 
 final class TestRunner
 {
@@ -55,17 +65,72 @@ final class TestRunner
 
 function buildController(string $paletteFromConfig = 'blue'): HomeController
 {
+    global $testStoragePath;
+
+    $projectRoot = dirname(__DIR__);
+    $landingContent = LandingContent::load($projectRoot, 'landing', 'medico');
+
     $twig = Twig::create(__DIR__ . '/../views', [
         'cache' => false,
         'auto_reload' => true,
     ]);
 
-    return new HomeController($twig, [
+    $twig->getEnvironment()->addGlobal('base_url', '');
+    $twig->getEnvironment()->addGlobal('app_env', 'test');
+    $twig->getEnvironment()->addGlobal('app_name', 'Clínica Médica Test');
+    $twig->getEnvironment()->addGlobal('app_mark', 'M');
+    $twig->getEnvironment()->addGlobal('app_badge', $landingContent['nav']['badge'] ?? 'Clínica médica');
+    $twig->getEnvironment()->addGlobal('app_palette', $paletteFromConfig);
+    $twig->getEnvironment()->addGlobal('landing_content', $landingContent);
+    $twig->getEnvironment()->addGlobal('show_palette_selector', false);
+    $twig->getEnvironment()->addGlobal('recaptcha_enabled', false);
+    $twig->getEnvironment()->addGlobal('recaptcha_site_key', '');
+    $twig->getEnvironment()->addGlobal('recaptcha_action', 'contact_submit');
+    $twig->getEnvironment()->addGlobal('asset_version', 'test');
+    $twig->getEnvironment()->addGlobal('github_url', '#');
+    $twig->getEnvironment()->addGlobal('x_url', '#');
+    $twig->getEnvironment()->addGlobal('facebook_url', '#');
+    $twig->getEnvironment()->addGlobal('instagram_url', '#');
+    $twig->getEnvironment()->addGlobal('whatsapp_url', '#');
+    $twig->getEnvironment()->addGlobal('csp_nonce', 'test-nonce-aaaa');
+
+    $config = [
         'app_name' => 'Clínica Médica Test',
         'app_mark' => 'M',
+        'app_slug' => 'medico',
+        'request_prefix' => 'MED',
+        'page_title' => 'Clínica Médica Test',
+        'canonical_url' => '',
+        'landing_content' => $landingContent,
         'palette' => $paletteFromConfig,
         'base_url' => '',
-    ]);
+        'contact_from' => 'no-reply@example.test',
+        'lead_log_hash_salt' => 'test-salt',
+    ];
+
+    return new HomeController(
+        $twig,
+        $config,
+        new RecaptchaVerifier(['recaptcha_enabled' => false]),
+        new ContactRateLimiter([
+            'rate_limit_max_attempts' => 0,
+            'rate_limit_window_seconds' => 600,
+            'storage_path' => $testStoragePath,
+        ]),
+        new ContactMailer([
+            'app_name' => 'Clínica Médica Test',
+            'contact_from' => 'no-reply@example.test',
+            'mail_driver' => 'smtp',
+        ]),
+        new LeadLogger([
+            'app_name' => 'Clínica Médica Test',
+            'app_slug' => 'medico',
+            'base_url' => '',
+            'lead_log_retention_days' => 1,
+            'lead_log_hash_salt' => 'test-salt',
+            'storage_path' => $testStoragePath,
+        ])
+    );
 }
 
 function renderPaletteFromHome(HomeController $controller, string $uri): string
@@ -116,6 +181,34 @@ function callValidateContact(HomeController $controller, array $data): array
     /** @var array $result */
     $result = $method->invoke($controller, $data);
     return $result;
+}
+
+function removeDirectory(string $path): void
+{
+    if (!is_dir($path)) {
+        return;
+    }
+
+    $items = scandir($path);
+    if ($items === false) {
+        return;
+    }
+
+    foreach ($items as $item) {
+        if ($item === '.' || $item === '..') {
+            continue;
+        }
+
+        $fullPath = $path . '/' . $item;
+        if (is_dir($fullPath)) {
+            removeDirectory($fullPath);
+            continue;
+        }
+
+        @unlink($fullPath);
+    }
+
+    @rmdir($path);
 }
 
 $t = new TestRunner();
