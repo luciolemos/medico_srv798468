@@ -49,6 +49,10 @@ final class CreateLandingScriptTest extends TestCase
         exec($command, $output, $exitCode);
 
         self::assertSame(0, $exitCode, implode("\n", $output));
+        $createOutput = implode("\n", $output);
+        self::assertStringContainsString('composer install --no-dev --optimize-autoloader', $createOutput);
+        self::assertStringContainsString('chown -R www-data:www-data', $createOutput);
+        self::assertStringContainsString('audit-apache-subdir-vhost.sh', $createOutput);
         self::assertFileExists($target . '/config/content/landing.php');
         self::assertFileExists($target . '/config/content/odontologia.php');
         self::assertFileDoesNotExist($target . '/config/content/pediatria.php');
