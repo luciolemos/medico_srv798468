@@ -23,6 +23,15 @@ if (session_status() === PHP_SESSION_NONE) {
     $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
     $sessionBase = trim((string) ($_ENV['APP_BASE'] ?? ''));
+    if ($sessionBase !== '' && PHP_SAPI === 'cli-server') {
+        $requestUriPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+        $normalizedBase = '/' . trim($sessionBase, '/');
+        if ($requestUriPath === '' || $requestUriPath === '/') {
+            $sessionBase = '';
+        } elseif ($normalizedBase !== '/' && strpos($requestUriPath, $normalizedBase . '/') !== 0 && $requestUriPath !== $normalizedBase) {
+            $sessionBase = '';
+        }
+    }
     $sessionPath = '/';
     if ($sessionBase !== '' && $sessionBase !== '/') {
         $sessionPath = '/' . trim($sessionBase, '/') . '/';
@@ -57,6 +66,15 @@ $landingContent = LandingContent::load(
 );
 
 $base = trim((string) ($_ENV['APP_BASE'] ?? ''));
+if ($base !== '' && PHP_SAPI === 'cli-server') {
+    $requestUriPath = (string) parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
+    $normalizedBase = '/' . trim($base, '/');
+    if ($requestUriPath === '' || $requestUriPath === '/') {
+        $base = '';
+    } elseif ($normalizedBase !== '/' && strpos($requestUriPath, $normalizedBase . '/') !== 0 && $requestUriPath !== $normalizedBase) {
+        $base = '';
+    }
+}
 if ($base === '') {
     $scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
     $scriptDir = rtrim(str_replace('\\', '/', dirname($scriptName)), '/');
