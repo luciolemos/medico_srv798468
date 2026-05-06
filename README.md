@@ -22,7 +22,8 @@ Copie `.env.example` para `.env` e ajuste:
 - `APP_PALETTE`: paleta padrão da landing (`blue`, `red`, `emerald`, `amber` ou `violet`).
 - `APP_SHOW_PALETTE_SELECTOR`: use `true` em catálogo/demo para mostrar o seletor de cores; mantenha `false` na landing final.
 - `FACEBOOK_URL`: link oficial do Facebook.
-- `WHATSAPP_URL`: link oficial de WhatsApp.
+- `APP_WHATSAPP_NUMBER` e `APP_WHATSAPP_MESSAGE`: número e mensagem inicial usados para gerar o link oficial de WhatsApp.
+- `WHATSAPP_URL`: fallback legado de WhatsApp quando `APP_WHATSAPP_NUMBER` estiver vazio.
 - `CONTACT_TO` e `CONTACT_FROM`: emails usados pelo formulário.
 - Configurações `SMTP_*`, se `MAIL_DRIVER="smtp"`.
 - `LEAD_LOG_RETENTION_DAYS`: retenção dos logs de leads e fallback em `storage/`.

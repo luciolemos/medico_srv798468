@@ -59,6 +59,8 @@ final class CreateLandingScriptTest extends TestCase
         self::assertFileDoesNotExist($target . '/config/content/veterinaria.php');
         self::assertStringContainsString('APP_CONTENT_FILE="odontologia"', (string) file_get_contents($target . '/.env'));
         self::assertStringContainsString('APP_SLUG="odontologia"', (string) file_get_contents($target . '/.env'));
+        self::assertStringContainsString('APP_WHATSAPP_NUMBER="5584996360721"', (string) file_get_contents($target . '/.env'));
+        self::assertStringContainsString('APP_WHATSAPP_MESSAGE="Oi! Quero conversar sobre o projeto de uma landing page com a NatalCode."', (string) file_get_contents($target . '/.env'));
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-640.webp');
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-mobile-640.webp');
         self::assertFileExists($target . '/public/assets/img/social/odontologia-og.jpg');
