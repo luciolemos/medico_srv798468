@@ -10,6 +10,7 @@ use App\Contact\LeadLogger;
 use App\Contact\RecaptchaVerifier;
 use App\Controllers\HomeController;
 use App\Core\LandingContent;
+use App\Core\WhatsappLink;
 use App\Middleware\SecurityHeadersMiddleware;
 use Slim\App;
 use Slim\Factory\AppFactory;
@@ -27,6 +28,11 @@ final class TestAppFactory
             'cache' => false,
             'auto_reload' => true,
         ]);
+        $whatsappUrl = WhatsappLink::fromConfig([
+            'app_whatsapp_number' => $config['app_whatsapp_number'] ?? '',
+            'app_whatsapp_message' => $config['app_whatsapp_message'] ?? '',
+            'whatsapp_url' => $config['whatsapp_url'] ?? '',
+        ]);
 
         $twig->getEnvironment()->addGlobal('base_url', $base);
         $twig->getEnvironment()->addGlobal('app_env', 'test');
@@ -42,7 +48,7 @@ final class TestAppFactory
         $twig->getEnvironment()->addGlobal('github_url', $config['github_url'] ?? '#');
         $twig->getEnvironment()->addGlobal('x_url', $config['x_url'] ?? '#');
         $twig->getEnvironment()->addGlobal('instagram_url', $config['instagram_url'] ?? '#');
-        $twig->getEnvironment()->addGlobal('whatsapp_url', $config['whatsapp_url'] ?? '#');
+        $twig->getEnvironment()->addGlobal('whatsapp_url', $whatsappUrl);
         $twig->getEnvironment()->addGlobal('csp_nonce', $config['csp_nonce'] ?? 'test-nonce-aaaa');
 
         $recaptchaVerifier = new RecaptchaVerifier([
@@ -107,7 +113,7 @@ final class TestAppFactory
             'x_url'                 => $config['x_url'] ?? '#',
             'facebook_url'          => $config['facebook_url'] ?? '#',
             'instagram_url'         => $config['instagram_url'] ?? '#',
-            'whatsapp_url'          => $config['whatsapp_url'] ?? '#',
+            'whatsapp_url'          => $whatsappUrl,
         ], $recaptchaVerifier, $rateLimiter, $mailer, $leadLogger);
 
         $app = AppFactory::create();
