@@ -220,7 +220,7 @@ return [
         'address' => 'Atendimento presencial com horário agendado',
         'meta' => 'Consultas, check-ups e acompanhamento clínico',
         'emergency_note' => 'Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.',
-        'credit' => 'Desenvolvido por <a href="https://natalcode.com.br/" target="_blank" rel="noopener noreferrer">NatalCode</a> - Soluções Digitais',
+        'credit' => 'Desenvolvido por NatalCode - Soluções Digitais',
     ],
     'floating_whatsapp' => [
         'label' => 'WhatsApp',
