@@ -39,7 +39,7 @@ return [
         'lead' => 'Consultas veterinárias, vacinação, check-ups e acompanhamento com escuta atenta, agenda organizada e orientação clara para tutores.',
         'primary_cta' => [
             'label' => 'Agendar consulta',
-            'href' => '#form-orcamento',
+            'href' => '#cta',
             'icon' => 'arrow-right-short',
         ],
         'secondary_cta' => [

@@ -39,7 +39,7 @@ return [
         'lead' => 'Consultas pediátricas, puericultura e acompanhamento do desenvolvimento com orientação clara para responsáveis, rotina organizada e acolhimento desde o primeiro contato.',
         'primary_cta' => [
             'label' => 'Agendar consulta',
-            'href' => '#form-orcamento',
+            'href' => '#cta',
             'icon' => 'arrow-right-short',
         ],
         'secondary_cta' => [

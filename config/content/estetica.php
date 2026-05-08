@@ -39,7 +39,7 @@ return [
         'lead' => 'Avaliação estética facial e corporal com direção cuidadosa, planejamento individual e acompanhamento consultivo para construir resultados coerentes com seu estilo, ritmo e objetivo.',
         'primary_cta' => [
             'label' => 'Agendar avaliação',
-            'href' => '#form-orcamento',
+            'href' => '#cta',
             'icon' => 'arrow-right-short',
         ],
         'secondary_cta' => [

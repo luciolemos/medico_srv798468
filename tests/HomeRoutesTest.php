@@ -166,6 +166,8 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Cuidado médico', $html);
         self::assertStringContainsString('Serviços da clínica', $html);
         self::assertStringContainsString('Desenvolvido por <a href="https://natalcode.com.br/" target="_blank" rel="noopener noreferrer">NatalCode</a> - Soluções Digitais', $html);
+        self::assertStringContainsString('href="#cta">Agendar</a>', $html);
+        self::assertStringNotContainsString('data-cta-id="nav_schedule"', $html);
         self::assertStringNotContainsString('id="copyModeToggle"', $html);
         self::assertStringNotContainsString('id="paletteFabToggle"', $html);
         self::assertStringNotContainsString('data-palette-btn="red"', $html);
