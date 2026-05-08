@@ -83,6 +83,8 @@ final class HomeRoutesTest extends TestCase
         self::assertSame('SAMEORIGIN', $response->getHeaderLine('X-Frame-Options'));
         self::assertSame('strict-origin-when-cross-origin', $response->getHeaderLine('Referrer-Policy'));
         self::assertStringContainsString('geolocation=()', $response->getHeaderLine('Permissions-Policy'));
+        self::assertStringContainsString('https://maps.google.com/', $response->getHeaderLine('Content-Security-Policy'));
+        self::assertStringContainsString('https://www.google.com/maps/', $response->getHeaderLine('Content-Security-Policy'));
     }
 
     public function testHomeRendersStructuredSeoMetadata(): void

@@ -55,7 +55,8 @@ final class SecurityHeadersMiddleware implements MiddlewareInterface
             "img-src 'self' data: https:",
             "connect-src 'self' https://www.google.com/recaptcha/",
             "font-src 'self'",
-            "frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/",
+            // Permite embeds necessários (reCAPTCHA e Google Maps)
+            "frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://www.google.com/maps/ https://maps.google.com/",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",

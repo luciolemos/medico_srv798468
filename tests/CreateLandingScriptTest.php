@@ -69,6 +69,8 @@ final class CreateLandingScriptTest extends TestCase
         self::assertStringContainsString('location-map-banner', (string) file_get_contents($target . '/public/assets/css/landing.css'));
         self::assertStringContainsString("'location' => [", (string) file_get_contents($target . '/config/content/landing.php'));
         self::assertStringContainsString("'map_embed_url' => 'https://maps.google.com/maps?", (string) file_get_contents($target . '/config/content/landing.php'));
+        self::assertStringContainsString('https://maps.google.com/', (string) file_get_contents($target . '/src/Middleware/SecurityHeadersMiddleware.php'));
+        self::assertStringContainsString('https://www.google.com/maps/', (string) file_get_contents($target . '/src/Middleware/SecurityHeadersMiddleware.php'));
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-640.webp');
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-mobile-640.webp');
         self::assertFileExists($target . '/public/assets/img/social/odontologia-og.jpg');
