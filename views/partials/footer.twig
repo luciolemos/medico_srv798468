@@ -38,7 +38,7 @@
       <span>© <span id="year">{{ "now"|date("Y") }}</span> — Todos os direitos reservados</span>
 
       {% if footer_content.credit|default('') %}
-        <span class="footer-credit">{{ footer_content.credit }}</span>
+        <span class="footer-credit">{{ footer_content.credit|raw }}</span>
       {% endif %}
     </div>
   </div>
