@@ -197,11 +197,14 @@ rename_standard_assets() {
   move_or_remove_asset "$TARGET_DIR/public/assets/img/hero/medico-mobile-640.webp" "$TARGET_DIR/public/assets/img/hero/${SLUG}-mobile-640.webp"
   move_or_remove_asset "$TARGET_DIR/public/assets/img/social/medico-og.jpg" "$TARGET_DIR/public/assets/img/social/${SLUG}-og.jpg"
   move_or_remove_asset "$TARGET_DIR/public/assets/img/social/medico-og.webp" "$TARGET_DIR/public/assets/img/social/${SLUG}-og.webp"
+  move_or_remove_asset "$TARGET_DIR/public/assets/img/medico-mark.svg" "$TARGET_DIR/public/assets/img/${SLUG}-mark.svg"
+  rm -f "$TARGET_DIR/public/assets/img/clinic-mark.svg"
 
   if [[ -f "$content_file" ]]; then
     sed -i "s|assets/img/hero/medico-|assets/img/hero/$(sed_escape "$SLUG")-|g" "$content_file"
     sed -i "s|assets/img/social/medico-og.jpg|assets/img/social/$(sed_escape "$SLUG")-og.jpg|g" "$content_file"
     sed -i "s|assets/img/social/medico-og.webp|assets/img/social/$(sed_escape "$SLUG")-og.webp|g" "$content_file"
+    sed -i "s|assets/img/medico-mark.svg|assets/img/$(sed_escape "$SLUG")-mark.svg|g" "$content_file"
   fi
 }
 
@@ -242,6 +245,7 @@ prune_extra_niche_assets() {
     rm -f "$TARGET_DIR/public/assets/img/hero/${asset_slug}-mobile-640.webp"
     rm -f "$TARGET_DIR/public/assets/img/social/${asset_slug}-og.jpg"
     rm -f "$TARGET_DIR/public/assets/img/social/${asset_slug}-og.webp"
+    rm -f "$TARGET_DIR/public/assets/img/${asset_slug}-mark.svg"
   done < <(preset_slugs)
 }
 

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Clínica Pediátrica">
+  <rect width="64" height="64" rx="18" fill="#047857"/>
+  <circle cx="32" cy="28" r="17" fill="#ecfdf5"/>
+  <path fill="#047857" d="M22 29a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm20 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+  <path fill="none" stroke="#047857" stroke-linecap="round" stroke-width="4" d="M24 36c4.4 4.2 11.6 4.2 16 0"/>
+  <path fill="#a7f3d0" d="M16.8 23.5c1.2-8 7.7-13.9 15.2-13.9 7.6 0 14.1 5.9 15.2 13.9-4.7-3.9-9.5-5.9-15.2-5.9-5.7 0-10.5 2-15.2 5.9Z"/>
+</svg>

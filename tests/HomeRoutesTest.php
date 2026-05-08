@@ -60,9 +60,13 @@ final class HomeRoutesTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
         self::assertStringContainsString('<title>Clínica Médica | Root</title>', $html);
         self::assertStringContainsString('href="/assets/css/landing.css?v=', $html);
+        self::assertStringContainsString('href="/assets/img/medico-mark.svg"', $html);
+        self::assertStringContainsString('src="/assets/img/medico-mark.svg"', $html);
         self::assertStringContainsString('src="/assets/img/hero/medico-640.webp"', $html);
         self::assertStringContainsString('media="(max-width: 576px)"', $html);
         self::assertStringContainsString('/assets/img/hero/medico-mobile-640.webp', $html);
+        self::assertStringNotContainsString('assets/img/clinic-mark.svg', $html);
+        self::assertStringNotContainsString('assets/img/img_default_640.webp', $html);
         self::assertStringNotContainsString('//assets/', $html);
     }
 
@@ -106,6 +110,7 @@ final class HomeRoutesTest extends TestCase
         self::assertSame('https://schema.org', $structuredData['@context'] ?? null);
         self::assertSame('MedicalClinic', $structuredData['@graph'][0]['@type'] ?? null);
         self::assertSame('http://localhost/medico/', $structuredData['@graph'][0]['url'] ?? null);
+        self::assertSame('http://localhost/medico/assets/img/medico-mark.svg', $structuredData['@graph'][0]['logo'] ?? null);
         self::assertSame('+5584999031906', $structuredData['@graph'][0]['telephone'] ?? null);
         self::assertSame(['https://facebook.com/clinica-medica'], $structuredData['@graph'][0]['sameAs'] ?? []);
         self::assertSame('OfferCatalog', $structuredData['@graph'][0]['hasOfferCatalog']['@type'] ?? null);

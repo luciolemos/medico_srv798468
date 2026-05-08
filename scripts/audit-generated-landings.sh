@@ -109,16 +109,23 @@ for slug in "${SLUGS[@]}"; do
     "$target/public/assets/img/hero/${slug}-960.webp" \
     "$target/public/assets/img/hero/${slug}-1896.webp" \
     "$target/public/assets/img/hero/${slug}-mobile-640.webp" \
-    "$target/public/assets/img/social/${slug}-og.jpg"; do
+    "$target/public/assets/img/social/${slug}-og.jpg" \
+    "$target/public/assets/img/${slug}-mark.svg"; do
     [[ -f "$required" ]] || fail "asset obrigatório ausente para $slug: ${required#$target/}"
   done
+
+  if [[ "$slug" != "medico" ]]; then
+    ! rg -n "assets/img/hero/medico-|assets/img/social/medico-og|assets/img/medico-mark\\.svg|assets/img/clinic-mark\\.svg|assets/img/img_default_640\\.webp" \
+      "$target/config" "$target/views" "$target/src" >/tmp/landing-audit-stale.txt \
+      || fail "$slug contém fallback/asset stale: $(head -1 /tmp/landing-audit-stale.txt)"
+  fi
 
   for other_slug in "${ALL_PRESET_SLUGS[@]}"; do
     if [[ "$other_slug" == "$slug" ]]; then
       continue
     fi
 
-    leftover="$(find "$target/public/assets/img/hero" "$target/public/assets/img/social" -maxdepth 1 -type f -name "${other_slug}-*" -print -quit)"
+    leftover="$(find "$target/public/assets/img/hero" "$target/public/assets/img/social" "$target/public/assets/img" -maxdepth 1 -type f -name "${other_slug}-*" -print -quit)"
     [[ -z "$leftover" ]] || fail "$slug carregou asset de outro nicho: ${leftover#$target/}"
 
     leftover_content="$target/config/content/${other_slug}.php"

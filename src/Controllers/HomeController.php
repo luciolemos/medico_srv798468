@@ -66,6 +66,7 @@ final class HomeController
         return $this->twig->render($response, 'pages/home.twig', [
             'app_name' => $this->config['app_name'] ?? 'Clínica Médica',
             'app_mark' => $this->config['app_mark'] ?? 'M',
+            'app_slug' => $this->config['app_slug'] ?? 'medico',
             'page_title' => $this->config['page_title'] ?? null,
             'landing_content' => $landingContent,
             'seo_meta' => $seoMeta,
@@ -399,4 +400,3 @@ final class HomeController
         return substr($slug !== '' ? $slug : 'LANDING', 0, 6);
     }
 }
-
