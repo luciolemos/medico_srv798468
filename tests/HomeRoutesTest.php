@@ -83,6 +83,8 @@ final class HomeRoutesTest extends TestCase
         self::assertSame('SAMEORIGIN', $response->getHeaderLine('X-Frame-Options'));
         self::assertSame('strict-origin-when-cross-origin', $response->getHeaderLine('Referrer-Policy'));
         self::assertStringContainsString('geolocation=()', $response->getHeaderLine('Permissions-Policy'));
+        self::assertStringContainsString('https://maps.google.com/', $response->getHeaderLine('Content-Security-Policy'));
+        self::assertStringContainsString('https://www.google.com/maps/', $response->getHeaderLine('Content-Security-Policy'));
     }
 
     public function testHomeRendersStructuredSeoMetadata(): void
@@ -166,6 +168,8 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('Cuidado médico', $html);
         self::assertStringContainsString('Serviços da clínica', $html);
         self::assertStringContainsString('Desenvolvido por <a href="https://natalcode.com.br/" target="_blank" rel="noopener noreferrer">NatalCode</a> - Soluções Digitais', $html);
+        self::assertStringContainsString('href="#cta">Agendar</a>', $html);
+        self::assertStringNotContainsString('data-cta-id="nav_schedule"', $html);
         self::assertStringNotContainsString('id="copyModeToggle"', $html);
         self::assertStringNotContainsString('id="paletteFabToggle"', $html);
         self::assertStringNotContainsString('data-palette-btn="red"', $html);

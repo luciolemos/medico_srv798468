@@ -43,7 +43,7 @@ return [
         'lead' => 'Consultas clínicas, check-ups preventivos e acompanhamento contínuo com escuta atenta, agenda organizada e orientação clara para o próximo passo do cuidado.',
         'primary_cta' => [
             'label' => 'Agendar consulta',
-            'href' => '#form-orcamento',
+            'href' => '#cta',
             'icon' => 'arrow-right-short',
         ],
         'secondary_cta' => [
