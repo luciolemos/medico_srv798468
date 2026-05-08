@@ -73,6 +73,11 @@ final class CreateLandingScriptTest extends TestCase
         self::assertStringContainsString('assets/img/odontologia-mark.svg', (string) file_get_contents($target . '/config/content/odontologia.php'));
         self::assertStringNotContainsString('assets/img/clinic-mark.svg', (string) file_get_contents($target . '/views/base.twig'));
         self::assertStringNotContainsString('assets/img/hero/medico-640.webp', (string) file_get_contents($target . '/views/pages/home.twig'));
+        $landingCss = (string) file_get_contents($target . '/public/assets/css/landing.css');
+        self::assertStringContainsString('min-width: 2.1rem;', $landingCss);
+        self::assertStringContainsString('aspect-ratio: 1 / 1;', $landingCss);
+        self::assertStringContainsString('border-radius: 999px;', $landingCss);
+        self::assertStringNotContainsString('width: 28px;', $landingCss);
 
         $validateCommand = escapeshellarg(PHP_BINARY)
             . ' ' . escapeshellarg($target . '/scripts/validate-landing-content.php')
