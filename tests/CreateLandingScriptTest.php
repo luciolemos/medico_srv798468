@@ -63,6 +63,10 @@ final class CreateLandingScriptTest extends TestCase
         self::assertStringContainsString('APP_WHATSAPP_MESSAGE="Oi! Quero conversar sobre o projeto de uma landing page com a NatalCode."', (string) file_get_contents($target . '/.env'));
         self::assertStringContainsString('Desenvolvido por <a href="https://natalcode.com.br/" target="_blank" rel="noopener noreferrer">NatalCode</a> - Soluções Digitais', (string) file_get_contents($target . '/config/content/landing.php'));
         self::assertStringContainsString('footer_content.credit|raw', (string) file_get_contents($target . '/views/partials/footer.twig'));
+        self::assertStringContainsString('location-map-banner', (string) file_get_contents($target . '/views/pages/home.twig'));
+        self::assertStringContainsString('location-map-banner', (string) file_get_contents($target . '/public/assets/css/landing.css'));
+        self::assertStringContainsString("'location' => [", (string) file_get_contents($target . '/config/content/landing.php'));
+        self::assertStringContainsString("'map_embed_url' => 'https://maps.google.com/maps?", (string) file_get_contents($target . '/config/content/landing.php'));
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-640.webp');
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-mobile-640.webp');
         self::assertFileExists($target . '/public/assets/img/social/odontologia-og.jpg');

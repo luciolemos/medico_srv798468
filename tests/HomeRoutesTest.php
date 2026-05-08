@@ -322,6 +322,7 @@ final class HomeRoutesTest extends TestCase
         self::assertStringContainsString('id="features"', $html);
         self::assertStringContainsString('id="how"', $html);
         self::assertStringContainsString('id="estrutura"', $html);
+        self::assertStringContainsString('id="localizacao"', $html);
         self::assertStringContainsString('id="cta"', $html);
         self::assertStringContainsString('id="form-orcamento"', $html);
         self::assertStringContainsString('id="faq"', $html);

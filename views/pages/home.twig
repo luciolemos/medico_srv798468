@@ -273,6 +273,70 @@
   </div>
 </section>
 
+{# Localização: seção com mapa em banner e informações compactas #}
+{% set location = content.location|default({}) %}
+{% if location.map_embed_url|default('') %}
+<section id="localizacao" class="py-5 py-lg-6 section-tech">
+  <div class="container">
+    <div class="text-center mb-4 mb-lg-5 section-heading">
+      <h2 class="fw-bold">{{ location.title|default('Localização') }}</h2>
+      {% if location.description|default(location.address|default('')) %}
+      <p class="text-secondary-emphasis mb-0">{{ location.description|default(location.address) }}</p>
+      {% endif %}
+    </div>
+
+    <div class="location-summary">
+      {% if location.eyebrow|default('') %}
+      <div class="location-summary-main glass">
+        <span class="location-eyebrow"><i class="bi bi-geo-alt"></i>{{ location.eyebrow }}</span>
+        <strong>{{ location.address|default('Atendimento com hora marcada') }}</strong>
+      </div>
+      {% endif %}
+
+      {% for item in location.details|default([]) %}
+      <div class="location-detail glass">
+        <span class="location-detail-icon" aria-hidden="true">
+          <i class="bi bi-{{ item.icon|default('check2-circle') }}"></i>
+        </span>
+        <span>{{ item.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="location-map-banner glass">
+      <div class="location-map-bar">
+        <span><i class="bi bi-map"></i> {{ location.map_title|default('Localização da clínica') }}</span>
+        <span>{{ location.map_subtitle|default(location.address|default('Atendimento com hora marcada')) }}</span>
+      </div>
+      <iframe
+        src="{{ location.map_embed_url }}"
+        title="{{ location.iframe_title|default('Mapa de localização') }}"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        allowfullscreen
+      ></iframe>
+    </div>
+
+    <div class="location-actions">
+      {% if location.note|default('') %}
+      <p class="location-note">{{ location.note }}</p>
+      {% endif %}
+
+      <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+        <a class="btn btn-primary cta-track" href="#cta" data-cta-id="location_primary">
+          {{ location.primary_label|default('Solicitar agendamento') }} <i class="bi bi-arrow-right-short"></i>
+        </a>
+        {% if location.map_link|default('') %}
+        <a class="btn btn-outline-light" href="{{ location.map_link }}" target="_blank" rel="noopener">
+          {{ location.secondary_label|default('Abrir no Google Maps') }} <i class="bi bi-box-arrow-up-right ms-1"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
 <section id="cta" class="py-5 py-lg-6 section-tech">
   <div class="container">
     <div class="text-center mb-4 mb-lg-5 section-heading">
