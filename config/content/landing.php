@@ -216,7 +216,7 @@ return [
         ],
     ],
     'footer' => [
-        'label' => 'Clínica médica',
+        'label' => 'Clínica Médica',
         'address' => 'Atendimento presencial com horário agendado',
         'meta' => 'Consultas, check-ups e acompanhamento clínico',
         'emergency_note' => 'Atendimento eletivo. Em caso de urgência ou emergência, procure o pronto atendimento mais próximo.',
