@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% set typography = landing_content.typography|default({}) %}
 {% set typography_profile = typography.profile|default('clinical') %}
+{% set app_logo = landing_content.seo.schema.logo|default('assets/img/' ~ app_slug|default('medico') ~ '-mark.svg') %}
 <html lang="pt-br" data-theme="dark" data-typography="{{ typography_profile|e('html_attr') }}" data-niche="{{ app_slug|default('landing')|e('html_attr') }}">
 <head>
   {% set meta = seo_meta|default({}) %}
@@ -58,9 +59,9 @@
   })();
   </script>
 
-  <link rel="icon" href="{{ base_url }}/assets/img/clinic-mark.svg">
-  <link rel="shortcut icon" href="{{ base_url }}/assets/img/clinic-mark.svg">
-  <link rel="apple-touch-icon" href="{{ base_url }}/assets/img/clinic-mark.svg">
+  <link rel="icon" href="{{ base_url }}/{{ app_logo }}">
+  <link rel="shortcut icon" href="{{ base_url }}/{{ app_logo }}">
+  <link rel="apple-touch-icon" href="{{ base_url }}/{{ app_logo }}">
 
   {# ==============================
      CSS — LIBS

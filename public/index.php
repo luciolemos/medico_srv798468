@@ -127,14 +127,15 @@ try {
 
 $twig = Twig::create(__DIR__ . '/../views', [
     'cache'       => $twigCache,
-    // In production the cache is versioned per deploy; auto_reload is only
-    // needed in local dev to avoid manual cache clears after template edits.
-    'auto_reload' => $isDev,
+    // Keep cached templates fresh after Git/Hostinger deploys where cache
+    // cleanup is not guaranteed to run.
+    'auto_reload' => true,
 ]);
 $twig->getEnvironment()->addGlobal('base_url', $base);
 $twig->getEnvironment()->addGlobal('app_env', $_ENV['APP_ENV'] ?? 'production');
 $twig->getEnvironment()->addGlobal('app_name', $_ENV['APP_NAME'] ?? 'Clínica Médica');
 $twig->getEnvironment()->addGlobal('app_mark', $_ENV['APP_MARK'] ?? 'M');
+$twig->getEnvironment()->addGlobal('app_slug', $_ENV['APP_SLUG'] ?? 'medico');
 $twig->getEnvironment()->addGlobal('app_badge', $_ENV['APP_BADGE'] ?? ($landingContent['nav']['badge'] ?? 'Clínica Médica'));
 $twig->getEnvironment()->addGlobal('app_palette', $_ENV['APP_PALETTE'] ?? 'blue');
 $twig->getEnvironment()->addGlobal('landing_content', $landingContent);

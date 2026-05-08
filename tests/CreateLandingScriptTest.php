@@ -64,9 +64,15 @@ final class CreateLandingScriptTest extends TestCase
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-640.webp');
         self::assertFileExists($target . '/public/assets/img/hero/odontologia-mobile-640.webp');
         self::assertFileExists($target . '/public/assets/img/social/odontologia-og.jpg');
+        self::assertFileExists($target . '/public/assets/img/odontologia-mark.svg');
         self::assertFileDoesNotExist($target . '/public/assets/img/hero/medico-640.webp');
+        self::assertFileDoesNotExist($target . '/public/assets/img/medico-mark.svg');
+        self::assertFileDoesNotExist($target . '/public/assets/img/clinic-mark.svg');
         self::assertFileDoesNotExist($target . '/public/assets/img/hero/pediatria-640.webp');
         self::assertFileDoesNotExist($target . '/public/assets/img/hero/veterinaria-640.webp');
+        self::assertStringContainsString('assets/img/odontologia-mark.svg', (string) file_get_contents($target . '/config/content/odontologia.php'));
+        self::assertStringNotContainsString('assets/img/clinic-mark.svg', (string) file_get_contents($target . '/views/base.twig'));
+        self::assertStringNotContainsString('assets/img/hero/medico-640.webp', (string) file_get_contents($target . '/views/pages/home.twig'));
 
         $validateCommand = escapeshellarg(PHP_BINARY)
             . ' ' . escapeshellarg($target . '/scripts/validate-landing-content.php')

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Clínica de Estética">
+  <rect width="64" height="64" rx="18" fill="#7c3aed"/>
+  <path fill="#f5f3ff" d="m32 10 7.3 14.7L55.5 27 43.8 38.4 46.6 54 32 46.3 17.4 54l2.8-15.6L8.5 27l16.2-2.3L32 10Z"/>
+  <path fill="#7c3aed" d="m32 22 3.2 6.5 7.2 1-5.2 5.1 1.2 7.1-6.4-3.4-6.4 3.4 1.2-7.1-5.2-5.1 7.2-1L32 22Z"/>
+</svg>

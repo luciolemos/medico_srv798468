@@ -5,7 +5,8 @@
 {% set hero = content.hero|default({}) %}
 {% set hero_image = hero.image|default({}) %}
 {% set hero_sources = hero_image.sources|default([]) %}
-{% set hero_image_src = hero_image.src|default('assets/img/hero/medico-640.webp') %}
+{% set hero_fallback_slug = app_slug|default('medico') %}
+{% set hero_image_src = hero_image.src|default('assets/img/hero/' ~ hero_fallback_slug ~ '-640.webp') %}
 {% set hero_image_sizes = hero_image.sizes|default('(max-width: 768px) 92vw, (max-width: 1200px) 44vw, 840px') %}
 {% set hero_mobile = hero_image.mobile|default({}) %}
 {% set hero_mobile_sources = hero_mobile.sources|default([]) %}

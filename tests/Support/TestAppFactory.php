@@ -38,6 +38,7 @@ final class TestAppFactory
         $twig->getEnvironment()->addGlobal('app_env', 'test');
         $twig->getEnvironment()->addGlobal('app_name', $config['app_name'] ?? 'Clínica Médica');
         $twig->getEnvironment()->addGlobal('app_mark', $config['app_mark'] ?? 'M');
+        $twig->getEnvironment()->addGlobal('app_slug', $config['app_slug'] ?? 'medico');
         $twig->getEnvironment()->addGlobal('app_badge', $config['app_badge'] ?? ($landingContent['nav']['badge'] ?? 'Clínica médica'));
         $twig->getEnvironment()->addGlobal('app_palette', $config['palette'] ?? 'blue');
         $twig->getEnvironment()->addGlobal('landing_content', $landingContent);

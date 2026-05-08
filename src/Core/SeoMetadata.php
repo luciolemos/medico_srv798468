@@ -22,7 +22,7 @@ final class SeoMetadata
             $seo['description'] ?? null,
             'Atendimento com hora marcada, equipe organizada e retorno claro.'
         );
-        $imageSrc = $this->firstNonEmpty($image['src'] ?? null, 'assets/img/social/medico-og.jpg');
+        $imageSrc = $this->firstNonEmpty($image['src'] ?? null, 'assets/img/social/' . $this->slug() . '-og.jpg');
 
         return [
             'title' => $this->firstNonEmpty(
@@ -62,7 +62,7 @@ final class SeoMetadata
             'image' => $meta['image']['url'] ?? '',
         ];
 
-        $logo = $this->firstNonEmpty($schema['logo'] ?? null, 'assets/img/clinic-mark.svg');
+        $logo = $this->firstNonEmpty($schema['logo'] ?? null, 'assets/img/' . $this->slug() . '-mark.svg');
         if ($logo !== '') {
             $business['logo'] = $this->absolutePublicUrl($logo);
         }
@@ -148,6 +148,12 @@ final class SeoMetadata
             'name' => $this->firstNonEmpty($this->arrayValue($this->content['services'] ?? [])['title'] ?? null, 'Serviços'),
             'itemListElement' => $items,
         ];
+    }
+
+    private function slug(): string
+    {
+        $slug = strtolower(trim((string) ($this->config['app_slug'] ?? '')));
+        return preg_match('/^[a-z0-9][a-z0-9-]*$/', $slug) === 1 ? $slug : 'medico';
     }
 
     private function faqStructuredData(string $canonicalUrl): array

@@ -15,6 +15,7 @@ return [
         ],
         'schema' => [
             'type' => 'MedicalClinic',
+            'logo' => 'assets/img/pediatria-mark.svg',
             'area_served' => 'Natal e região',
             'include_services' => true,
             'include_faq' => true,
