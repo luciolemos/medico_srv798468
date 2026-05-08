@@ -978,15 +978,21 @@ html.fx-ready .hero-media img {
 }
 
 .step-num {
-  width: 28px;
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
+  min-width: 2.1rem;
+  min-height: 2.1rem;
+  width: auto;
+  height: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  border-radius: 999px;
   border: 1px solid rgba(var(--gradA), 0.45);
   background: rgba(var(--gradA), 0.16);
   color: rgba(206, 239, 255, 0.95);
   font-weight: 700;
+  padding: 0.35rem;
 }
 
 .checklist {
