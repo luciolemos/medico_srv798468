@@ -219,11 +219,6 @@
     const fromUrl = getPaletteFromUrl();
     if (fromUrl) {
       activePalette = fromUrl;
-    } else {
-      try {
-        const saved = localStorage.getItem("palette");
-        if (isValidPalette(saved || "")) activePalette = saved;
-      } catch (e) {}
     }
     applyPalette(activePalette);
     persistPaletteCookie(activePalette);

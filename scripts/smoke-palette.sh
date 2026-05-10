@@ -126,11 +126,11 @@ html_q_blue_cookie_emerald="$(request_html "${BASE_URL}?palette=blue" "$cookie_e
 p_q_blue_cookie_emerald="$(extract_palette_from_html "$html_q_blue_cookie_emerald")"
 assert_palette "query sobre cookie" "$p_q_blue_cookie_emerald" "blue" || failures=$((failures + 1))
 
-# 3) Cookie deve prevalecer sem query
+# 3) Sem query, default SSR deve prevalecer sobre cookie
 curl -sS -L --max-time "$TIMEOUT" -c "$cookie_red" "${BASE_URL}?palette=red" >/dev/null
 html_cookie_red="$(request_html "$BASE_URL" "$cookie_red")"
 p_cookie_red="$(extract_palette_from_html "$html_cookie_red")"
-assert_palette "cookie sem query" "$p_cookie_red" "red" || failures=$((failures + 1))
+assert_palette "default sobre cookie" "$p_cookie_red" "$DEFAULT_PALETTE" || failures=$((failures + 1))
 
 # 4) Query invalida deve cair no default SSR esperado
 html_q_invalid="$(request_html "${BASE_URL}?palette=invalida")"
