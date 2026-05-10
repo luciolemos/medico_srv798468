@@ -44,10 +44,10 @@ final class HomeController
 
         if (in_array($paletteFromQuery, self::ALLOWED_PALETTES, true)) {
             $palette = $paletteFromQuery;
-        } elseif (in_array($paletteFromCookie, self::ALLOWED_PALETTES, true)) {
-            $palette = $paletteFromCookie;
         } elseif (in_array($paletteFromConfig, self::ALLOWED_PALETTES, true)) {
             $palette = $paletteFromConfig;
+        } elseif (in_array($paletteFromCookie, self::ALLOWED_PALETTES, true)) {
+            $palette = $paletteFromCookie;
         } else {
             $palette = 'blue';
         }
