@@ -470,7 +470,7 @@
           </div>
         </div>
 
-        <div class="col-12 form-step d-none" data-form-step="2">
+        <div class="col-12 form-step" data-form-step="2">
           <div class="row g-3">
             <div class="col-12" data-step-field="2">
               <label class="form-label text-secondary-emphasis" for="cta-mensagem">{{ form_fields.message_label|default('Motivo da consulta') }}</label>
@@ -485,7 +485,10 @@
                 <div class="row g-3 mt-1">
                   <div class="col-12">
                     <label class="form-label text-secondary-emphasis" for="cta-empresa">{{ form_fields.optional_label|default('Convênio / observações') }}</label>
-                    <input class="form-control form-control-lg" type="text" id="cta-empresa" name="empresa" value="{{ form_data.empresa|e }}">
+                    <input class="form-control form-control-lg{{ form_errors.empresa is defined ? ' is-invalid' : '' }}" type="text" id="cta-empresa" name="empresa" value="{{ form_data.empresa|e }}">
+                    {% if form_errors.empresa is defined %}
+                      <div class="invalid-feedback d-block">{{ form_errors_copy.optional|default('Use no máximo 120 caracteres neste campo.') }}</div>
+                    {% endif %}
                   </div>
                 </div>
               </details>
@@ -497,7 +500,7 @@
           <button class="btn btn-outline-light btn-lg px-4 d-none" type="button" id="leadFormPrev">{{ form_buttons.previous|default('Voltar') }}</button>
           <div class="ms-sm-auto d-flex gap-2">
             <button class="btn btn-outline-light btn-lg px-4" type="button" id="leadFormNext">{{ form_buttons.next|default('Próximo') }}</button>
-            <button class="btn btn-primary btn-lg px-4 btn-submit-email cta-track d-none" type="submit" id="leadFormSubmit" data-cta-id="form_submit">
+            <button class="btn btn-primary btn-lg px-4 btn-submit-email cta-track" type="submit" id="leadFormSubmit" data-cta-id="form_submit">
               {{ form_buttons.submit|default('Enviar solicitação') }} <i class="bi bi-envelope ms-1"></i>
             </button>
           </div>

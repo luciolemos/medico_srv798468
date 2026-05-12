@@ -62,7 +62,8 @@ final class CreateLandingScriptTest extends TestCase
         self::assertStringContainsString('APP_WHATSAPP_NUMBER="5584996360721"', (string) file_get_contents($target . '/.env'));
         self::assertStringContainsString('APP_WHATSAPP_MESSAGE="Oi! Quero conversar sobre o projeto de uma landing page com a NatalCode."', (string) file_get_contents($target . '/.env'));
         self::assertStringContainsString('Desenvolvido por <a href="https://natalcode.com.br/" target="_blank" rel="noopener noreferrer">NatalCode</a> - Soluções Digitais', (string) file_get_contents($target . '/config/content/landing.php'));
-        self::assertStringContainsString('footer_content.credit|raw', (string) file_get_contents($target . '/views/partials/footer.twig'));
+        self::assertStringNotContainsString('footer_content.credit|raw', (string) file_get_contents($target . '/views/partials/footer.twig'));
+        self::assertStringContainsString('footer_content.credit }}</span>', (string) file_get_contents($target . '/views/partials/footer.twig'));
         self::assertStringContainsString("'href' => '#cta'", (string) file_get_contents($target . '/config/content/landing.php'));
         self::assertStringNotContainsString('data-cta-id="nav_schedule"', (string) file_get_contents($target . '/views/partials/navbar.twig'));
         self::assertStringContainsString('location-map-banner', (string) file_get_contents($target . '/views/pages/home.twig'));

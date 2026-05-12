@@ -46,17 +46,20 @@ final class SecurityHeadersMiddleware implements MiddlewareInterface
     {
         $noncePart = $this->cspNonce !== ''
             ? " 'nonce-{$this->cspNonce}'"
-            : " 'unsafe-inline'";
+            : '';
 
         return implode('; ', [
             "default-src 'self'",
             "script-src 'self'{$noncePart} https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
-            "style-src 'self' 'unsafe-inline'",
+            "style-src 'self'",
+            "style-src-elem 'self'",
+            "style-src-attr 'none'",
             "img-src 'self' data: https:",
             "connect-src 'self' https://www.google.com/recaptcha/",
             "font-src 'self'",
             // Permite embeds necessários (reCAPTCHA e Google Maps)
             "frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com/ https://www.google.com/maps/ https://maps.google.com/",
+            "frame-ancestors 'self'",
             "object-src 'none'",
             "base-uri 'self'",
             "form-action 'self'",

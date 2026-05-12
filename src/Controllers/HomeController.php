@@ -256,8 +256,57 @@ final class HomeController
 
     private function resolveClientIp(): string
     {
-        $ip = trim((string) ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
-        return $ip !== '' ? $ip : 'unknown';
+        $remoteAddr = trim((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
+        $trustedProxies = $this->trustedProxies();
+
+        if ($remoteAddr !== '' && in_array($remoteAddr, $trustedProxies, true)) {
+            $candidates = [
+                trim((string) ($_SERVER['HTTP_CF_CONNECTING_IP'] ?? '')),
+                trim((string) ($_SERVER['HTTP_X_REAL_IP'] ?? '')),
+            ];
+
+            $forwardedFor = trim((string) ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? ''));
+            if ($forwardedFor !== '') {
+                $parts = explode(',', $forwardedFor);
+                $first = trim((string) ($parts[0] ?? ''));
+                if ($first !== '') {
+                    $candidates[] = $first;
+                }
+            }
+
+            foreach ($candidates as $candidate) {
+                if ($this->isValidIp($candidate)) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $this->isValidIp($remoteAddr) ? $remoteAddr : 'unknown';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function trustedProxies(): array
+    {
+        $raw = $this->config['trusted_proxies'] ?? [];
+        if (!is_array($raw)) {
+            return [];
+        }
+
+        $valid = [];
+        foreach ($raw as $ip) {
+            if (is_string($ip) && $this->isValidIp($ip)) {
+                $valid[] = $ip;
+            }
+        }
+
+        return array_values(array_unique($valid));
+    }
+
+    private function isValidIp(string $value): bool
+    {
+        return $value !== '' && filter_var($value, FILTER_VALIDATE_IP) !== false;
     }
 
     private function setFormFlash(array $status, ?array $data = null, ?array $errors = null): void
@@ -343,9 +392,15 @@ final class HomeController
 
     private function resolveOrigin(): string
     {
+        $publicOrigin = trim((string) ($this->config['public_origin'] ?? ''));
+        if ($publicOrigin !== '') {
+            return rtrim($publicOrigin, '/');
+        }
+
         $forwardedProto = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
         $scheme = $forwardedProto === 'https' || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $configuredHost = trim((string) ($this->config['public_host'] ?? ''));
+        $host = $configuredHost !== '' ? $configuredHost : (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
         $base = rtrim((string) ($this->config['base_url'] ?? ''), '/');
         return $scheme . '://' . $host . ($base !== '' ? $base : '');
     }
