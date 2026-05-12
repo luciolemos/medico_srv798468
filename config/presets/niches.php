@@ -57,4 +57,13 @@ return [
         'request_prefix' => 'PSI',
         'tone' => 'Calmo, reservado, empático e claro.',
     ],
+    'nutricao' => [
+        'name' => 'Clínica de Nutrição',
+        'mark' => 'N',
+        'palette' => 'emerald',
+        'typography' => 'family',
+        'schema_type' => 'MedicalBusiness',
+        'request_prefix' => 'NUT',
+        'tone' => 'Acolhedor, educativo, objetivo e orientado a rotina.',
+    ],
 ];

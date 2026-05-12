@@ -117,8 +117,14 @@ final class ContactMailer implements MailerInterface
             return $from;
         }
 
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $configuredHost = trim((string) ($this->config['public_host'] ?? ''));
+        $host = $configuredHost !== '' ? $configuredHost : (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
         $host = preg_replace('/:\d+$/', '', (string) $host) ?? 'localhost';
+        $host = preg_replace('/[^A-Za-z0-9.-]/', '', $host) ?? 'localhost';
+        if ($host === '' || $host === '.' || $host === '-') {
+            $host = 'localhost';
+        }
+
         return 'no-reply@' . $host;
     }
 

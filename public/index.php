@@ -91,6 +91,19 @@ $showPaletteSelector = filter_var($_ENV['APP_SHOW_PALETTE_SELECTOR'] ?? false, F
 $recaptchaEnabled = filter_var($_ENV['RECAPTCHA_ENABLED'] ?? false, FILTER_VALIDATE_BOOLEAN);
 $recaptchaSiteKey = trim((string) ($_ENV['RECAPTCHA_SITE_KEY'] ?? ''));
 $recaptchaAction = trim((string) ($_ENV['RECAPTCHA_ACTION'] ?? 'contact_submit'));
+$trustedProxiesRaw = trim((string) ($_ENV['TRUSTED_PROXIES'] ?? ''));
+$trustedProxies = [];
+if ($trustedProxiesRaw !== '') {
+    $parts = preg_split('/[\s,]+/', $trustedProxiesRaw) ?: [];
+    foreach ($parts as $proxy) {
+        $proxy = trim($proxy);
+        if ($proxy === '' || filter_var($proxy, FILTER_VALIDATE_IP) === false) {
+            continue;
+        }
+        $trustedProxies[] = $proxy;
+    }
+    $trustedProxies = array_values(array_unique($trustedProxies));
+}
 $twigCache = $isDev ? false : __DIR__ . '/../storage/cache/twig';
 if ($twigCache !== false) {
     if (!is_dir($twigCache)) {
@@ -118,6 +131,29 @@ $whatsappUrl = WhatsappLink::fromConfig([
     'app_whatsapp_message' => $_ENV['APP_WHATSAPP_MESSAGE'] ?? '',
     'whatsapp_url' => $_ENV['WHATSAPP_URL'] ?? '',
 ]);
+
+$canonicalUrl = trim((string) ($_ENV['APP_CANONICAL_URL'] ?? ''));
+$publicOrigin = '';
+$publicHost = '';
+if ($canonicalUrl !== '') {
+    $parsedCanonical = parse_url($canonicalUrl);
+    if (is_array($parsedCanonical)) {
+        $canonicalScheme = strtolower((string) ($parsedCanonical['scheme'] ?? ''));
+        $canonicalHost = strtolower((string) ($parsedCanonical['host'] ?? ''));
+        $canonicalPort = isset($parsedCanonical['port']) ? (int) $parsedCanonical['port'] : null;
+        if (
+            in_array($canonicalScheme, ['http', 'https'], true)
+            && $canonicalHost !== ''
+            && preg_match('/^[a-z0-9.-]+$/', $canonicalHost) === 1
+        ) {
+            $publicHost = $canonicalHost;
+            if ($canonicalPort !== null && $canonicalPort > 0) {
+                $publicHost .= ':' . $canonicalPort;
+            }
+            $publicOrigin = $canonicalScheme . '://' . $publicHost;
+        }
+    }
+}
 
 try {
     $cspNonce = base64_encode(random_bytes(16));
@@ -181,6 +217,7 @@ $mailerInner = new ContactMailer([
     'smtp_encryption' => $_ENV['SMTP_ENCRYPTION'] ?? 'tls',
     'smtp_auth'       => ($_ENV['SMTP_AUTH'] ?? 'true') !== 'false',
     'smtp_timeout'    => (int) ($_ENV['SMTP_TIMEOUT'] ?? 15),
+    'public_host'     => $publicHost,
 ]);
 $mailAsync = filter_var($_ENV['MAIL_ASYNC'] ?? false, FILTER_VALIDATE_BOOLEAN);
 $mailer = $mailAsync ? new AsyncMailer($mailerInner) : $mailerInner;
@@ -205,6 +242,9 @@ $controller = new HomeController($twig, [
     'palette'              => $_ENV['APP_PALETTE'] ?? 'blue',
     'show_palette_selector' => $showPaletteSelector,
     'base_url'             => $base,
+    'public_origin'        => $publicOrigin,
+    'public_host'          => $publicHost,
+    'trusted_proxies'      => $trustedProxies,
     'contact_to'           => $_ENV['CONTACT_TO'] ?? null,
     'x_url'                => $_ENV['X_URL'] ?? '#',
     'facebook_url'         => $_ENV['FACEBOOK_URL'] ?? '#',
