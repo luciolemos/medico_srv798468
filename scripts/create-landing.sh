@@ -17,6 +17,7 @@ APP_PALETTE=""
 REQUEST_PREFIX=""
 DRY_RUN=0
 LIST_PRESETS=0
+RUN_VERIFY=1
 
 usage() {
   cat <<'USAGE'
@@ -32,6 +33,7 @@ Options:
   --palette VALUE          Paleta inicial: blue, red, emerald, amber ou violet. Default: preset do nicho ou blue
   --request-prefix VALUE   Prefixo de protocolo, por exemplo PED, VET, ODO. Default: preset do nicho ou slug em maiúsculas
   --list-presets           Lista os presets cadastrados e o conteúdo ativo esperado
+  --no-verify              Não executa validação strict automática após gerar
   --dry-run                Mostra o que seria feito sem copiar arquivos
   --help                   Mostra esta ajuda
 
@@ -217,6 +219,39 @@ resolve_content_file() {
   printf 'landing'
 }
 
+source_has_slug_content() {
+  [[ -f "$SOURCE_ROOT/config/content/${SLUG}.php" ]]
+}
+
+required_slug_assets() {
+  cat <<EOF
+public/assets/img/hero/${SLUG}-640.webp
+public/assets/img/hero/${SLUG}-960.webp
+public/assets/img/hero/${SLUG}-1896.webp
+public/assets/img/hero/${SLUG}-mobile-640.webp
+public/assets/img/social/${SLUG}-og.jpg
+public/assets/img/${SLUG}-mark.svg
+EOF
+}
+
+ensure_slug_assets_exist_in_source() {
+  local missing=0
+  local rel
+
+  while IFS= read -r rel; do
+    [[ -n "$rel" ]] || continue
+    if [[ ! -f "$SOURCE_ROOT/$rel" ]]; then
+      echo "[error] asset obrigatório ausente para slug com conteúdo próprio: $rel" >&2
+      missing=1
+    fi
+  done < <(required_slug_assets)
+
+  if [[ "$missing" -eq 1 ]]; then
+    echo "[error] crie os assets acima (ou remova config/content/${SLUG}.php para usar fallback landing) e rode novamente." >&2
+    exit 1
+  fi
+}
+
 prune_extra_niche_content() {
   local file
   local content_name
@@ -283,6 +318,10 @@ while [[ $# -gt 0 ]]; do
       DRY_RUN=1
       shift
       ;;
+    --no-verify)
+      RUN_VERIFY=0
+      shift
+      ;;
     --help|-h)
       usage
       exit 0
@@ -323,6 +362,10 @@ fi
 if [[ -z "$APP_PALETTE" ]]; then
   APP_PALETTE="$(preset_value palette)"
   APP_PALETTE="${APP_PALETTE:-blue}"
+fi
+
+if source_has_slug_content; then
+  ensure_slug_assets_exist_in_source
 fi
 
 if ! is_allowed_palette "$APP_PALETTE"; then
@@ -411,6 +454,15 @@ set_env_value "$TARGET_DIR/.env" "APP_PALETTE" "$APP_PALETTE"
 printf '# slug=palette\n%s=%s\n' "$SLUG" "$APP_PALETTE" > "$TARGET_DIR/palettes.map"
 
 echo "[ok  ] landing criada em $TARGET_DIR"
+if [[ "$RUN_VERIFY" -eq 1 ]]; then
+  verify_cmd=(php "$TARGET_DIR/scripts/validate-landing-content.php" --project-root "$TARGET_DIR" --content "$CONTENT_FILE" --slug "$SLUG" --strict)
+  if "${verify_cmd[@]}" >/dev/null; then
+    echo "[ok  ] validação strict automática passou (${CONTENT_FILE})"
+  else
+    echo "[error] validação strict automática falhou: ${verify_cmd[*]}" >&2
+    exit 1
+  fi
+fi
 echo "[next] cd $TARGET_DIR && composer install --no-dev --optimize-autoloader"
 echo "[next] sudo chown -R www-data:www-data $TARGET_DIR/storage"
 echo "[next] php scripts/validate-landing-content.php --content ${CONTENT_FILE} --slug ${SLUG} --strict"
